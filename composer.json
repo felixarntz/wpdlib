@@ -1,0 +1,27 @@
+{
+  "name": "felixarntz/wpdlib",
+  "description": "Common library for Definitely plugins for WordPress",
+  "version": "0.5.0",
+  "license": "GPL-2.0",
+  "keywords": [
+    "wordpress", "library", "developer", "backend", "definitely"
+  ],
+  "homepage": "https://github.com/felixarntz/wpdlib/",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "felix-arntz@leaves-and-love.net",
+      "homepage": "http://leaves-and-love.net",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "felix-arntz@leaves-and-love.net",
+    "issues": "https://github.com/felixarntz/wpdlib/issues"
+  },
+  "autoload": {
+    "psr-0": {
+      "WPDLib\\": "inc/"
+    }
+  }
+}
