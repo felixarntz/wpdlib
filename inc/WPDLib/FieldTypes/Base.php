@@ -14,34 +14,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 	class Base {
-		private $type = '';
+		protected $type = '';
+		protected $args = array();
 
-		public function __construct( $type ) {
+		public function __construct( $type, $args ) {
 			$this->type = $type;
-		}
-
-		public abstract function display( $args, $echo = true ) {
-			$args = wp_parse_args( $args, array(
+			$this->args = wp_parse_args( $args, array(
 				'id'		=> '',
 				'name'		=> '',
-				'value'		=> '',
+				'class'		=> '',
+				'required'	=> false,
+				'readonly'	=> false,
+				'disabled'	=> false,
 			) );
+			if ( strpos( $this->args['class'], 'wpdlib-input-' . $this->type ) === false ) {
+				if ( ! empty( $this->args['class'] ) ) {
+					$this->args['class'] .= ' ';
+				}
+				$this->args['class'] .= 'wpdlib-input-' . $this->type;
+			}
+			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
+				$this->args['class'] .= ' wpdlib-input';
+			}
+		}
 
-			extract( $args );
-
-			if ( ! empty( $id ) ) {
-				$id = ' id="' . $id . '"';
+		public function __get( $property ) {
+			if ( method_exists( $this, $method = 'get_' . $property ) ) {
+				return $this->$method();
+			} elseif ( property_exists( $this, $property ) ) {
+				return $this->$property;
+			} elseif ( isset( $this->args[ $property ] ) ) {
+				return $this->args[ $property ];
 			}
 
-			if ( ! empty( $name ) ) {
-				$name = ' name="' . $name . '"';
-			}
+			return null;
+		}
 
-			if ( ! empty( $value ) ) {
-				$value = ' value="' . esc_attr( $value ) . '"';
-			}
+		public function display( $val, $echo = true ) {
+			$args = $this->args;
+			$args['value'] = $val;
 
-			$output = '<input type="' . $this->type . '"' . $id . $name . $value . '>';
+			$output = '<input type="' . $this->type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -52,17 +65,22 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 		public function validate( $val = null ) {
 			if ( $val === null ) {
-				$val = '';
+				return '';
 			}
-			return wp_kses_post( $val );
+
+			return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
 		}
 
 		public function parse( $val, $formatted = false ) {
-			return $val;
+			if ( $formatted ) {
+				return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' );
+			}
+
+			return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
 		}
 
 		public function enqueue_assets() {
-
+			return array();
 		}
 	}
 

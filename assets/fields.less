@@ -1,0 +1,92 @@
+.wpdlib-option-box {
+	display: inline-block;
+	width: 32px;
+	height: 18px;
+	margin-top: 4px;
+	margin-right: 10px;
+	margin-bottom: -4px;
+	background-size: cover;
+}
+
+.wpdlib-input {
+	width: 100%;
+	max-width: 500px !important;
+	.checkbox,
+	.radio {
+		float: left;
+		width: 48%;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		margin-left: 1%;
+		@media all and (min-width: 1280px) {
+			width: 32%;
+		}
+		&.box {
+			input {
+				display: none;
+			}
+			label {
+				display: block;
+				text-align: center;
+				cursor: default;
+			}
+			div {
+				display: block;
+				height: auto;
+				max-width: 100%;
+				padding-bottom: 56.25%;
+				cursor: pointer;
+				background-size: cover;
+				border: 4px solid #e5e5e5;
+				box-sizing: border-box;
+				&.checked {
+					border-color: #0074a2;
+				}
+			}
+		}
+	}
+}
+
+.wpdlib-input-checkbox {
+	width: auto !important;
+}
+
+.wpdlib-input-range-viewer,
+.wpdlib-input-color-viewer {
+	height: 27px;
+	text-align: right;
+	& + input {
+		height: 27px;
+		vertical-align: bottom;
+	}
+}
+
+.wpdlib-input-range-viewer {
+	width: 40px;
+	margin-right: 5px;
+}
+
+.wpdlib-input-color-viewer {
+	width: 70px;
+	margin-right: -1px;
+	& + input {
+		margin-left: 0;
+		background-color: #eeeeee;
+	}
+}
+
+.wpdlib-media-title {
+	width: 100%;
+	max-width: 500px !important;
+}
+
+.wpdlib-media-image,
+.wpdlib-media-link {
+	display: block;
+}
+
+.wpdlib-media-image {
+	height: auto;
+	max-width: 300px;
+	max-height: 300px;
+}

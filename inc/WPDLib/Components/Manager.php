@@ -14,48 +14,157 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 	final class Manager {
-		private static $instance = null;
+		private static $base_dir = '';
+		private static $base_url = '';
 
-		public static function instance() {
-			if ( self::$instance === null ) {
-				self::$instance = new self();
-			}
-			return self::$instance;
-		}
+		private static $hierarchy_toplevel = array();
+		private static $hierarchy_children = array();
 
-		private $hierarchy_toplevel = array();
-		private $hierarchy_children = array();
+		private static $scopes = array();
+		private static $current_scope = '';
 
-		private function __construct() {
+		private static $components = array();
 
-		}
-
-		public function register_hierarchy( $hierarchy, $toplevel = true ) {
+		public static function register_hierarchy( $hierarchy, $toplevel = true ) {
 			foreach ( $hierarchy as $class => $children ) {
-				if ( $toplevel && ! in_array( $class, $this->hierarchy_toplevel ) ) {
-					$this->hierarchy_toplevel[] = $class;
+				if ( $toplevel && ! in_array( $class, self::$hierarchy_toplevel ) ) {
+					self::$hierarchy_toplevel[] = $class;
 				}
-				if ( ! isset( $this->hierarchy_children[ $class ] ) ) {
-					$this->hierarchy_children[ $class ] = array_keys( $children );
+				if ( ! isset( self::$hierarchy_children[ $class ] ) ) {
+					self::$hierarchy_children[ $class ] = array_keys( $children );
 				} else {
-					$this->hierarchy_children[ $class ] = array_merge( $this->hierarchy_children[ $class ], array_keys( $children ) );
+					self::$hierarchy_children[ $class ] = array_merge( self::$hierarchy_children[ $class ], array_keys( $children ) );
 				}
-				$this->register_hierarchy( $children, false );
+				self::register_hierarchy( $children, false );
 			}
 		}
 
-		public function get_children( $class ) {
-			if ( isset( $this->hierarchy_children[ $class ] ) ) {
-				return $this->hierarchy_children[ $class ];
+		public static function get_children( $class ) {
+			if ( isset( self::hierarchy_children[ $class ] ) ) {
+				return self::hierarchy_children[ $class ];
 			}
 			return array();
 		}
 
-		public function is_toplevel( $class ) {
-			if ( in_array( $class, $this->hierarchy_toplevel ) ) {
+		public static function is_toplevel( $class ) {
+			if ( in_array( $class, self::hierarchy_toplevel ) ) {
 				return true;
 			}
 			return false;
+		}
+
+		public static function set_scope( $scope ) {
+			if ( ! in_array( $scope, self::$scopes ) ) {
+				self::$scopes[] = $scope;
+			}
+			self::$current_scope = $scope;
+		}
+
+		public static function get_scope() {
+			return self::$current_scope;
+		}
+
+		public static function add( $component ) {
+			if ( ! self::is_too_late() ) {
+				if ( is_a( $component, 'WPDLib\Components\Base' ) ) {
+					$component_class = get_class( $component );
+					if ( self::is_toplevel( $component_class ) ) {
+						if ( ! isset( self::$components[ $component_class ] ) ) {
+							self::$components[ $component_class ] = array();
+						}
+						if ( ! isset( self::$components[ $component_class ][ $component->slug ] ) ) {
+							$component->validate();
+							$component->scope = $current_scope;
+							self::$components[ $component_class ][ $component->slug ] = $component;
+							return $component;
+						}
+						return self::$components[ $component_class ][ $component->slug ];
+					}
+					return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', $current_scope );
+				}
+				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', $current_scope );
+			}
+			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', $current_scope );
+		}
+
+		public static function get( $component_path, $current_children = null ) {
+			$component_path = explode( '.', $component_path, 2 );
+			if ( $current_children === null ) {
+				foreach ( self::$components as $class => $components ) {
+					if ( isset( $components[ $component_path[0] ] ) ) {
+						$current = $components[ $component_path[0] ];
+						break;
+					}
+				}
+			} elseif ( isset( $current_children[ $component_path[0] ] ) ) {
+				$current = $current_children[ $component_path[0] ];
+			}
+			if ( $current !== null ) {
+				if ( isset( $component_path[1] ) ) {
+					return self::get( $component_path[1], $current->children );
+				}
+				return $current;
+			}
+			return null;
+		}
+
+		public static function is_too_late() {
+			return did_action( 'init' ) > 0 && ! doing_action( 'init' );
+		}
+
+		public static function get_info( $field = '' ) {
+			$composer_file = self::get_base_dir() . '/composer.json';
+			if ( ! file_exists( $composer_file ) ) {
+				if ( ! empty( $field ) ) {
+					return false;
+				}
+				return array();
+			}
+			$info = json_decode( file_get_contents( $composer_file ), true );
+			if ( ! empty( $field ) ) {
+				if ( isset( $info[ $field ] ) ) {
+					return $info[ $field ];
+				}
+				return false;
+			}
+			return $info;
+		}
+
+		public static function get_dependency_info( $dependency, $field = '' ) {
+			$bower_file = self::get_base_dir() . '/assets/vendor/' . $dependency . '/bower.json';
+			if ( ! file_exists( $bower_file ) ) {
+				if ( ! empty( $field ) ) {
+					return false;
+				}
+				return array();
+			}
+			$info = json_decode( file_get_contents( $bower_file ), true );
+			if ( ! empty( $field ) ) {
+				if ( isset( $info[ $field ] ) ) {
+					return $info[ $field ];
+				}
+				return false;
+			}
+			return $info;
+		}
+
+		public static function get_base_dir() {
+			if ( empty( self::$base_dir ) ) {
+				self::determine_base();
+			}
+			return self::$base_dir;
+		}
+
+		public static function get_base_url() {
+			if ( empty( self::$base_url ) ) {
+				self::determine_base();
+			}
+			return self::$base_url;
+		}
+
+		private static function determine_base() {
+			self::$base_dir = str_replace( '/inc/WPDLib/Components', '', dirname( __FILE__ ) );
+			self::$base_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, self::$base_dir );
 		}
 	}
 

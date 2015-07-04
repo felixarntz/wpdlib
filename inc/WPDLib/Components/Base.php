@@ -17,6 +17,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		protected $slug = '';
 		protected $args = array();
 
+		protected $scope = '';
 		protected $parent = null;
 		protected $children = array();
 
@@ -48,19 +49,25 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function add( $component ) {
-			if ( is_a( $component, 'WPDLib\Components\Base' ) ) {
-				$children = \WPDLib\Components\Manager::instance()->get_children( get_class( $this ) );
-				if ( in_array( get_class( $component ), $children ) ) {
-					//TODO: check if component must be globally unique
-					$component->validate();
-					$component->parent = $this;
-					$this->children[ $component->slug ] = $component;
-				} else {
-					//TODO: throw notice
+			if ( ! \WPDLib\Components\Manager::is_too_late() ) {
+				if ( is_a( $component, 'WPDLib\Components\Base' ) ) {
+					$children = \WPDLib\Components\Manager::get_children( get_class( $this ) );
+					if ( in_array( get_class( $component ), $children ) ) {
+						//TODO: check if component must be globally unique
+						if ( ! isset( $this->children[ $component->slug ] ) ) {
+							$component->validate();
+							$component->parent = $this;
+							$component->scope = \WPDLib\Components\Manager::get_scope();
+							$this->children[ $component->slug ] = $component;
+							return $component;
+						}
+						return $this->children[ $component->slug ];
+					}
+					return new \WPDLib\Util\Error( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', \WPDLib\Components\Manager::get_scope() );
 				}
-			} else {
-				//TODO: throw notice
+				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', \WPDLib\Components\Manager::get_scope() );
 			}
+			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', \WPDLib\Components\Manager::get_scope() );
 		}
 
 		public function validate() {
