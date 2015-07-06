@@ -56,6 +56,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		}
 
 		public function enqueue_assets() {
+			if ( self::is_enqueued( get_class( $this ) ) ) {
+				return array();
+			}
+
 			$assets_url = \WPDLib\Components\Manager::get_base_url() . '/assets';
 			$version = \WPDLib\Components\Manager::get_dependency_info( 'datetimepicker', 'version' );
 

@@ -48,6 +48,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 		}
 
 		public function enqueue_assets() {
+			if ( self::is_enqueued( get_class( $this ) ) ) {
+				return array();
+			}
+
 			$assets_dir = \WPDLib\Components\Manager::get_base_dir() . '/assets';
 			$assets_url = \WPDLib\Components\Manager::get_base_url() . '/assets';
 			$version = \WPDLib\Components\Manager::get_dependency_info( 'select2', 'version' );

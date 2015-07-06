@@ -93,6 +93,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		public function enqueue_assets() {
+			if ( self::is_enqueued( get_class( $this ) ) ) {
+				return array();
+			}
+
 			wp_enqueue_media();
 
 			return array(

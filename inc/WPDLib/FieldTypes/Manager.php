@@ -82,6 +82,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				}
 			}
 
+			$dependencies = array_unique( $dependencies );
+
 			wp_enqueue_style( 'wpdlib-fields', $assets_url . '/fields.min.css', array(), $version );
 
 			wp_enqueue_script( 'wpdlib-fields', $assets_url . '/fields.min.js', $dependencies, $version, true );

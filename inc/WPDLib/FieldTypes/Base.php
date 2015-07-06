@@ -17,6 +17,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		protected $type = '';
 		protected $args = array();
 
+		private static $enqueued = array();
+
 		public function __construct( $type, $args ) {
 			$this->type = $type;
 			$this->args = wp_parse_args( $args, array(
@@ -81,6 +83,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 		public function enqueue_assets() {
 			return array();
+		}
+
+		protected static function is_enqueued( $class ) {
+			if ( ! in_array( $class, self::$enqueued ) ) {
+				self::$enqueued[] = $class;
+				return false;
+			}
+			return true;
 		}
 	}
 
