@@ -56,7 +56,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		}
 
 		public function enqueue_assets() {
-			if ( self::is_enqueued( get_class( $this ) ) ) {
+			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();
 			}
 

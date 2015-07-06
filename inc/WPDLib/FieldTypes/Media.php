@@ -93,7 +93,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		public function enqueue_assets() {
-			if ( self::is_enqueued( get_class( $this ) ) ) {
+			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();
 			}
 

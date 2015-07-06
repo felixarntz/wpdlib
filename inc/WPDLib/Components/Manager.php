@@ -25,6 +25,8 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 		private static $components = array();
 
+		private static $component_finder = array();
+
 		public static function register_hierarchy( $hierarchy, $toplevel = true ) {
 			foreach ( $hierarchy as $class => $children ) {
 				if ( $toplevel && ! in_array( $class, self::$hierarchy_toplevel ) ) {
@@ -65,26 +67,39 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 		}
 
 		public static function add( $component ) {
-			if ( ! self::is_too_late() ) {
-				if ( is_a( $component, 'WPDLib\Components\Base' ) ) {
-					$component_class = get_class( $component );
-					if ( self::is_toplevel( $component_class ) ) {
-						if ( ! isset( self::$components[ $component_class ] ) ) {
-							self::$components[ $component_class ] = array();
-						}
-						if ( ! isset( self::$components[ $component_class ][ $component->slug ] ) ) {
-							$component->validate();
-							$component->scope = self::$current_scope;
-							self::$components[ $component_class ][ $component->slug ] = $component;
-							return $component;
-						}
-						return self::$components[ $component_class ][ $component->slug ];
-					}
-					return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', self::$current_scope );
-				}
+			if ( self::is_too_late() ) {
+				return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', self::$current_scope );
+			}
+
+			if ( ! is_a( $component, 'WPDLib\Components\Base' ) ) {
 				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', self::$current_scope );
 			}
-			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', self::$current_scope );
+
+			$component_class = get_class( $component );
+			if ( ! self::is_toplevel( $component_class ) ) {
+				return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', self::$current_scope );
+			}
+
+			$status = $component->validate();
+			if ( is_wp_error( $status ) ) {
+				return $status;
+			}
+
+			if ( ! $component->is_valid_slug() ) {
+				return new \WPDLib\Util\Error( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), $component_class, $component->slug ), '', self::$current_scope );
+			}
+
+			if ( ! isset( self::$components[ $component_class ] ) ) {
+				self::$components[ $component_class ] = array();
+			}
+
+			// for toplevel components, if a component of the same slug already exists, merge their properties then return the original
+			if ( isset( self::$components[ $component_class ][ $component->slug ] ) ) {
+				return self::_merge_components( self::$components[ $component_class ][ $component->slug ], $component );
+			}
+
+			self::$components[ $component_class ][ $component->slug ] = $component;
+			return $component;
 		}
 
 		public static function get( $component_path, $start_class = '' ) {
@@ -113,6 +128,29 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 				}
 			}
 			return null;
+		}
+
+		public static function exists( $slug, $class, $check_slug = '' ) {
+			if ( ! isset( self::$component_finder[ $class ] ) ) {
+				self::$component_finder[ $class ] = array();
+			}
+
+			if ( ! empty( $check_slug ) ) {
+				if ( ! isset( self::$component_finder[ $class ][ $check_slug ] ) ) {
+					self::$component_finder[ $class ][ $check_slug ] = array();
+				}
+				if ( ! in_array( $slug, self::$component_finder[ $class ][ $check_slug ] ) ) {
+					self::$component_finder[ $class ][ $check_slug ][] = $slug;
+					return false;
+				}
+				return true;
+			}
+
+			if ( ! in_array( $slug, self::$component_finder[ $class ] ) ) {
+				self::$component_finder[ $class ][] = $slug;
+				return false;
+			}
+			return true;
 		}
 
 		public static function is_too_late() {
@@ -179,6 +217,22 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 				return $current;
 			}
 			return null;
+		}
+
+		private static function _merge_components( $a, $b ) {
+			$args = $a->args;
+			$parents = $a->parents;
+			$children = $a->children;
+
+			$_args = $b->args;
+			$_parents = $b->parents;
+			$_children = $b->children;
+
+			$a->args = array_merge( $args, $_args );
+			$a->parents = array_merge( $parents, $_parents );
+			$a->children = array_merge( $children, $_children );
+
+			return $a;
 		}
 
 		private static function _determine_base() {

@@ -18,8 +18,11 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		protected $args = array();
 
 		protected $scope = '';
-		protected $parent = null;
+		protected $parents = array();
 		protected $children = array();
+
+		protected $validated = false;
+		protected $valid_slug = null;
 
 		public function __construct( $slug, $args ) {
 			$this->slug = $slug;
@@ -49,34 +52,105 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function add( $component ) {
-			if ( ! \WPDLib\Components\Manager::is_too_late() ) {
-				if ( is_a( $component, 'WPDLib\Components\Base' ) ) {
-					$children = \WPDLib\Components\Manager::get_children( get_class( $this ) );
-					if ( in_array( get_class( $component ), $children ) ) {
-						//TODO: check if component must be globally unique
-						if ( ! isset( $this->children[ $component->slug ] ) ) {
-							$component->validate();
-							$component->parent = $this;
-							$component->scope = \WPDLib\Components\Manager::get_scope();
-							$this->children[ $component->slug ] = $component;
-							return $component;
-						}
-						return $this->children[ $component->slug ];
-					}
-					return new \WPDLib\Util\Error( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', \WPDLib\Components\Manager::get_scope() );
-				}
+			if ( \WPDLib\Components\Manager::is_too_late() ) {
+				return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', \WPDLib\Components\Manager::get_scope() );
+			}
+
+			if ( ! is_a( $component, 'WPDLib\Components\Base' ) ) {
 				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', \WPDLib\Components\Manager::get_scope() );
 			}
-			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', \WPDLib\Components\Manager::get_scope() );
+
+			$children = \WPDLib\Components\Manager::get_children( get_class( $this ) );
+			if ( ! in_array( get_class( $component ), $children ) ) {
+				return new \WPDLib\Util\Error( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', \WPDLib\Components\Manager::get_scope() );
+			}
+
+			$status = $component->validate( $this );
+			if ( is_wp_error( $status ) ) {
+				return $status;
+			}
+
+			if ( ! $component->is_valid_slug() ) {
+				return new \WPDLib\Util\Error( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), get_class( $component ), $component->slug ), '', \WPDLib\Components\Manager::get_scope() );
+			}
+
+			$this->children[ $component->slug ] = $component;
+			return $component;
 		}
 
-		public function validate() {
-			$defaults = $this->get_defaults();
-			foreach ( $defaults as $key => $default ) {
-				if ( ! isset( $this->args[ $key ] ) ) {
-					$this->args[ $key ] = $default;
+		public function get_path() {
+			$path = array();
+
+			$parents = $this->parents;
+			while ( count( $parents ) > 0 ) {
+				$parent_slug = key( $parents );
+				$path[] = $parent_slug;
+				$parents = $parents[ $parent_slug ]->parents;
+			}
+
+			return implode( '.', array_reverse( $path ) );
+		}
+
+		public function validate( $parent = null ) {
+			if ( $parent !== null ) {
+				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
+					return new \WPDLib\Util\Error( 'no_multiparent_component', sprintf( __( 'The component %1$s of class %2$s already has a parent assigned and is not a multiparent component.', 'wpdlib' ), $this->slug, get_class( $this ) ), '', \WPDLib\Components\Manager::get_scope() );
+				}
+				$this->parents[ $parent->slug ] = $parent;
+			}
+			if ( ! $this->validated ) {
+				$defaults = $this->get_defaults();
+				foreach ( $defaults as $key => $default ) {
+					if ( ! isset( $this->args[ $key ] ) ) {
+						$this->args[ $key ] = $default;
+					}
+				}
+				$this->scope = \WPDLib\Components\Manager::get_scope();
+				$this->validated = true;
+				return true;
+			}
+			return false;
+		}
+
+		public function is_valid_slug() {
+			if ( $this->valid_slug === null ) {
+				$globalnames = $this->supports_globalslug();
+				if ( $globalnames !== true ) {
+					if ( count( $this->parents ) > 0 && $globalnames !== false ) {
+						$parent = $this->parents[ key( $this->parents ) ];
+						$not_found = false;
+						while ( get_class( $parent ) != $globalnames ) {
+							if ( count( $parent->parents ) < 1 ) {
+								$not_found = true;
+								break;
+							}
+							$parent = $parent->parents[ key( $parent->parents ) ]
+						}
+						if ( $not_found ) {
+							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
+						} else {
+							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ), $parent->slug );
+						}
+					} else {
+						$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
+					}
+				} else {
+					\WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) ); // just use the function to add the component
+					$this->valid_slug = true;
 				}
 			}
+			return $this->valid_slug;
+		}
+
+		protected function supports_multiparents() {
+			return false;
+		}
+
+		protected function supports_globalslug() {
+			if ( \WPDLib\Components\Manager::is_toplevel( get_class( $this ) ) ) {
+				return true;
+			}
+			return false;
 		}
 
 		protected abstract function get_defaults();
