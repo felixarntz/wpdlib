@@ -40,14 +40,14 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 		}
 
 		public static function get_children( $class ) {
-			if ( isset( self::hierarchy_children[ $class ] ) ) {
-				return self::hierarchy_children[ $class ];
+			if ( isset( self::$hierarchy_children[ $class ] ) ) {
+				return self::$hierarchy_children[ $class ];
 			}
 			return array();
 		}
 
 		public static function is_toplevel( $class ) {
-			if ( in_array( $class, self::hierarchy_toplevel ) ) {
+			if ( in_array( $class, self::$hierarchy_toplevel ) ) {
 				return true;
 			}
 			return false;
@@ -74,17 +74,17 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 						}
 						if ( ! isset( self::$components[ $component_class ][ $component->slug ] ) ) {
 							$component->validate();
-							$component->scope = $current_scope;
+							$component->scope = self::$current_scope;
 							self::$components[ $component_class ][ $component->slug ] = $component;
 							return $component;
 						}
 						return self::$components[ $component_class ][ $component->slug ];
 					}
-					return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', $current_scope );
+					return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', self::$current_scope );
 				}
-				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', $current_scope );
+				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', self::$current_scope );
 			}
-			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', $current_scope );
+			return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', self::$current_scope );
 		}
 
 		public static function get( $component_path, $start_class = '' ) {
