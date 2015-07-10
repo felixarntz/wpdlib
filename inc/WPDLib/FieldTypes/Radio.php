@@ -27,8 +27,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				'class'	=> $this->args['class'],
 			);
 
+			$name = $this->get_sanitized_name();
+
 			$single_type = 'radio';
-			if ( isset( $this->args['multiple'] ) ) {
+			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
 				$single_type = 'checkbox';
 			}
 
@@ -37,7 +39,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			foreach ( $this->args['options'] as $value => $label ) {
 				$option_atts = array(
 					'id'		=> $args['id'] . '-' . $value,
-					'name'		=> $this->args['name'],
+					'name'		=> $name,
 					'value'		=> $value,
 					'checked'	=> $this->is_value_checked_or_selected( $value, $val ),
 					'readonly'	=> $args['readonly'],
@@ -129,6 +131,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			}
 		}
 
+		public function is_empty( $val ) {
+			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
+				return count( (array) $val ) < 1;
+			}
+			return empty( $val );
+		}
+
 		public function parse( $val, $formatted = false ) {
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
 				$parsed = array();
@@ -190,6 +199,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			}
 
 			return $option == $value;
+		}
+
+		protected function get_sanitized_name() {
+			$name = $this->args['name'];
+			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
+				if ( '[]' != substr( $name, -2 ) ) {
+					$name .= '[]';
+				}
+			}
+			return $name;
 		}
 	}
 

@@ -17,11 +17,6 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Multiselect' ) ) {
 		public function __construct( $type, $args ) {
 			parent::__construct( $type, $args );
 			$this->args['multiple'] = true;
-			$this->args['name'] .= '[]';
-		}
-
-		public function is_empty( $val ) {
-			return count( (array) $val ) < 1;
 		}
 	}
 

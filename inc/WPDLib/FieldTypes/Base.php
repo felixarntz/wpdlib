@@ -22,12 +22,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		public function __construct( $type, $args ) {
 			$this->type = $type;
 			$this->args = wp_parse_args( $args, array(
-				'id'		=> '',
-				'name'		=> '',
-				'class'		=> '',
-				'required'	=> false,
-				'readonly'	=> false,
-				'disabled'	=> false,
+				'id'			=> '',
+				'name'			=> '',
+				'class'			=> '',
+				'placeholder'	=> '',
+				'required'		=> false,
+				'readonly'		=> false,
+				'disabled'		=> false,
 			) );
 			if ( strpos( $this->args['class'], 'wpdlib-input-' . $this->type ) === false ) {
 				if ( ! empty( $this->args['class'] ) ) {
@@ -37,6 +38,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			}
 			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
 				$this->args['class'] .= ' wpdlib-input';
+			}
+		}
+
+		public function __set( $property, $value ) {
+			if ( in_array( $property, array( 'id', 'name' ) ) ) {
+				$this->args[ $property ] = $value;
 			}
 		}
 

@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+jQuery( document ).ready( function( $ ) {
 
 	if ( typeof $.fn.select2 !== 'undefined' ) {
 		// select2 setup
@@ -214,14 +214,14 @@ jQuery(document).ready(function($) {
 	// repeatable fields
 	if ( $( '.wpdlib-input-repeatable' ).length > 0 && _wpdlib_data !== undefined ) {
 		$( '.wpdlib-input-repeatable' ).each(function() {
-			$( this ).on( 'click', '.new-repeatable-button', function( e ) {
+			$( this ).on( 'click', '.wpdlib-new-repeatable-button', function( e ) {
 				var $parent = $( '#' + e.delegateTarget.id );
 				var limit = parseInt( $parent.data( 'limit' ));
-				var id_prefix = $parent.data( 'parent-slug' ) + '-' + $parent.data( 'slug' );
-				var key = $parent.find( '.repeatable-row' ).length;
+				var id = $parent.attr( 'id' );
+				var key = $parent.find( '.wpdlib-repeatable-row' ).length;
 
-				if ( typeof _wpdlib_data.repeatable_field_templates[ id_prefix ] !== 'undefined' ) {
-					var output = _wpdlib_data.repeatable_field_templates[ id_prefix ].replace( /{{KEY}}/g, key ).replace( /{{KEY_PLUSONE}}/g, key + 1 );
+				if ( typeof _wpdlib_data.repeatable_field_templates[ id ] !== 'undefined' ) {
+					var output = _wpdlib_data.repeatable_field_templates[ id ].replace( /{{KEY}}/g, key ).replace( /{{KEY_PLUSONE}}/g, key + 1 );
 
 					$parent.append( output );
 					if ( typeof $.fn.select2 !== 'undefined' ) {
@@ -234,16 +234,16 @@ jQuery(document).ready(function($) {
 					}
 
 					if ( limit > 0 && limit === key + 1 ) {
-						$parent.find( '.new-repeatable-button' ).hide();
+						$parent.find( '.wpdlib-new-repeatable-button' ).hide();
 					}
 				}
 
 				e.preventDefault();
 			});
-			$( this ).on( 'click', '.remove-repeatable-button', function( e ) {
+			$( this ).on( 'click', '.wpdlib-remove-repeatable-button', function( e ) {
 				var $parent = $( '#' + e.delegateTarget.id );
 
-				var $rows = $parent.find( '.repeatable-row' );
+				var $rows = $parent.find( '.wpdlib-repeatable-row' );
 
 				var number = parseInt( $( this ).data( 'number' ) ) + 1;
 
@@ -254,13 +254,13 @@ jQuery(document).ready(function($) {
 				$rows.filter( ':gt(' + ( number - 1 ) + ')' ).each(function() {
 					var $row = $( this );
 
-					var number = parseInt( $row.find( '.remove-repeatable-button' ).data( 'number' ) );
+					var number = parseInt( $row.find( '.wpdlib-remove-repeatable-button' ).data( 'number' ) );
 
 					var target = number - 1;
 
 					$row.find( 'span:first' ).html( $row.find( 'span:first' ).html().replace( ( number + 1 ).toString(), ( target + 1 ).toString() ) );
 
-					$row.find( '.repeatable-col input, .repeatable-col select, .repeatable-col img, .repeatable-col a' ).each(function() {
+					$row.find( '.wpdlib-repeatable-col input, .wpdlib-repeatable-col select, .wpdlib-repeatable-col img, .wpdlib-repeatable-col a' ).each(function() {
 						if ( $( this ).attr( 'id' ) ) {
 							$( this ).attr( 'id', $( this ).attr( 'id' ).replace( number.toString(), target.toString() ) );
 						}
@@ -270,13 +270,13 @@ jQuery(document).ready(function($) {
 						}
 					});
 
-					$row.find('.remove-repeatable-button').data('number', target.toString());
+					$row.find('.wpdlib-remove-repeatable-button').data( 'number', target.toString() );
 				});
 
 				var limit = parseInt( $( '#' + e.delegateTarget.id ).data( 'limit' ) );
 
-				if ( limit > 0 && limit > $( '#' + e.delegateTarget.id ).find( '.repeatable-row' ).length) {
-					$( '#' + e.delegateTarget.id ).find( '.new-repeatable-button' ).show();
+				if ( limit > 0 && limit > $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length) {
+					$( '#' + e.delegateTarget.id ).find( '.wpdlib-new-repeatable-button' ).show();
 				}
 			});
 		});

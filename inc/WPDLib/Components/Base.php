@@ -91,12 +91,17 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return implode( '.', array_reverse( $path ) );
 		}
 
-		public function get_parent( $index = 0 ) {
-			$parents = array_values( $this->parents );
-			if ( isset( $parents[ $index ] ) ) {
-				return $parents[ $index ];
+		public function get_parent( $index = 0, $depth = 1 ) {
+			$current = $this;
+			for ( $i = 0; $i < $depth; $i++ ) {
+				$parents = array_values( $current->parents );
+				if ( isset( $parents[ $index ] ) ) {
+					$current = $parents[ $index ];
+				} else {
+					return null;
+				}
 			}
-			return null;
+			return $current;
 		}
 
 		public function validate( $parent = null ) {
@@ -153,18 +158,11 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return $this->valid_slug;
 		}
 
-		protected function supports_multiparents() {
-			return false;
-		}
-
-		protected function supports_globalslug() {
-			if ( \WPDLib\Components\Manager::is_toplevel( get_class( $this ) ) ) {
-				return true;
-			}
-			return false;
-		}
-
 		protected abstract function get_defaults();
+
+		protected abstract function supports_multiparents();
+
+		protected abstract function supports_globalslug();
 	}
 
 }

@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Email' ) ) {
 			$input = sanitize_email( $val );
 			$val = is_email( $input );
 			if ( ! $val ) {
-				return new \WP_Error( 'invalid_email', sprintf( __( '%s is not a valid email address.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $input, 'string', 'output' ) ))
+				return new \WP_Error( 'invalid_email', sprintf( __( '%s is not a valid email address.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $input, 'string', 'output' ) ) );
 			}
 
 			return $val;

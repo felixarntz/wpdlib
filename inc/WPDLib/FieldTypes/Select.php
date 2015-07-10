@@ -16,9 +16,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 	class Select extends \WPDLib\FieldTypes\Radio {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
+			$args['name'] = $this->get_sanitized_name();
+			unset( $args['placeholder'] );
 			unset( $args['options'] );
 
 			$output = '<select' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
+			if ( ! empty( $this->args['placeholder'] ) ) {
+				$output .= '<option value=""' . ( empty( $val ) ? ' selected="selected"' : '' ) . '>' . esc_html( $this->args['placeholder'] ) . '</option>';
+			}
 			foreach ( $this->args['options'] as $value => $label ) {
 				$option_atts = array(
 					'value'		=> $value,

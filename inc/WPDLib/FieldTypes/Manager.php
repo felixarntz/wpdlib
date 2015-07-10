@@ -14,27 +14,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 
 	final class Manager {
-		public static function get_instance( $args ) {
+		public static function get_instance( $args, $repeatable = false ) {
 			if ( ! isset( $args['type'] ) ) {
 				return null;
 			}
 			$field_type = $args['type'];
-			unset( $args['type'] );
 
 			$field_types = self::get_field_types();
 			if ( ! in_array( $field_type, $field_types ) ) {
 				return null;
 			}
 
+			if ( $repeatable ) {
+				$non_repeatable_types = array(
+					'wysiwyg',
+					'repeatable',
+				);
+				if ( in_array( $field_type, $non_repeatable_types ) ) {
+					return null;
+				}
+				$replace_types = array(
+					'radio'		=> 'select',
+					'multibox'	=> 'multiselect',
+				);
+				if ( isset( $replace_types[ $field_type ] ) ) {
+					$field_type = $replace_types[ $field_type ];
+				}
+			}
+
+			$field_keys = array(
+				'id',
+				'name',
+				'class',
+				'required',
+				'readonly',
+				'disabled',
+				'options',
+				'min',
+				'max',
+				'step',
+				'mime_types',
+				'repeatable',
+			);
+
+			$field_args = array_intersect_key( $args, array_flip( $field_keys ) );
+
 			if ( class_exists( 'WPDLib\FieldTypes\\' . ucfirst( $field_type ) ) ) {
 				$class_name = '\WPDLib\FieldTypes\\' . ucfirst( $field_type );
-				return new $class_name( $field_type, $args );
+				return new $class_name( $field_type, $field_args );
 			}
-			return new \WPDLib\FieldTypes\Base( $field_type, $args );
+			return new \WPDLib\FieldTypes\Base( $field_type, $field_args );
 		}
 
 		public static function get_field_types() {
-			$types = array(
+			return array(
 				'checkbox',
 				'radio',
 				'multibox',
@@ -55,8 +88,6 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'text',
 				'repeatable',
 			);
-
-			return $types;
 		}
 
 		public static function enqueue_assets( $fields = array() ) {
@@ -101,7 +132,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			$bool_atts = array_filter( $atts, 'is_bool' );
 
 			$atts = array_diff_key( $atts, $bool_atts );
-			uksort( $atts, array( __CLASS__, '_sort_html_attributes' ) );
+			uksort( $atts, array( __CLASS__, 'sort_html_attributes' ) );
 
 			foreach ( $atts as $key => $value ) {
 				if ( is_array( $value ) ) {
@@ -270,7 +301,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
-		private static function _sort_html_attributes( $a, $b ) {
+		private static function sort_html_attributes( $a, $b ) {
 			if ( $a != $b ) {
 				$priorities = array( 'id', 'name', 'class' );
 				if ( strpos( $a, 'data-' ) === 0 && strpos( $b, 'data-' ) !== 0 ) {

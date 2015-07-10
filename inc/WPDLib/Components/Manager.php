@@ -95,7 +95,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 			// for toplevel components, if a component of the same slug already exists, merge their properties then return the original
 			if ( isset( self::$components[ $component_class ][ $component->slug ] ) ) {
-				return self::_merge_components( self::$components[ $component_class ][ $component->slug ], $component );
+				return self::merge_components( self::$components[ $component_class ][ $component->slug ], $component );
 			}
 
 			self::$components[ $component_class ][ $component->slug ] = $component;
@@ -108,7 +108,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 				if ( isset( self::$components[ $class ] ) && isset( self::$components[ $class ][ $component_path[0] ] ) ) {
 					$current = self::$components[ $class ][ $component_path[0] ];
 					if ( isset( $component_path[1] ) ) {
-						$current = self::_get( $component_path[1], $current->children );
+						$current = self::get_component_recursive( $component_path[1], $current->children );
 					}
 					if ( $current !== null ) {
 						return $current;
@@ -119,7 +119,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 					if ( isset( $components[ $component_path[0] ] ) ) {
 						$current = $components[ $component_path[0] ];
 						if ( isset( $component_path[1] ) ) {
-							$current = self::_get( $component_path[1], $current->children );
+							$current = self::get_component_recursive( $component_path[1], $current->children );
 						}
 						if ( $current !== null ) {
 							return $current;
@@ -195,31 +195,31 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 		public static function get_base_dir() {
 			if ( empty( self::$base_dir ) ) {
-				self::_determine_base();
+				self::determine_base();
 			}
 			return self::$base_dir;
 		}
 
 		public static function get_base_url() {
 			if ( empty( self::$base_url ) ) {
-				self::_determine_base();
+				self::determine_base();
 			}
 			return self::$base_url;
 		}
 
-		private static function _get( $component_path, $current_children ) {
+		private static function get_component_recursive( $component_path, $current_children ) {
 			$component_path = explode( '.', $component_path, 2 );
 			if ( isset( $current_children[ $component_path[0] ] ) ) {
 				$current = $current_children[ $component_path[0] ];
 				if ( isset( $component_path[1] ) ) {
-					return self::_get( $component_path[1], $current->children );
+					return self::get_component_recursive( $component_path[1], $current->children );
 				}
 				return $current;
 			}
 			return null;
 		}
 
-		private static function _merge_components( $a, $b ) {
+		private static function merge_components( $a, $b ) {
 			$args = $a->args;
 			$parents = $a->parents;
 			$children = $a->children;
@@ -235,7 +235,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			return $a;
 		}
 
-		private static function _determine_base() {
+		private static function determine_base() {
 			self::$base_dir = str_replace( '/inc/WPDLib/Components', '', dirname( __FILE__ ) );
 			self::$base_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, self::$base_dir );
 		}

@@ -23,6 +23,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
+			unset( $args['placeholder'] );
 			$args['value'] = $val;
 
 			unset( $args['mime_types'] );

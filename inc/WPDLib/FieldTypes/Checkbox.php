@@ -16,6 +16,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 	class Checkbox extends \WPDLib\FieldTypes\Base {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
+			unset( $args['placeholder'] );
 			if ( $val ) {
 				$args['checked'] = true;
 			}
