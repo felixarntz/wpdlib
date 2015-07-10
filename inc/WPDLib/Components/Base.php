@@ -91,6 +91,14 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return implode( '.', array_reverse( $path ) );
 		}
 
+		public function get_parent( $index = 0 ) {
+			$parents = array_values( $this->parents );
+			if ( isset( $parents[ $index ] ) ) {
+				return $parents[ $index ];
+			}
+			return null;
+		}
+
 		public function validate( $parent = null ) {
 			if ( $parent !== null ) {
 				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
@@ -116,20 +124,23 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			if ( $this->valid_slug === null ) {
 				$globalnames = $this->supports_globalslug();
 				if ( $globalnames !== true ) {
-					if ( count( $this->parents ) > 0 && $globalnames !== false ) {
-						$parent = $this->parents[ key( $this->parents ) ];
-						$not_found = false;
-						while ( get_class( $parent ) != $globalnames ) {
-							if ( count( $parent->parents ) < 1 ) {
-								$not_found = true;
-								break;
+					if ( $globalnames !== false ) {
+						$found = false;
+						$parent = $this->get_parent();
+						if ( $parent !== null ) {
+							$found = true;
+							while ( get_class( $parent ) != $globalnames ) {
+								$parent = $parent->get_parent();
+								if ( $parent === null ) {
+									$found = false;
+									break;
+								}
 							}
-							$parent = $parent->parents[ key( $parent->parents ) ]
 						}
-						if ( $not_found ) {
-							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
-						} else {
+						if ( $found ) {
 							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ), $parent->slug );
+						} else {
+							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
 						}
 					} else {
 						$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );

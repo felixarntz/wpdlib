@@ -22,6 +22,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			parent::__construct( $type, $args );
 		}
 
+		public function display( $val, $echo = true ) {
+			$args = $this->args;
+			$args['value'] = $val;
+
+			$output = '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+
+			if ( $echo ) {
+				echo $output;
+			}
+
+			return $output;
+		}
+
 		public function validate( $val = null ) {
 			if ( $val === null ) {
 				return \WPDLib\FieldTypes\Manager::format( current_time( 'timestamp' ), $this->type, 'input' );

@@ -34,7 +34,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		}
 
 		public static function get_field_types() {
-			return array(
+			$types = array(
 				'checkbox',
 				'radio',
 				'multibox',
@@ -55,6 +55,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'text',
 				'repeatable',
 			);
+
+			return $types;
 		}
 
 		public static function enqueue_assets( $fields = array() ) {
@@ -102,6 +104,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			uksort( $atts, array( __CLASS__, '_sort_html_attributes' ) );
 
 			foreach ( $atts as $key => $value ) {
+				if ( is_array( $value ) ) {
+					continue;
+				}
+				if ( is_string( $value ) && empty( $value ) ) {
+					continue;
+				}
 				$output .= ' ' . $key . '="' . esc_attr( $value ) . '"';
 			}
 
