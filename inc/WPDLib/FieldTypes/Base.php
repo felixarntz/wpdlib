@@ -73,6 +73,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
 		}
 
+		public function is_empty( $val ) {
+			return empty( $val );
+		}
+
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
 				return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' );

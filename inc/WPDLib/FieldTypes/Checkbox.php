@@ -37,6 +37,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 			return \WPDLib\FieldTypes\Manager::format( $val, 'boolean', 'input' );
 		}
 
+		public function is_empty( $val ) {
+			return false;
+		}
+
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
 				return \WPDLib\FieldTypes\Manager::format( $val, 'boolean', 'output' );

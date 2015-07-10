@@ -19,6 +19,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Multiselect' ) ) {
 			$this->args['multiple'] = true;
 			$this->args['name'] .= '[]';
 		}
+
+		public function is_empty( $val ) {
+			return count( (array) $val ) < 1;
+		}
 	}
 
 }

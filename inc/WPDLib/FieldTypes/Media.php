@@ -88,6 +88,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $val;
 		}
 
+		public function is_empty( $val ) {
+			return absint( $val ) < 1;
+		}
+
 		public function parse( $val, $formatted = false ) {
 			return absint( $val );
 		}
