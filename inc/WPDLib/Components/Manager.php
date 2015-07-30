@@ -89,7 +89,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 				return new \WPDLib\Util\Error( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), $component_class, $component->slug ), '', self::$current_scope );
 			}
 
-			if ( ! isset( self::$components[ $component_class ] ) ) {
+			if ( ! isset( self::$components[ $component_class ] ) ) {
 				self::$components[ $component_class ] = array();
 			}
 

@@ -26,7 +26,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 
 		public function __construct( $slug, $args ) {
 			$this->slug = $slug;
-			$this->args = $args;
+			$this->args = (array) $args;
 		}
 
 		public function __set( $property, $value ) {
