@@ -1,0 +1,116 @@
+# Copyright (c) 2014-2015 Felix Arntz
+msgid ""
+msgstr ""
+"Project-Id-Version: wpdlib 0.5.0\n"
+"Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
+"POT-Creation-Date: 2015-08-08 17:15:59+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
+"Language-Team: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
+"X-Generator: grunt-wp-i18n 0.5.3\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: UNITED STATES\n"
+"X-Poedit-SourceCharset: uft-8\n"
+"X-Poedit-KeywordsList: __;_e;_x:1,2c;_ex:1,2c;_n:1,2; "
+"_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_attr__; esc_html__;esc_attr_e; "
+"esc_html_e;esc_attr_x:1,2c; esc_html_x:1,2c;\n"
+"X-Poedit-Bookmars: \n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Textdomain-Support: yes\n"
+
+#: inc/WPDLib/Components/Base.php:56 inc/WPDLib/Components/Manager.php:71
+msgid "Components must not be added later than the %s hook."
+msgstr ""
+
+#: inc/WPDLib/Components/Base.php:60 inc/WPDLib/Components/Manager.php:75
+msgid "The object is not a component."
+msgstr ""
+
+#: inc/WPDLib/Components/Base.php:65
+msgid ""
+"The component %1$s of class %2$s is not a valid child for the component "
+"%3$s."
+msgstr ""
+
+#: inc/WPDLib/Components/Base.php:74 inc/WPDLib/Components/Manager.php:89
+msgid "A component of class %1$s with slug %2$s already exists."
+msgstr ""
+
+#: inc/WPDLib/Components/Base.php:110
+msgid ""
+"The component %1$s of class %2$s already has a parent assigned and is not a "
+"multiparent component."
+msgstr ""
+
+#: inc/WPDLib/Components/Manager.php:80
+msgid "The component %1$s of class %2$s is not a valid toplevel component."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Color.php:43
+msgid "%s is not a valid hexadecimal color."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Datetime.php:58
+msgid "The date %1$s is invalid. It must not occur earlier than %2$s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Datetime.php:62
+msgid "The date %1$s is invalid. It must not occur later than %2$s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Email.php:25
+msgid "%s is not a valid email address."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Media.php:45
+msgid "Choose / Upload a File"
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Media.php:62
+msgid "Open File"
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Media.php:81
+msgid "The post with ID %s is not a valid WordPress media file."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Media.php:86
+msgid "The media item with ID %1$s is neither of the valid formats (%2$s)."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Media.php:110
+msgid "Open file"
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Number.php:39
+msgid "The number %1$s is invalid since it is not divisible by %2$s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Number.php:43
+msgid "The number %1$s is invalid. It must be greater than or equal to %2$s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Number.php:47
+msgid "The number %1$s is invalid. It must be lower than or equal to %2$s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Radio.php:115 inc/WPDLib/FieldTypes/Radio.php:134
+msgid "%s is not a valid option."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Repeatable.php:64
+msgid "Add new"
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Repeatable.php:178
+#: inc/WPDLib/FieldTypes/Repeatable.php:181
+msgid "%s."
+msgstr ""
+
+#: inc/WPDLib/FieldTypes/Repeatable.php:207
+msgid "Remove"
+msgstr ""

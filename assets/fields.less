@@ -11,8 +11,8 @@
 .wpdlib-input {
 	width: 100%;
 	max-width: 500px !important;
-	.checkbox,
-	.radio {
+	.wpdlib-checkbox,
+	.wpdlib-radio {
 		float: left;
 		width: 48%;
 		padding-top: 5px;
@@ -83,10 +83,56 @@
 .wpdlib-media-image,
 .wpdlib-media-link {
 	display: block;
+	.wpdlib-repeatable-table & {
+		display: inline-block;
+		margin-left: 10px;
+	}
 }
 
 .wpdlib-media-image {
 	height: auto;
 	max-width: 300px;
 	max-height: 300px;
+	.wpdlib-repeatable-table & {
+		width: auto;
+		height: 28px;
+		max-height: 28px;
+	}
+}
+
+.wpdlib-media-link {
+	.wpdlib-repeatable-table & {
+		line-height: 28px;
+	}
+}
+
+.wpdlib-input-repeatable {
+	width: 100%;
+	overflow: auto;
+}
+
+.wpdlib-repeatable-table {
+	margin: 10px 0;
+	clear: both;
+	table-layout: fixed;
+	border-collapse: collapse;
+	border-spacing: 0;
+	&,
+	th,
+	td {
+		border: 1px solid #dddddd;
+	}
+	th,
+	td {
+		width: auto;
+		margin-bottom: 5px;
+		padding: 4px;
+		&.wpdlib-repeatable-number {
+			width: 25px;
+		}
+	}
+}
+
+.wpdlib-remove-repeatable-button {
+	color: #aa0000;
 }

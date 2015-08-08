@@ -4,7 +4,11 @@
   "version": "0.5.0",
   "license": "GPL-2.0",
   "keywords": [
-    "wordpress", "library", "developer", "backend", "definitely"
+    "wordpress",
+    "library",
+    "developer",
+    "wp",
+    "definitely"
   ],
   "homepage": "https://github.com/felixarntz/wpdlib/",
   "authors": [

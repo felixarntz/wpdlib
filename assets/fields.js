@@ -1,19 +1,18 @@
 jQuery( document ).ready( function( $ ) {
 
-	if ( typeof $.fn.select2 !== 'undefined' ) {
-		// select2 setup
-		function formatSelect2( option ) {
-			var $option = $( option.element );
+	// select2 setup
+	function formatSelect2( option ) {
+		var $option = $( option.element );
 
-			if ( $option.data().hasOwnProperty( 'image' ) ) {
-				return '<div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div>' + option.text;
-			} else if ( $option.data().hasOwnProperty( 'color' ) ) {
-				return '<div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div>' + option.text;
-			} else {
-				return option.text;
-			}
+		if ( $option.data().hasOwnProperty( 'image' ) ) {
+			return '<div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div>' + option.text;
+		} else if ( $option.data().hasOwnProperty( 'color' ) ) {
+			return '<div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div>' + option.text;
+		} else {
+			return option.text;
 		}
-
+	}
+	if ( typeof $.fn.select2 !== 'undefined' ) {
 		var select2_args = {
 			containerCss : {
 				'width': '100%',
@@ -29,7 +28,7 @@ jQuery( document ).ready( function( $ ) {
 		$( '.wpdlib-input-select' ).select2( select2_args );
 	}
 
-	if ( typeof $.fn.datetimepicker !== 'undefined' )
+	if ( typeof $.fn.datetimepicker !== 'undefined' ) {
 		// datetimepicker setup
 		var dtp_datetimepicker_args = {
 			lang: _wpdlib_data.language,
@@ -135,7 +134,7 @@ jQuery( document ).ready( function( $ ) {
 	});
 
 	// radio handling
-	$( document ).on( 'click', '.wpdlib-input-radio .radio div', function() {
+	$( document ).on( 'click', '.wpdlib-input-radio .wpdlib-radio div', function() {
 		var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
 
 		$( this ).parent().parent().find( '.radio div' ).removeClass( 'checked' );
@@ -150,7 +149,7 @@ jQuery( document ).ready( function( $ ) {
 	});
 
 	// multibox handling
-	$( document ).on( 'click', '.wpdlib-input-multibox .checkbox div', function() {
+	$( document ).on( 'click', '.wpdlib-input-multibox .wpdlib-checkbox div', function() {
 		var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
 
 		if ( $( this ).hasClass( 'checked' ) ) {
@@ -170,7 +169,7 @@ jQuery( document ).ready( function( $ ) {
 
 		var _orig_send_attachment = wp.media.editor.send.attachment;
 
-		$( document ).on( 'click', '.wpdlib-input-media-button', function() {
+		$( document ).on( 'click', '.wpdlib-media-button', function() {
 			var $button = $( this );
 
 			var search_id = $button.attr( 'id' ).replace( '-media-button', '' );
@@ -223,7 +222,8 @@ jQuery( document ).ready( function( $ ) {
 				if ( typeof _wpdlib_data.repeatable_field_templates[ id ] !== 'undefined' ) {
 					var output = _wpdlib_data.repeatable_field_templates[ id ].replace( /{{KEY}}/g, key ).replace( /{{KEY_PLUSONE}}/g, key + 1 );
 
-					$parent.append( output );
+					$parent.find( '.wpdlib-repeatable-table' ).show();
+					$parent.find( '.wpdlib-repeatable-table' ).append( output );
 					if ( typeof $.fn.select2 !== 'undefined' ) {
 						$parent.find( '.wpdlib-input-select' ).select2( select2_args );
 					}
@@ -275,8 +275,11 @@ jQuery( document ).ready( function( $ ) {
 
 				var limit = parseInt( $( '#' + e.delegateTarget.id ).data( 'limit' ) );
 
-				if ( limit > 0 && limit > $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length) {
+				if ( limit > 0 && limit > $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length ) {
 					$( '#' + e.delegateTarget.id ).find( '.wpdlib-new-repeatable-button' ).show();
+				}
+				if ( $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length < 1 ) {
+					$( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-table' ).hide();
 				}
 			});
 		});

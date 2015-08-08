@@ -19,12 +19,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Url' ) ) {
 				return '';
 			}
 
-			$sanitized_url = sanitize_url( $val );
-			if ( $sanitized_url != $val ) {
-				return new \WP_Error( 'invalid_url', sprintf( __( '%s is not a valid URL.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' ) ) );
+			return \WPDLib\FieldTypes\Manager::format( $val, 'url', 'input' );
+		}
+
+		public function parse( $val, $formatted = false ) {
+			if ( $formatted ) {
+				return \WPDLib\FieldTypes\Manager::format( $val, 'url', 'output' );
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $sanitized_url, 'string', 'output' );
+			return \WPDLib\FieldTypes\Manager::format( $val, 'url', 'input' );
 		}
 	}
 

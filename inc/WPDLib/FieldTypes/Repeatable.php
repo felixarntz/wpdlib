@@ -28,15 +28,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			} else {
 				$args['repeatable']['limit'] = absint( $args['repeatable']['limit'] );
 			}
-			if ( ! isset( $args['repeatable']['fields'] ) || ! is_array( $args['repeatable']['fields'] ) {
+			if ( ! isset( $args['repeatable']['fields'] ) || ! is_array( $args['repeatable']['fields'] ) ) {
 				$args['repeatable']['fields'] = array();
 			}
 			parent::__construct( $type, $args );
 
 			foreach ( $this->args['repeatable']['fields'] as $field_slug => $field_args ) {
-				if ( isset( $field_args['title'] ) ) {
-					$field_args['placeholder'] = $field_args['title'];
-				}
 				$field = \WPDLib\FieldTypes\Manager::get_instance( $field_args );
 				if ( $field !== null ) {
 					$this->fields[ $field_slug ] = $field;
@@ -65,9 +62,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 
 			$output = '<div' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
 			$output .= '<p><a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Add new', 'wpdlib' ) . '</a></p>';
+			$output .= '<table class="wpdlib-repeatable-table"' . ( count( $val ) < 1 ? ' style="display:none;"' : '' ) . '>';
+			$output .= '<tr>';
+			$output .= '<th class="wpdlib-repeatable-number">#</th>';
+			foreach ( $this->args['repeatable']['fields'] as $slug => $args ) {
+				$output .= '<th class="wpdlib-repeatable-' . $this->args['id'] . '-' . $slug . '">' . ( isset( $args['title'] ) ? $args['title'] : '' ) . '</th>';
+			}
+			$output .= '<th></th>';
+			$output .= '</tr>';
 			foreach ( $val as $key => $values ) {
 				$output .= $this->display_item( $key, $values, false );
 			}
+			$output .= '</table>';
 			$output .= '</div>';
 
 			if ( $echo ) {
@@ -165,14 +171,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 		}
 
 		protected function display_item( $key, $values = array(), $echo = true ) {
-			$output = '<p class="wpdlib-repeatable-row">';
+			$output = '<tr class="wpdlib-repeatable-row">';
 
+			$output .= '<td class="wpdlib-repeatable-number">';
 			if ( '{{' . 'KEY' . '}}' === $key ) {
 				$output .= '<span>' . sprintf( __( '%s.', 'wpdlib' ), '{{' . 'KEY_PLUSONE' . '}}' ) . '</span>';
 			} else {
 				$key = absint( $key );
 				$output .= '<span>' . sprintf( __( '%s.', 'wpdlib' ), $key + 1 ) . '</span>';
 			}
+			$output .= '</td>';
 
 			foreach ( $this->args['repeatable']['fields'] as $slug => $args ) {
 				if ( ! isset( $this->fields[ $slug ] ) ) {
@@ -184,20 +192,22 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 				$this->fields[ $slug ]->id = $this->args['id'] . '-' . $key . '-' . $slug;
 				$this->fields[ $slug ]->name = $this->args['name'] . '[' . $key . '][' . $slug . ']';
 
-				$output .= '<span class="wpdlib-repeatable-col">';
+				$output .= '<td class="wpdlib-repeatable-col wpdlib-repeatable-' . $this->args['id'] . '-' . $slug . '">';
 				$output .= $this->fields[ $slug ]->display( $val, false );
-				$output .= '</span>';
+				$output .= '</td>';
 			}
 
 			$button_args = array(
-				'class'			=> 'wpdlib-remove-repeatable-button button',
+				'class'			=> 'wpdlib-remove-repeatable-button',
 				'href'			=> '#',
 				'data-number'	=> $key,
 			);
 
+			$output .= '<td>';
 			$output .= '<a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Remove', 'wpdlib' ) . '</a>';
+			$output .= '</td>';
 
-			$output .= '</p>';
+			$output .= '</tr>';
 
 			if ( $echo ) {
 				echo $output;

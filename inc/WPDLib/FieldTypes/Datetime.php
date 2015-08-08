@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 
 	class Datetime extends \WPDLib\FieldTypes\Base {
+		protected static $locale = null;
+
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'min'	=> '',
@@ -24,7 +26,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
-			$args['value'] = $val;
+			$args['value'] = $this->parse( $val, true );
 
 			$output = '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
 
@@ -38,6 +40,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		public function validate( $val = null ) {
 			if ( $val === null ) {
 				return \WPDLib\FieldTypes\Manager::format( current_time( 'timestamp' ), $this->type, 'input' );
+			}
+
+			if ( 'time' != $this->type ) {
+				$val = $this->untranslate( $val );
 			}
 
 			$timestamp = strtotime( $val );
@@ -88,6 +94,75 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 					'start_of_week'	=> get_option( 'start_of_week' ),
 				),
 			);
+		}
+
+		protected function untranslate( $val ) {
+			if ( self::$locale === null ) {
+				global $wp_locale;
+
+				self::$locale = array(
+					'weekday'			=> array(
+						'Sunday'			=> $wp_locale->weekday[0],
+						'Monday'			=> $wp_locale->weekday[1],
+						'Tuesday'			=> $wp_locale->weekday[2],
+						'Wednesday'			=> $wp_locale->weekday[3],
+						'Thursday'			=> $wp_locale->weekday[4],
+						'Friday'			=> $wp_locale->weekday[5],
+						'Saturday'			=> $wp_locale->weekday[6],
+					),
+					'weekday_initial'	=> $wp_locale->weekday_initial,
+					'weekday_abbrev'	=> $wp_locale->weekday_abbrev,
+					'month'				=> array(
+						'January'			=> $wp_locale->month['01'],
+						'February'			=> $wp_locale->month['02'],
+						'March'				=> $wp_locale->month['03'],
+						'April'				=> $wp_locale->month['04'],
+						'May'				=> $wp_locale->month['05'],
+						'June'				=> $wp_locale->month['06'],
+						'July'				=> $wp_locale->month['07'],
+						'August'			=> $wp_locale->month['08'],
+						'September'			=> $wp_locale->month['09'],
+						'October'			=> $wp_locale->month['10'],
+						'November'			=> $wp_locale->month['11'],
+						'December'			=> $wp_locale->month['12'],
+					),
+					'month_abbrev'		=> $wp_locale->month_abbrev,
+				);
+			}
+
+			$val = preg_replace_callback( '/[A-Za-z]+/', function( $matches ) {
+				$term = $matches[0];
+
+				if ( $key = array_search( $term, self::$locale['weekday_initial'] ) ) {
+					if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
+						return $key;
+					}
+				}
+
+				if ( $key = array_search( $term, self::$locale['weekday_abbrev'] ) ) {
+					if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
+						return $key;
+					}
+				}
+
+				if ( $key = array_search( $term, self::$locale['weekday'] ) ) {
+					return $key;
+				}
+
+				if ( $key = array_search( $term, self::$locale['month_abbrev'] ) ) {
+					if ( $key = array_search( $key, self::$locale['month'] ) ) {
+						return $key;
+					}
+				}
+
+				if ( $key = array_search( $term, self::$locale['month'] ) ) {
+					return $key;
+				}
+
+				return $term;
+			}, $val );
+
+			return $val;
 		}
 	}
 

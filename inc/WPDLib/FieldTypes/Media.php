@@ -31,12 +31,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			$text_args = array(
 				'id'	=> $args['id'] . '-media-title',
 				'class'	=> 'wpdlib-media-title',
-				'value'	=> $val ? basename( get_attached_file( $val ) : '',
+				'value'	=> $val ? basename( get_attached_file( $val ) ) : '',
 			);
 
 			$button_args = array(
 				'id'	=> $args['id'] . '-media-button',
-				'class'	=> 'wpdlib-media-button media-button',
+				'class'	=> 'wpdlib-media-button button',
 				'href'	=> '#',
 			);
 

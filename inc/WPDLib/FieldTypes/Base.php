@@ -30,14 +30,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 				'readonly'		=> false,
 				'disabled'		=> false,
 			) );
+			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
+				$this->args['class'] .= ' wpdlib-input';
+			}
 			if ( strpos( $this->args['class'], 'wpdlib-input-' . $this->type ) === false ) {
 				if ( ! empty( $this->args['class'] ) ) {
 					$this->args['class'] .= ' ';
 				}
 				$this->args['class'] .= 'wpdlib-input-' . $this->type;
-			}
-			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
-				$this->args['class'] .= ' wpdlib-input';
 			}
 		}
 

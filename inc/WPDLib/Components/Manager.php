@@ -102,32 +102,48 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			return $component;
 		}
 
-		public static function get( $component_path, $start_class = '' ) {
+		public static function get( $component_path, $start_class = '', $single = false ) {
 			$component_path = explode( '.', $component_path, 2 );
+			$toplevel_components = array();
 			if ( ! empty( $start_class ) ) {
-				if ( isset( self::$components[ $class ] ) && isset( self::$components[ $class ][ $component_path[0] ] ) ) {
-					$current = self::$components[ $class ][ $component_path[0] ];
-					if ( isset( $component_path[1] ) ) {
-						$current = self::get_component_recursive( $component_path[1], $current->children );
-					}
-					if ( $current !== null ) {
-						return $current;
-					}
+				if ( isset( self::$components[ $start_class ] ) ) {
+					$toplevel_components = self::$components[ $start_class ];
 				}
 			} else {
 				foreach ( self::$components as $class => $components ) {
-					if ( isset( $components[ $component_path[0] ] ) ) {
-						$current = $components[ $component_path[0] ];
-						if ( isset( $component_path[1] ) ) {
-							$current = self::get_component_recursive( $component_path[1], $current->children );
-						}
-						if ( $current !== null ) {
-							return $current;
-						}
-					}
+					$toplevel_components = array_merge( $toplevel_components, $components );
 				}
 			}
-			return null;
+
+			$results = array();
+
+			if ( '*' == $component_path[0] ) {
+				if ( isset( $component_path[1] ) ) {
+					foreach ( $toplevel_components as $current ) {
+						$current = self::get_components_recursive( $component_path[1], $current->children );
+						$results = array_merge( $results, $current );
+					}
+				} else {
+					$results = array_merge( $results, array_values( $toplevel_components ) );
+				}
+			} elseif ( isset( $toplevel_components[ $component_path[0] ] ) ) {
+				$current = $toplevel_components[ $component_path[0] ];
+				if ( isset( $component_path[1] ) ) {
+					$current = self::get_components_recursive( $component_path[1], $current->children );
+					$results = array_merge( $results, $current );
+				} else {
+					$results[] = $current;
+				}
+			}
+
+			if ( $single ) {
+				if ( count( $results ) > 0 ) {
+					return $results[0];
+				}
+				return null;
+			}
+
+			return $results;
 		}
 
 		public static function exists( $slug, $class, $check_slug = '' ) {
@@ -207,16 +223,35 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			return self::$base_url;
 		}
 
-		private static function get_component_recursive( $component_path, $current_children ) {
+		public static function load_textdomain() {
+			$locale = apply_filters( 'plugin_locale', get_locale(), 'wpdlib' );
+			return load_textdomain( 'wpdlib', self::get_base_dir() . '/languages/wpdlib-' . $locale . '.mo' );
+		}
+
+		private static function get_components_recursive( $component_path, $current_children ) {
 			$component_path = explode( '.', $component_path, 2 );
-			if ( isset( $current_children[ $component_path[0] ] ) ) {
+			$results = array();
+
+			if ( '*' == $component_path[0] ) {
+				if ( isset( $component_path[1] ) ) {
+					foreach ( $current_children as $current ) {
+						$current = self::get_components_recursive( $component_path[1], $current->children );
+						$results = array_merge( $results, $current );
+					}
+				} else {
+					$results = array_merge( $results, array_values( $current_children ) );
+				}
+			} elseif ( isset( $current_children[ $component_path[0] ] ) ) {
 				$current = $current_children[ $component_path[0] ];
 				if ( isset( $component_path[1] ) ) {
-					return self::get_component_recursive( $component_path[1], $current->children );
+					$current = self::get_components_recursive( $component_path[1], $current->children );
+					$results = array_merge( $results, $current );
+				} else {
+					$results[] = $current;
 				}
-				return $current;
 			}
-			return null;
+
+			return $results;
 		}
 
 		private static function merge_components( $a, $b ) {
@@ -240,5 +275,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			self::$base_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, self::$base_dir );
 		}
 	}
+
+	Manager::load_textdomain();
 
 }

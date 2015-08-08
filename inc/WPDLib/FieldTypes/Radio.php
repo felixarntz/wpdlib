@@ -29,9 +29,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
 			$name = $this->get_sanitized_name();
 
-			$single_type = 'radio';
+			$single_type = 'wpdlib-radio';
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
-				$single_type = 'checkbox';
+				$single_type = 'wpdlib-checkbox';
 			}
 
 			$output = '<div' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
@@ -108,9 +108,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					}
 				}
 
-				foreach ( $val as $v ) {
-					if ( ! isset( $this->args['options'][ $v ] ) ) {
-						return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPOD\Util::format( $v, 'string', 'output' ) ) );
+				for ( $i = 0; $i < count( $val ); $i++ ) {
+					if ( ! isset( $this->args['options'][ $val[ $i ] ] ) ) {
+						$key = array_search( $val[ $i ], $this->args['options'] );
+						if ( '' !== $key ) {
+							return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val[ $i ], 'string', 'output' ) ) );
+						} else {
+							$val[ $i ] = $key;
+						}
 					}
 				}
 
@@ -124,7 +129,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				}
 
 				if ( ! isset( $this->args['options'][ $val ] ) ) {
-					return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPOD\Util::format( $val, 'string', 'output' ) ) );
+					$key = array_search( $val, $this->args['options'] );
+					if ( '' !== $key ) {
+						return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' ) ) );
+					} else {
+						$val = $key;
+					}
 				}
 
 				return $val;

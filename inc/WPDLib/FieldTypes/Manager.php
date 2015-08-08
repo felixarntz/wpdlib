@@ -46,6 +46,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'id',
 				'name',
 				'class',
+				'placeholder',
 				'required',
 				'readonly',
 				'disabled',
@@ -261,11 +262,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 							}
 						} else {
 							if ( $type == 'date' ) {
-								$format = 'Y-m-d';
+								$format = 'Ymd';
 							} elseif ( $type == 'time' ) {
-								$format = 'H:i:s';
+								$format = 'His';
 							} else {
-								$format = 'Y-m-d H:i:s';
+								$format = 'YmdHis';
 							}
 						}
 					}
