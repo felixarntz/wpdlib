@@ -23,9 +23,12 @@
     "email": "felix-arntz@leaves-and-love.net",
     "issues": "https://github.com/felixarntz/wpdlib/issues"
   },
+  "config": {
+    "preferred-install": "dist"
+  },
   "autoload": {
-    "psr-0": {
-      "WPDLib\\": "inc/"
+    "psr-4": {
+      "WPDLib\\": "inc/WPDLib/"
     }
   }
 }

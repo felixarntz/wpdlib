@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 
-	class Wysiwyg extends \WPDLib\FieldTypes\Textarea {
+	class Wysiwyg extends Textarea {
 		public function display( $val, $echo = true ) {
 			$wp_editor_settings = array(
 				'wpautop'		=> true,
@@ -40,15 +42,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 				return '';
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $value, 'html', 'input' );;
+			return FieldManager::format( $value, 'html', 'input' );;
 		}
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return \WPDLib\FieldTypes\Manager::format( $val, 'html', 'output' );
+				return FieldManager::format( $val, 'html', 'output' );
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, 'html', 'input' );
+			return FieldManager::format( $val, 'html', 'input' );
 		}
 	}
 

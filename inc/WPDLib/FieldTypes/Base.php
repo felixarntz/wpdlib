@@ -7,6 +7,8 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
@@ -63,7 +65,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			$args = $this->args;
 			$args['value'] = $val;
 
-			$output = '<input type="' . $this->type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -77,7 +79,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 				return '';
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
+			return FieldManager::format( $val, 'string', 'input' );
 		}
 
 		public function is_empty( $val ) {
@@ -86,10 +88,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' );
+				return FieldManager::format( $val, 'string', 'output' );
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
+			return FieldManager::format( $val, 'string', 'input' );
 		}
 
 		public function enqueue_assets() {

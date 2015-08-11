@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Email' ) ) {
 
-	class Email extends \WPDLib\FieldTypes\Base {
+	class Email extends Base {
 		public function validate( $val = null ) {
 			if ( $val === null ) {
 				return '';
@@ -22,7 +24,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Email' ) ) {
 			$input = sanitize_email( $val );
 			$val = is_email( $input );
 			if ( ! $val ) {
-				return new \WP_Error( 'invalid_email', sprintf( __( '%s is not a valid email address.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $input, 'string', 'output' ) ) );
+				return new WPError( 'invalid_email', sprintf( __( '%s is not a valid email address.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $input, 'string', 'output' ) ) );
 			}
 
 			return $val;

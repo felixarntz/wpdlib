@@ -7,6 +7,8 @@
 
 namespace WPDLib\Components;
 
+use WPDLib\Util\Error as UtilError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
@@ -68,16 +70,16 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 		public static function add( $component ) {
 			if ( self::is_too_late() ) {
-				return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', self::$current_scope );
+				return new UtilError( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', self::$current_scope );
 			}
 
 			if ( ! is_a( $component, 'WPDLib\Components\Base' ) ) {
-				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', self::$current_scope );
+				return new UtilError( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', self::$current_scope );
 			}
 
 			$component_class = get_class( $component );
 			if ( ! self::is_toplevel( $component_class ) ) {
-				return new \WPDLib\Util\Error( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', self::$current_scope );
+				return new UtilError( 'no_toplevel_component', sprintf( __( 'The component %1$s of class %2$s is not a valid toplevel component.', 'wpdlib' ), $component->slug, $component_class ), '', self::$current_scope );
 			}
 
 			$status = $component->validate();
@@ -86,7 +88,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			}
 
 			if ( ! $component->is_valid_slug() ) {
-				return new \WPDLib\Util\Error( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), $component_class, $component->slug ), '', self::$current_scope );
+				return new UtilError( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), $component_class, $component->slug ), '', self::$current_scope );
 			}
 
 			if ( ! isset( self::$components[ $component_class ] ) ) {

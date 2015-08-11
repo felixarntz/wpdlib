@@ -7,13 +7,16 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
-	class Media extends \WPDLib\FieldTypes\Base {
+	class Media extends Base {
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'mime_types'	=> 'all',
@@ -40,9 +43,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				'href'	=> '#',
 			);
 
-			$output = '<input type="hidden"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
-			$output .= '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Choose / Upload a File', 'wpdlib' ) . '</a>';
+			$output = '<input type="hidden"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
+			$output .= '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
+			$output .= '<a' . FieldManager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Choose / Upload a File', 'wpdlib' ) . '</a>';
 
 			if ( $val ) {
 				if ( $this->check_filetype( $val, 'image' ) ) {
@@ -51,7 +54,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 						'class'	=> 'wpdlib-media-image',
 						'src'	=> wp_get_attachment_url( $val ),
 					);
-					$output .= '<img' . \WPDLib\FieldTypes\Manager::make_html_attributes( $image_args, false, false ) . ' />';
+					$output .= '<img' . FieldManager::make_html_attributes( $image_args, false, false ) . ' />';
 				} else {
 					$link_args = array(
 						'id'	=> $args['id'] . '-media-link',
@@ -59,7 +62,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 						'href'	=> wp_get_attachment_url( $val ),
 						'target'=> '_blank',
 					);
-					$output .= '<a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $link_args, false, false ) . '>' . __( 'Open File', 'wpdlib' ) . '</a>';
+					$output .= '<a' . FieldManager::make_html_attributes( $link_args, false, false ) . '>' . __( 'Open File', 'wpdlib' ) . '</a>';
 				}
 			}
 
@@ -78,12 +81,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			$val = absint( $val );
 
 			if ( 'attachment' != get_post_type( $val ) ) {
-				return new \WP_Error( 'invalid_media_post_type', sprintf( __( 'The post with ID %s is not a valid WordPress media file.', 'wpdlib' ), $val ) );
+				return new WPError( 'invalid_media_post_type', sprintf( __( 'The post with ID %s is not a valid WordPress media file.', 'wpdlib' ), $val ) );
 			}
 
 			if ( ! $this->check_filetype( $val, $this->args['mime_types'] ) ) {
 				$valid_formats = is_array( $this->args['mime_types'] ) ? implode( ', ', $this->args['mime_types'] ) : $this->args['mime_types'];
-				return new \WP_Error( 'invalid_media_mime_type', sprintf( __( 'The media item with ID %1$s is neither of the valid formats (%2$s).', 'wpdlib' ), $val, $valid_formats ) );
+				return new WPError( 'invalid_media_mime_type', sprintf( __( 'The media item with ID %1$s is neither of the valid formats (%2$s).', 'wpdlib' ), $val, $valid_formats ) );
 			}
 
 			return $val;

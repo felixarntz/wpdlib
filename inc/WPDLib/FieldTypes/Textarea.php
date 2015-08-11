@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Textarea' ) ) {
 
-	class Textarea extends \WPDLib\FieldTypes\Base {
+	class Textarea extends Base {
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'rows'	=> 5,
@@ -22,7 +24,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Textarea' ) ) {
 		}
 
 		public function display( $val, $echo = true ) {
-			$output = '<textarea' . \WPDLib\FieldTypes\Manager::make_html_attributes( $this->args, false, false ) . '>';
+			$output = '<textarea' . FieldManager::make_html_attributes( $this->args, false, false ) . '>';
 			$output .= esc_textarea( $val );
 			$output .= '</textarea>';
 

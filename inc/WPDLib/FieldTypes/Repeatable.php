@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 
-	class Repeatable extends \WPDLib\FieldTypes\Base {
+	class Repeatable extends Base {
 		protected $fields = array();
 
 		public function __construct( $type, $args ) {
@@ -34,7 +36,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			parent::__construct( $type, $args );
 
 			foreach ( $this->args['repeatable']['fields'] as $field_slug => $field_args ) {
-				$field = \WPDLib\FieldTypes\Manager::get_instance( $field_args );
+				$field = FieldManager::get_instance( $field_args );
 				if ( $field !== null ) {
 					$this->fields[ $field_slug ] = $field;
 				}
@@ -60,8 +62,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 				$button_args['style'] = 'display:none;';
 			}
 
-			$output = '<div' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
-			$output .= '<p><a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Add new', 'wpdlib' ) . '</a></p>';
+			$output = '<div' . FieldManager::make_html_attributes( $args, false, false ) . '>';
+			$output .= '<p><a' . FieldManager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Add new', 'wpdlib' ) . '</a></p>';
 			$output .= '<table class="wpdlib-repeatable-table"' . ( count( $val ) < 1 ? ' style="display:none;"' : '' ) . '>';
 			$output .= '<tr>';
 			$output .= '<th class="wpdlib-repeatable-number">#</th>';
@@ -204,7 +206,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			);
 
 			$output .= '<td>';
-			$output .= '<a' . \WPDLib\FieldTypes\Manager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Remove', 'wpdlib' ) . '</a>';
+			$output .= '<a' . FieldManager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Remove', 'wpdlib' ) . '</a>';
 			$output .= '</td>';
 
 			$output .= '</tr>';

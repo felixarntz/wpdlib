@@ -7,13 +7,16 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 
-	class Color extends \WPDLib\FieldTypes\Base {
+	class Color extends Base {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $val;
@@ -24,8 +27,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 				'value'	=> $args['value'],
 			);
 
-			$output = '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<input type="' . $this->type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+			$output = '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
+			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -40,7 +43,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			}
 
 			if ( ! preg_match( '/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i', $val ) ) {
-				return new \WP_Error( 'invalid_color_hex', sprintf( __( '%s is not a valid hexadecimal color.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' ) ) );
+				return new WPError( 'invalid_color_hex', sprintf( __( '%s is not a valid hexadecimal color.', 'wpdlib' ), FieldManager::format( $val, 'string', 'output' ) ) );
 			}
 
 			return strtolower( $val );

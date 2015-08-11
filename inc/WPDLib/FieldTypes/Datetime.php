@@ -7,13 +7,17 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\FieldTypes\Manager as FieldManager;
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 
-	class Datetime extends \WPDLib\FieldTypes\Base {
+	class Datetime extends Base {
 		protected static $locale = null;
 
 		public function __construct( $type, $args ) {
@@ -28,7 +32,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$args = $this->args;
 			$args['value'] = $this->parse( $val, true );
 
-			$output = '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -39,7 +43,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 
 		public function validate( $val = null ) {
 			if ( $val === null ) {
-				return \WPDLib\FieldTypes\Manager::format( current_time( 'timestamp' ), $this->type, 'input' );
+				return FieldManager::format( current_time( 'timestamp' ), $this->type, 'input' );
 			}
 
 			if ( 'time' != $this->type ) {
@@ -50,16 +54,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$timestamp_min = ! empty( $this->args['min'] ) ? strtotime( $this->args['min'] ) : null;
 			$timestamp_max = ! empty( $this->args['max'] ) ? strtotime( $this->args['max'] ) : null;
 
-			$value = \WPDLib\FieldTypes\Manager::format( $timestamp, $this->type, 'input' );
-			$value_min = $timestamp_min !== null ? \WPDLib\FieldTypes\Manager::format( $timestamp_min, $this->type, 'input' ) : null;
-			$value_max = $timestamp_max !== null ? \WPDLib\FieldTypes\Manager::format( $timestamp_max, $this->type, 'input' ) : null;
+			$value = FieldManager::format( $timestamp, $this->type, 'input' );
+			$value_min = $timestamp_min !== null ? FieldManager::format( $timestamp_min, $this->type, 'input' ) : null;
+			$value_max = $timestamp_max !== null ? FieldManager::format( $timestamp_max, $this->type, 'input' ) : null;
 
 			if ( $value_min !== null && $value < $value_min ) {
-				return new \WP_Error( 'invalid_' . $this->type . '_too_small', sprintf( __( 'The date %1$s is invalid. It must not occur earlier than %2$s.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, $this->type, 'output' ), \WPDLib\FieldTypes\Manager::format( $timestamp_min, $this->type, 'output' ) ) );
+				return new WPError( 'invalid_' . $this->type . '_too_small', sprintf( __( 'The date %1$s is invalid. It must not occur earlier than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_min, $this->type, 'output' ) ) );
 			}
 
 			if ( $value_max !== null && $value > $value_max ) {
-				return new \WP_Error( 'invalid_' . $this->type . '_too_big', sprintf( __( 'The date %1$s is invalid. It must not occur later than %2$s.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, $this->type, 'output' ), \WPDLib\FieldTypes\Manager::format( $timestamp_max, $this->type, 'output' ) ) );
+				return new WPError( 'invalid_' . $this->type . '_too_big', sprintf( __( 'The date %1$s is invalid. It must not occur later than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_max, $this->type, 'output' ) ) );
 			}
 
 			return $value;
@@ -69,9 +73,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$timestamp = strtotime( $val );
 
 			if ( $formatted ) {
-				return \WPDLib\FieldTypes\Manager::format( $timestamp, $this->type, 'output' );
+				return FieldManager::format( $timestamp, $this->type, 'output' );
 			}
-			return \WPDLib\FieldTypes\Manager::format( $timestamp, $this->type, 'input' );
+			return FieldManager::format( $timestamp, $this->type, 'input' );
 		}
 
 		public function enqueue_assets() {
@@ -79,8 +83,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 				return array();
 			}
 
-			$assets_url = \WPDLib\Components\Manager::get_base_url() . '/assets';
-			$version = \WPDLib\Components\Manager::get_dependency_info( 'datetimepicker', 'version' );
+			$assets_url = ComponentManager::get_base_url() . '/assets';
+			$version = ComponentManager::get_dependency_info( 'datetimepicker', 'version' );
 
 			wp_enqueue_style( 'datetimepicker', $assets_url . '/vendor/datetimepicker/jquery.datetimepicker.css', array(), $version );
 			wp_enqueue_script( 'datetimepicker', $assets_url . '/vendor/datetimepicker/jquery.datetimepicker.js', array( 'jquery' ), $version, true );

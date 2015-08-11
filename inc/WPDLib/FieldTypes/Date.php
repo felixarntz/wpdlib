@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Date' ) ) {
 
-	class Date extends \WPDLib\FieldTypes\Datetime {
+	class Date extends Datetime {
 
 	}
 

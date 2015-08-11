@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 
-	class Checkbox extends \WPDLib\FieldTypes\Base {
+	class Checkbox extends Base {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			unset( $args['placeholder'] );
@@ -21,7 +23,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 				$args['checked'] = true;
 			}
 
-			$output = '<input type="' . $this->type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -35,7 +37,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 				return false;
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, 'boolean', 'input' );
+			return FieldManager::format( $val, 'boolean', 'input' );
 		}
 
 		public function is_empty( $val ) {
@@ -44,10 +46,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return \WPDLib\FieldTypes\Manager::format( $val, 'boolean', 'output' );
+				return FieldManager::format( $val, 'boolean', 'output' );
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, 'boolean', 'input' );
+			return FieldManager::format( $val, 'boolean', 'input' );
 		}
 	}
 

@@ -7,13 +7,16 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
-	class Radio extends \WPDLib\FieldTypes\Base {
+	class Radio extends Base {
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'options'	=> array(),
@@ -34,7 +37,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				$single_type = 'wpdlib-checkbox';
 			}
 
-			$output = '<div' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
+			$output = '<div' . FieldManager::make_html_attributes( $args, false, false ) . '>';
 
 			foreach ( $this->args['options'] as $value => $label ) {
 				$option_atts = array(
@@ -74,7 +77,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
 				$output .= '<div class="' . $single_type . $additional_class . '">';
 
-				$output .= '<input type="' . $single_type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $option_atts, false, false ) . ' />';
+				$output .= '<input type="' . $single_type . '"' . FieldManager::make_html_attributes( $option_atts, false, false ) . ' />';
 
 				$output .= $additional_output;
 
@@ -112,7 +115,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					if ( ! isset( $this->args['options'][ $val[ $i ] ] ) ) {
 						$key = array_search( $val[ $i ], $this->args['options'] );
 						if ( '' !== $key ) {
-							return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val[ $i ], 'string', 'output' ) ) );
+							return new WPError( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), FieldManager::format( $val[ $i ], 'string', 'output' ) ) );
 						} else {
 							$val[ $i ] = $key;
 						}
@@ -131,7 +134,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				if ( ! isset( $this->args['options'][ $val ] ) ) {
 					$key = array_search( $val, $this->args['options'] );
 					if ( '' !== $key ) {
-						return new \WP_Error( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' ) ) );
+						return new WPError( 'invalid_' . $this->type . '_option', sprintf( __( '%s is not a valid option.', 'wpdlib' ), FieldManager::format( $val, 'string', 'output' ) ) );
 					} else {
 						$val = $key;
 					}
@@ -168,11 +171,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 								$v = $this->args['options'][ $v ];
 							}
 						}
-						$parsed[] = \WPDLib\FieldTypes\Manager::format( $v, 'string', 'output' );
+						$parsed[] = FieldManager::format( $v, 'string', 'output' );
 					}
 				} else {
 					foreach ( $val as $v ) {
-						$parsed[] = \WPDLib\FieldTypes\Manager::format( $v, 'string', 'input' );
+						$parsed[] = FieldManager::format( $v, 'string', 'input' );
 					}
 				}
 
@@ -192,10 +195,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 							$val = $this->args['options'][ $val ];
 						}
 					}
-					return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'output' );
+					return FieldManager::format( $val, 'string', 'output' );
 				}
 
-				return \WPDLib\FieldTypes\Manager::format( $val, 'string', 'input' );
+				return FieldManager::format( $val, 'string', 'input' );
 			}
 		}
 

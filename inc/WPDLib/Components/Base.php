@@ -7,6 +7,9 @@
 
 namespace WPDLib\Components;
 
+use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\Util as UtilError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
@@ -52,17 +55,17 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function add( $component ) {
-			if ( \WPDLib\Components\Manager::is_too_late() ) {
-				return new \WPDLib\Util\Error( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', \WPDLib\Components\Manager::get_scope() );
+			if ( ComponentManager::is_too_late() ) {
+				return new UtilError( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', ComponentManager::get_scope() );
 			}
 
 			if ( ! is_a( $component, 'WPDLib\Components\Base' ) ) {
-				return new \WPDLib\Util\Error( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', \WPDLib\Components\Manager::get_scope() );
+				return new UtilError( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', ComponentManager::get_scope() );
 			}
 
-			$children = \WPDLib\Components\Manager::get_children( get_class( $this ) );
+			$children = ComponentManager::get_children( get_class( $this ) );
 			if ( ! in_array( get_class( $component ), $children ) ) {
-				return new \WPDLib\Util\Error( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', \WPDLib\Components\Manager::get_scope() );
+				return new UtilError( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', ComponentManager::get_scope() );
 			}
 
 			$status = $component->validate( $this );
@@ -71,7 +74,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			}
 
 			if ( ! $component->is_valid_slug() ) {
-				return new \WPDLib\Util\Error( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), get_class( $component ), $component->slug ), '', \WPDLib\Components\Manager::get_scope() );
+				return new UtilError( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), get_class( $component ), $component->slug ), '', ComponentManager::get_scope() );
 			}
 
 			$this->children[ $component->slug ] = $component;
@@ -107,7 +110,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		public function validate( $parent = null ) {
 			if ( $parent !== null ) {
 				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
-					return new \WPDLib\Util\Error( 'no_multiparent_component', sprintf( __( 'The component %1$s of class %2$s already has a parent assigned and is not a multiparent component.', 'wpdlib' ), $this->slug, get_class( $this ) ), '', \WPDLib\Components\Manager::get_scope() );
+					return new UtilError( 'no_multiparent_component', sprintf( __( 'The component %1$s of class %2$s already has a parent assigned and is not a multiparent component.', 'wpdlib' ), $this->slug, get_class( $this ) ), '', ComponentManager::get_scope() );
 				}
 				$this->parents[ $parent->slug ] = $parent;
 			}
@@ -118,7 +121,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 						$this->args[ $key ] = $default;
 					}
 				}
-				$this->scope = \WPDLib\Components\Manager::get_scope();
+				$this->scope = ComponentManager::get_scope();
 				$this->validated = true;
 				return true;
 			}
@@ -143,15 +146,15 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 							}
 						}
 						if ( $found ) {
-							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ), $parent->slug );
+							$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ), $parent->slug );
 						} else {
-							$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
+							$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ) );
 						}
 					} else {
-						$this->valid_slug = ! \WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) );
+						$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ) );
 					}
 				} else {
-					\WPDLib\Components\Manager::exists( $this->slug, get_class( $this ) ); // just use the function to add the component
+					ComponentManager::exists( $this->slug, get_class( $this ) ); // just use the function to add the component
 					$this->valid_slug = true;
 				}
 			}

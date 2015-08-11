@@ -7,13 +7,16 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 
-	class Number extends \WPDLib\FieldTypes\Base {
+	class Number extends Base {
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'min'	=> '',
@@ -33,18 +36,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 				return $format == 'int' ? 0 : 0.0;
 			}
 
-			$val = \WPDLib\FieldTypes\Manager::format( $val, $format, 'input' );
+			$val = FieldManager::format( $val, $format, 'input' );
 
-			if ( ! empty( $this->args['step'] ) && $val % \WPDLib\FieldTypes\Manager::format( $this->args['step'], $format, 'input' ) != 0 ) {
-				return new \WP_Error( 'invalid_number_step', sprintf( __( 'The number %1$s is invalid since it is not divisible by %2$s.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, $format, 'output' ), \WPDLib\FieldTypes\Manager::format( $this->args['step'], $format, 'output' ) ) );
+			if ( ! empty( $this->args['step'] ) && $val % FieldManager::format( $this->args['step'], $format, 'input' ) != 0 ) {
+				return new WPError( 'invalid_number_step', sprintf( __( 'The number %1$s is invalid since it is not divisible by %2$s.', 'wpdlib' ), FieldManager::format( $val, $format, 'output' ), FieldManager::format( $this->args['step'], $format, 'output' ) ) );
 			}
 
-			if ( ! empty( $this->args['min'] ) && $val < \WPDLib\FieldTypes\Manager::format( $this->args['min'], $format, 'input' ) ) {
-				return new \WP_Error( 'invalid_number_too_small', sprintf( __( 'The number %1$s is invalid. It must be greater than or equal to %2$s.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, $format, 'output' ), \WPDLib\FieldTypes\Manager::format( $this->args['min'], $format, 'output' ) ) );
+			if ( ! empty( $this->args['min'] ) && $val < FieldManager::format( $this->args['min'], $format, 'input' ) ) {
+				return new WPError( 'invalid_number_too_small', sprintf( __( 'The number %1$s is invalid. It must be greater than or equal to %2$s.', 'wpdlib' ), FieldManager::format( $val, $format, 'output' ), FieldManager::format( $this->args['min'], $format, 'output' ) ) );
 			}
 
-			if ( ! empty( $this->args['max'] ) && $val > \WPDLib\FieldTypes\Manager::format( $this->args['max'], $format, 'input' ) ) {
-				return new \WP_Error( 'invalid_number_too_big', sprintf( __( 'The number %1$s is invalid. It must be lower than or equal to %2$s.', 'wpdlib' ), \WPDLib\FieldTypes\Manager::format( $val, $format, 'output' ), \WPDLib\FieldTypes\Manager::format( $this->args['max'], $format, 'output' ) ) );
+			if ( ! empty( $this->args['max'] ) && $val > FieldManager::format( $this->args['max'], $format, 'input' ) ) {
+				return new WPError( 'invalid_number_too_big', sprintf( __( 'The number %1$s is invalid. It must be lower than or equal to %2$s.', 'wpdlib' ), FieldManager::format( $val, $format, 'output' ), FieldManager::format( $this->args['max'], $format, 'output' ) ) );
 			}
 
 			return $val;
@@ -57,10 +60,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 			}
 
 			if ( $formatted ) {
-				return \WPDLib\FieldTypes\Manager::format( $val, $format, 'output' );
+				return FieldManager::format( $val, $format, 'output' );
 			}
 
-			return \WPDLib\FieldTypes\Manager::format( $val, $format, 'input' );
+			return FieldManager::format( $val, $format, 'input' );
 		}
 	}
 

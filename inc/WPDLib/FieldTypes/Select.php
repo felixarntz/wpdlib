@@ -7,20 +7,23 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 
-	class Select extends \WPDLib\FieldTypes\Radio {
+	class Select extends Radio {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['name'] = $this->get_sanitized_name();
 			unset( $args['placeholder'] );
 			unset( $args['options'] );
 
-			$output = '<select' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . '>';
+			$output = '<select' . FieldManager::make_html_attributes( $args, false, false ) . '>';
 			if ( ! empty( $this->args['placeholder'] ) ) {
 				$output .= '<option value=""' . ( empty( $val ) ? ' selected="selected"' : '' ) . '>' . esc_html( $this->args['placeholder'] ) . '</option>';
 			}
@@ -41,7 +44,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 						$label = '';
 					}
 				}
-				$output .= '<option' . \WPDLib\FieldTypes\Manager::make_html_attributes( $option_atts, false, false ) . '>' . esc_html( $label ) . '</option>';
+				$output .= '<option' . FieldManager::make_html_attributes( $option_atts, false, false ) . '>' . esc_html( $label ) . '</option>';
 			}
 			$output .= '</select>';
 
@@ -57,9 +60,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 				return array();
 			}
 
-			$assets_dir = \WPDLib\Components\Manager::get_base_dir() . '/assets';
-			$assets_url = \WPDLib\Components\Manager::get_base_url() . '/assets';
-			$version = \WPDLib\Components\Manager::get_dependency_info( 'select2', 'version' );
+			$assets_dir = ComponentManager::get_base_dir() . '/assets';
+			$assets_url = ComponentManager::get_base_url() . '/assets';
+			$version = ComponentManager::get_dependency_info( 'select2', 'version' );
 
 			wp_enqueue_style( 'select2', $assets_url . '/vendor/select2/select2.css', array(), $version );
 			wp_enqueue_script( 'select2', $assets_url . '/vendor/select2/select2.min.js', array( 'jquery' ), $version, true );

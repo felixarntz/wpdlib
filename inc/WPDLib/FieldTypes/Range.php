@@ -7,13 +7,15 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\FieldTypes\Manager as FieldManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
 
-	class Range extends \WPDLib\FieldTypes\Number {
+	class Range extends Number {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $val;
@@ -24,8 +26,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
 				'value'	=> $args['value'],
 			);
 
-			$output = '<input type="text"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<input type="' . $this->type . '"' . \WPDLib\FieldTypes\Manager::make_html_attributes( $args, false, false ) . ' />';
+			$output = '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
+			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;

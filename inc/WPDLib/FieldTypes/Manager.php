@@ -7,6 +7,8 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\Components\Manager as ComponentManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
@@ -64,7 +66,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				$class_name = '\WPDLib\FieldTypes\\' . ucfirst( $field_type );
 				return new $class_name( $field_type, $field_args );
 			}
-			return new \WPDLib\FieldTypes\Base( $field_type, $field_args );
+			return new Base( $field_type, $field_args );
 		}
 
 		public static function get_field_types() {
@@ -92,8 +94,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		}
 
 		public static function enqueue_assets( $fields = array() ) {
-			$assets_url = \WPDLib\Components\Manager::get_base_url() . '/assets';
-			$version = \WPDLib\Components\Manager::get_info( 'version' );
+			$assets_url = ComponentManager::get_base_url() . '/assets';
+			$version = ComponentManager::get_info( 'version' );
 
 			$dependencies = array( 'jquery' );
 			$script_vars = array();

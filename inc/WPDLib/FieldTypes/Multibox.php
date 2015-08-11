@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Multibox' ) ) {
 
-	class Multibox extends \WPDLib\FieldTypes\Radio {
+	class Multibox extends Radio {
 		public function __construct( $type, $args ) {
 			parent::__construct( $type, $args );
 			$this->args['multiple'] = true;

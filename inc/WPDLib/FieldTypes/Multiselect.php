@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Multiselect' ) ) {
 
-	class Multiselect extends \WPDLib\FieldTypes\Select {
+	class Multiselect extends Select {
 		public function __construct( $type, $args ) {
 			parent::__construct( $type, $args );
 			$this->args['multiple'] = true;
