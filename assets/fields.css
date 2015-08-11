@@ -11,7 +11,7 @@
 
 .wpdlib-input {
   width: 100%;
-  max-width: 500px !important;
+  max-width: 500px;
 }
 
 .wpdlib-input .wpdlib-checkbox,
@@ -60,6 +60,10 @@
 .wpdlib-input .wpdlib-checkbox.box div.checked,
 .wpdlib-input .wpdlib-radio.box div.checked {
   border-color: #0074a2;
+}
+
+.wpdlib-input-repeatable {
+  max-width: none !important;
 }
 
 .wpdlib-input-checkbox {
