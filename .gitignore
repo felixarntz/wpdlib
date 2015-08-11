@@ -21,7 +21,7 @@ nbproject/
 node_modules/*
 
 ############
-## Composer
+## Vendor
 ############
 
 vendor/
