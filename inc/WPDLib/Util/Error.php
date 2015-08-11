@@ -7,13 +7,15 @@
 
 namespace WPDLib\Util;
 
+use WP_Error as WPError;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
 if ( ! class_exists( 'WPDLib\Util\Error' ) ) {
 
-	final class Error extends \WP_Error {
+	final class Error extends WPError {
 		private $scope = '';
 
 		public function __construct( $code = '', $message = '', $data = '', $scope = '' ) {
