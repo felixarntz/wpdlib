@@ -57,8 +57,8 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 				$this->args['sublabel'] = true;
 			} elseif ( isset( $admin_page_hooks[ $screen_slug ] ) ) {
 				$this->args['added'] = true;
-				$this->args['subslug'] = false;
-				$this->args['sublabel'] = true;
+				$this->args['subslug'] = $screen_slug;
+				$this->args['sublabel'] = false;
 			}
 
 			return $this->args['added'];
