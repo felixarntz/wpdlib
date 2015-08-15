@@ -54,6 +54,18 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return null;
 		}
 
+		public function __isset( $property ) {
+			if ( method_exists( $this, 'get_' . $property ) ) {
+				return true;
+			} elseif ( property_exists( $this, $property ) ) {
+				return true;
+			} elseif ( isset( $this->args[ $property ] ) ) {
+				return true;
+			}
+
+			return false;
+		}
+
 		public function add( $component ) {
 			if ( ComponentManager::is_too_late() ) {
 				return new UtilError( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', ComponentManager::get_scope() );
@@ -63,8 +75,10 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				return new UtilError( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', ComponentManager::get_scope() );
 			}
 
+			$component_class = get_class( $component );
+
 			$children = ComponentManager::get_children( get_class( $this ) );
-			if ( ! in_array( get_class( $component ), $children ) ) {
+			if ( ! in_array( $component_class, $children ) ) {
 				return new UtilError( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', ComponentManager::get_scope() );
 			}
 
@@ -77,7 +91,12 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				return new UtilError( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), get_class( $component ), $component->slug ), '', ComponentManager::get_scope() );
 			}
 
-			$this->children[ $component->slug ] = $component;
+			if ( ! isset( $this->children[ $component_class ] ) ) {
+				$this->children[ $component_class ] = array();
+			}
+
+			$this->children[ $component_class ][ $component->slug ] = $component;
+
 			return $component;
 		}
 
@@ -92,6 +111,22 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			}
 
 			return implode( '.', array_reverse( $path ) );
+		}
+
+		public function get_children( $class = '' ) {
+			$children = array();
+
+			if ( $class && '*' !== $class ) {
+				if ( isset( $this->children[ $class ] ) ) {
+					$children = $this->children[ $class ];
+				}
+			} else {
+				foreach ( $this->children as $class => $ch ) {
+					$children = array_merge( $children, $ch );
+				}
+			}
+
+			return $children;
 		}
 
 		public function get_parent( $index = 0, $depth = 1 ) {

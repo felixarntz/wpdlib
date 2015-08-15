@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wpdlib 0.5.0\n"
 "Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
-"POT-Creation-Date: 2015-08-11 08:13:36+00:00\n"
+"POT-Creation-Date: 2015-08-15 15:00:29+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,25 +22,28 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Textdomain-Support: yes\n"
 
-#: inc/WPDLib/Components/Base.php:59 inc/WPDLib/Components/Manager.php:73
+#: inc/WPDLib/Components/Base.php:71 inc/WPDLib/Components/Manager.php:73
+#: inc/WPDLib/FieldTypes/Base.php:71
 msgid "Components must not be added later than the %s hook."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:63 inc/WPDLib/Components/Manager.php:77
+#: inc/WPDLib/Components/Base.php:75 inc/WPDLib/Components/Manager.php:77
+#: inc/WPDLib/FieldTypes/Base.php:75
 msgid "The object is not a component."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:68
+#: inc/WPDLib/Components/Base.php:82 inc/WPDLib/FieldTypes/Base.php:82
 msgid ""
 "The component %1$s of class %2$s is not a valid child for the component "
 "%3$s."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:77 inc/WPDLib/Components/Manager.php:91
+#: inc/WPDLib/Components/Base.php:91 inc/WPDLib/Components/Manager.php:91
+#: inc/WPDLib/FieldTypes/Base.php:91
 msgid "A component of class %1$s with slug %2$s already exists."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:113
+#: inc/WPDLib/Components/Base.php:148 inc/WPDLib/FieldTypes/Base.php:148
 msgid ""
 "The component %1$s of class %2$s already has a parent assigned and is not a "
 "multiparent component."
@@ -48,6 +51,10 @@ msgstr ""
 
 #: inc/WPDLib/Components/Manager.php:82
 msgid "The component %1$s of class %2$s is not a valid toplevel component."
+msgstr ""
+
+#: inc/WPDLib/Components/Menu.php:82
+msgid "Menu label"
 msgstr ""
 
 #: inc/WPDLib/FieldTypes/Color.php:46
