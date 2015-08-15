@@ -92,7 +92,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			}
 
 			if ( ! isset( $this->children[ $component_class ] ) ) {
-				$this->children[ $component_class ] = array();
+				$this->children[ $component_class ] = array();
 			}
 
 			$this->children[ $component_class ][ $component->slug ] = $component;
