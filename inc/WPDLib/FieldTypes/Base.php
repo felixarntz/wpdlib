@@ -5,39 +5,46 @@
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
  */
 
-namespace WPDLib\Components;
+namespace WPDLib\FieldTypes;
 
-use WPDLib\Components\Manager as ComponentManager;
-use WPDLib\Util as UtilError;
+use WPDLib\FieldTypes\Manager as FieldManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
-if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
+if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
-	abstract class Base {
-		protected $slug = '';
+	class Base {
+		protected $type = '';
 		protected $args = array();
 
-		protected $scope = '';
-		protected $parents = array();
-		protected $children = array();
+		private static $enqueued = array();
 
-		protected $validated = false;
-		protected $valid_slug = null;
-
-		public function __construct( $slug, $args ) {
-			$this->slug = $slug;
-			$this->args = (array) $args;
+		public function __construct( $type, $args ) {
+			$this->type = $type;
+			$this->args = wp_parse_args( $args, array(
+				'id'			=> '',
+				'name'			=> '',
+				'class'			=> '',
+				'placeholder'	=> '',
+				'required'		=> false,
+				'readonly'		=> false,
+				'disabled'		=> false,
+			) );
+			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
+				if ( ! empty( $this->args['class'] ) ) {
+					$this->args['class'] .= ' ';
+				}
+				$this->args['class'] .= 'wpdlib-input';
+			}
+			if ( strpos( $this->args['class'], 'wpdlib-input-' . $this->type ) === false ) {
+				$this->args['class'] .= ' wpdlib-input-' . $this->type;
+			}
 		}
 
 		public function __set( $property, $value ) {
-			if ( method_exists( $this, $method = 'set_' . $property ) ) {
-				$this->$method( $value );
-			} elseif ( property_exists( $this, $property ) ) {
-				$this->$property = $value;
-			} elseif ( isset( $this->args[ $property ] ) ) {
+			if ( in_array( $property, array( 'id', 'name' ) ) ) {
 				$this->args[ $property ] = $value;
 			}
 		}
@@ -54,153 +61,50 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return null;
 		}
 
-		public function __isset( $property ) {
-			if ( method_exists( $this, 'get_' . $property ) ) {
-				return true;
-			} elseif ( property_exists( $this, $property ) ) {
-				return true;
-			} elseif ( isset( $this->args[ $property ] ) ) {
-				return true;
+		public function display( $val, $echo = true ) {
+			$args = $this->args;
+			$args['value'] = $val;
+
+			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
+
+			if ( $echo ) {
+				echo $output;
 			}
 
-			return false;
+			return $output;
 		}
 
-		public function add( $component ) {
-			if ( ComponentManager::is_too_late() ) {
-				return new UtilError( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', ComponentManager::get_scope() );
+		public function validate( $val = null ) {
+			if ( $val === null ) {
+				return '';
 			}
 
-			if ( ! is_a( $component, 'WPDLib\Components\Base' ) ) {
-				return new UtilError( 'no_component', __( 'The object is not a component.', 'wpdlib' ), '', ComponentManager::get_scope() );
-			}
-
-			$component_class = get_class( $component );
-
-			$children = ComponentManager::get_children( get_class( $this ) );
-			if ( ! in_array( $component_class, $children ) ) {
-				return new UtilError( 'no_valid_child_component', sprintf( __( 'The component %1$s of class %2$s is not a valid child for the component %3$s.', 'wpdlib' ), $component->slug, get_class( $component ), $this->slug ), '', ComponentManager::get_scope() );
-			}
-
-			$status = $component->validate( $this );
-			if ( is_wp_error( $status ) ) {
-				return $status;
-			}
-
-			if ( ! $component->is_valid_slug() ) {
-				return new UtilError( 'no_valid_slug_component', sprintf( __( 'A component of class %1$s with slug %2$s already exists.', 'wpdlib' ), get_class( $component ), $component->slug ), '', ComponentManager::get_scope() );
-			}
-
-			if ( ! isset( $this->children[ $component_class ] ) ) {
-				$this->children[ $component_class ] = array();
-			}
-
-			$this->children[ $component_class ][ $component->slug ] = $component;
-
-			return $component;
+			return FieldManager::format( $val, 'string', 'input' );
 		}
 
-		public function get_path() {
-			$path = array();
-
-			$parents = $this->parents;
-			while ( count( $parents ) > 0 ) {
-				$parent_slug = key( $parents );
-				$path[] = $parent_slug;
-				$parents = $parents[ $parent_slug ]->parents;
-			}
-
-			return implode( '.', array_reverse( $path ) );
+		public function is_empty( $val ) {
+			return empty( $val );
 		}
 
-		public function get_children( $class = '' ) {
-			$children = array();
-
-			if ( $class && '*' !== $class ) {
-				if ( isset( $this->children[ $class ] ) ) {
-					$children = $this->children[ $class ];
-				}
-			} else {
-				foreach ( $this->children as $class => $ch ) {
-					$children = array_merge( $children, $ch );
-				}
+		public function parse( $val, $formatted = false ) {
+			if ( $formatted ) {
+				return FieldManager::format( $val, 'string', 'output' );
 			}
 
-			return $children;
+			return FieldManager::format( $val, 'string', 'input' );
 		}
 
-		public function get_parent( $index = 0, $depth = 1 ) {
-			$current = $this;
-			for ( $i = 0; $i < $depth; $i++ ) {
-				$parents = array_values( $current->parents );
-				if ( isset( $parents[ $index ] ) ) {
-					$current = $parents[ $index ];
-				} else {
-					return null;
-				}
-			}
-			return $current;
+		public function enqueue_assets() {
+			return array();
 		}
 
-		public function validate( $parent = null ) {
-			if ( $parent !== null ) {
-				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
-					return new UtilError( 'no_multiparent_component', sprintf( __( 'The component %1$s of class %2$s already has a parent assigned and is not a multiparent component.', 'wpdlib' ), $this->slug, get_class( $this ) ), '', ComponentManager::get_scope() );
-				}
-				$this->parents[ $parent->slug ] = $parent;
+		protected static function is_enqueued( $class ) {
+			if ( ! in_array( $class, self::$enqueued ) ) {
+				self::$enqueued[] = $class;
+				return false;
 			}
-			if ( ! $this->validated ) {
-				$defaults = $this->get_defaults();
-				foreach ( $defaults as $key => $default ) {
-					if ( ! isset( $this->args[ $key ] ) ) {
-						$this->args[ $key ] = $default;
-					}
-				}
-				$this->scope = ComponentManager::get_scope();
-				$this->validated = true;
-				return true;
-			}
-			return false;
+			return true;
 		}
-
-		public function is_valid_slug() {
-			if ( $this->valid_slug === null ) {
-				$globalnames = $this->supports_globalslug();
-				if ( $globalnames !== true ) {
-					if ( $globalnames !== false ) {
-						$found = false;
-						$parent = $this->get_parent();
-						if ( $parent !== null ) {
-							$found = true;
-							while ( get_class( $parent ) != $globalnames ) {
-								$parent = $parent->get_parent();
-								if ( $parent === null ) {
-									$found = false;
-									break;
-								}
-							}
-						}
-						if ( $found ) {
-							$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ), $parent->slug );
-						} else {
-							$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ) );
-						}
-					} else {
-						$this->valid_slug = ! ComponentManager::exists( $this->slug, get_class( $this ) );
-					}
-				} else {
-					ComponentManager::exists( $this->slug, get_class( $this ) ); // just use the function to add the component
-					$this->valid_slug = true;
-				}
-			}
-			return $this->valid_slug;
-		}
-
-		protected abstract function get_defaults();
-
-		protected abstract function supports_multiparents();
-
-		protected abstract function supports_globalslug();
 	}
 
 }
