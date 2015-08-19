@@ -83,7 +83,6 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 					default:
 						$this->menu_slug = 'options-general.php';
 				}
-				$this->menu_slug = 'add_' . $this->slug . '_page';
 			} elseif ( isset( $admin_page_hooks[ 'edit.php?post_type=' . $this->slug ] ) ) {
 				// check if it is a post type menu
 				$this->added = true;
