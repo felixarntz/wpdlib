@@ -17,60 +17,114 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 
 	class Menu extends Base {
 
+		protected $added = false;
+		protected $menu_slug = '';
+		protected $first_submenu_label = false;
+
+		public function __construct( $slug, $args ) {
+			parent::__construct( $slug, $args );
+			$this->validate_filter = 'wpdlib_menu_validated';
+		}
+
 		public function is_already_added( $screen_slug ) {
 			global $admin_page_hooks;
 
-			if ( null !== $this->args['added'] ) {
-				return $this->args['added'];
-			}
-
-			$this->args['added'] = false;
-
-			if ( empty( $this->slug ) ) {
-				return $this->args['added'];
+			if ( $this->added ) {
+				return $this->added;
 			}
 
 			if ( isset( $admin_page_hooks[ $this->slug ] ) ) {
 				// check for the exact menu slug
-				$this->args['added'] = true;
-				$this->args['subslug'] = $this->slug;
-				$this->args['sublabel'] = true;
+				$this->added = true;
+				$this->menu_slug = $this->slug;
 			} elseif ( ( $key = array_search( $this->slug, $admin_page_hooks ) ) !== false && strstr( $key, 'separator' ) === false ) {
 				// check for the sanitized menu title
-				$this->args['added'] = true;
-				$this->args['subslug'] = $key;
-				$this->args['sublabel'] = true;
-			} elseif ( ! in_array( $this->slug, array( 'menu', 'submenu' ) ) && function_exists( 'add_' . $this->slug . '_page' ) ) {
+				$this->added = true;
+				$this->menu_slug = $key;
+			} elseif ( ! in_array( $this->slug, array( 'menu', 'submenu', 'object' ) ) && function_exists( 'add_' . $this->slug . '_page' ) ) {
 				// check for submenu page function
-				$this->args['added'] = true;
-				$this->args['subslug'] = 'add_' . $this->slug . '_page';
-				$this->args['sublabel'] = true;
+				$this->added = true;
+				$this->menu_slug = 'add_' . $this->slug . '_page';
 			} elseif ( isset( $admin_page_hooks[ 'edit.php?post_type=' . $this->slug ] ) ) {
 				// check if it is a post type menu
-				$this->args['added'] = true;
-				$this->args['subslug'] = 'edit.php?post_type=' . $this->slug;
-				$this->args['sublabel'] = true;
+				$this->added = true;
+				$this->menu_slug = 'edit.php?post_type=' . $this->slug;
+			} elseif ( 'attachment' == $this->slug ) {
+				$this->added = true;
+				$this->menu_slug = 'upload.php';
 			} elseif ( 'post' == $this->slug ) {
 				// special case: post type 'post'
-				$this->args['added'] = true;
-				$this->args['subslug'] = 'edit.php';
-				$this->args['sublabel'] = true;
+				$this->added = true;
+				$this->menu_slug = 'edit.php';
 			} elseif ( isset( $admin_page_hooks[ $screen_slug ] ) ) {
-				$this->args['added'] = true;
-				$this->args['subslug'] = $screen_slug;
-				$this->args['sublabel'] = false;
+				$this->added = true;
+				$this->menu_slug = $screen_slug;
 			}
 
-			return $this->args['added'];
+			if ( $this->added ) {
+				$this->first_submenu_label = true;
+			}
+
+			return $this->added;
+		}
+
+		public function create() {
+			foreach ( $this->get_children() as $menu_item ) {
+				if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
+					if ( empty( $this->slug ) ) {
+						$status = $menu_item->add_to_menu( array(
+							'mode'			=> 'submenu',
+							'menu_slug'		=> null,
+						) );
+					} elseif ( ! $this->is_already_added( $menu_item->slug ) ) {
+						$status = $menu_item->add_to_menu( array(
+							'mode'			=> 'menu',
+							'menu_label'	=> $this->args['label'],
+							'menu_icon'		=> $this->args['icon'],
+							'menu_priority'	=> $this->args['priority'],
+						) );
+						if ( $status ) {
+							$this->added = true;
+							$this->menu_slug = $menu_item->slug;
+							if ( is_callable( array( $menu_item, 'get_menu_slug' ) ) ) {
+								$this->menu_slug = $menu_item->get_menu_slug();
+							}
+							$this->first_submenu_label = $status;
+						}
+					} else {
+						$status = $menu_item->add_to_menu( array(
+							'mode'			=> 'submenu',
+							'menu_slug'		=> $this->menu_slug,
+						) );
+						if ( $status ) {
+							if ( true !== $this->first_submenu_label ) {
+								global $submenu;
+
+								if ( isset( $submenu[ $this->menu_slug ] ) ) {
+									$submenu[ $this->menu_slug ][0][0] = $this->first_submenu_label;
+									$this->first_submenu_label = true;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		public function validate( $parent = null ) {
 			$status = parent::validate( $parent );
 
 			if ( $status === true ) {
-				$this->args['added'] = null;
-				$this->args['subslug'] = $this->slug;
-				$this->args['sublabel'] = false;
+				if ( isset( $this->args['position'] ) ) {
+					if ( null === $this->args['priority'] ) {
+						$this->args['priority'] = $this->args['position'];
+					}
+					unset( $this->args['position'] );
+				}
+
+				if ( null !== $this->args['priority'] ) {
+					$this->args['priority'] = floatval( $this->args['priority'] );
+				}
 
 				//TODO add special validation for icon
 			}
@@ -81,7 +135,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			$defaults = array(
 				'label'			=> __( 'Menu label', 'wpdlib' ),
 				'icon'			=> '',
-				'position'		=> null,
+				'priority'		=> null,
 			);
 
 			return apply_filters( 'wpdlib_menu_defaults', $defaults );

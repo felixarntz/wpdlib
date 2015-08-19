@@ -26,6 +26,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 
 		protected $validated = false;
 		protected $valid_slug = null;
+		protected $validate_filter = '';
 
 		public function __construct( $slug, $args ) {
 			$this->slug = $slug;
@@ -126,6 +127,8 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				}
 			}
 
+			uasort( $children, array( $this, '_sort_by_priority' ) );
+
 			return $children;
 		}
 
@@ -157,6 +160,11 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 					}
 				}
 				$this->scope = ComponentManager::get_scope();
+
+				if ( ! empty( $this->validate_filter ) ) {
+					$this->args = apply_filters( $this->validate_filter, $this->args, $this );
+				}
+
 				$this->validated = true;
 				return true;
 			}
@@ -201,6 +209,17 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		protected abstract function supports_multiparents();
 
 		protected abstract function supports_globalslug();
+
+		protected function _sort_by_priority( $a, $b ) {
+			$pa = $a->priority;
+			$pb = $b->priority;
+
+			if ( null === $pa || null === $pb ) {
+				return 0;
+			}
+
+			return ( $pa < $pb ? -1 : 1 );
+		}
 	}
 
 }

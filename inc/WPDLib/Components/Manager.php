@@ -58,7 +58,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 		}
 
 		public static function set_scope( $scope ) {
-			if ( ! in_array( $scope, self::$scopes ) ) {
+			if ( ! empty( $scope ) && ! in_array( $scope, self::$scopes ) ) {
 				self::$scopes[] = $scope;
 			}
 			self::$current_scope = $scope;
@@ -234,6 +234,13 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 			return load_textdomain( 'wpdlib', self::get_base_dir() . '/languages/wpdlib-' . $locale . '.mo' );
 		}
 
+		public static function create_menu() {
+			$menus = self::get( '*', 'WPDLib\Components\Menu' );
+			foreach ( $menus as $menu ) {
+				$menu->create();
+			}
+		}
+
 		private static function get_components_recursive( $component_path, $curr, $class_path = '' ) {
 			$component_path = explode( '.', $component_path, 2 );
 			$class_path = explode( '.', $class_path, 2 );
@@ -285,11 +292,12 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 		}
 
 		private static function determine_base() {
-			self::$base_dir = str_replace( '/inc/WPDLib/Components', '', dirname( __FILE__ ) );
+			self::$base_dir = str_replace( '/inc/WPDLib/Components', '', wp_normalize_path( dirname( __FILE__ ) ) );
 			self::$base_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, self::$base_dir );
 		}
 	}
 
 	Manager::load_textdomain();
+	add_action( 'admin_menu', array( 'WPDLib\Components\Manager', 'create_menu' ), 40 );
 
 }
