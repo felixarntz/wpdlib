@@ -33,7 +33,17 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 			}
 
 			if ( $val === null ) {
-				return $format == 'int' ? 0 : 0.0;
+				if ( 'int' == $format ) {
+					if ( $this->args['min'] > 0 ) {
+						return absint( $this->args['min'] );
+					}
+					return 0;
+				} else {
+					if ( $this->args['min'] > 0 ) {
+						return floatval( $this->args['min'] );
+					}
+					return 0.0;
+				}
 			}
 
 			$val = FieldManager::format( $val, $format, 'input' );

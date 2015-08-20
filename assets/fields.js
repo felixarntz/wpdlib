@@ -137,15 +137,14 @@ jQuery( document ).ready( function( $ ) {
 	$( document ).on( 'click', '.wpdlib-input-radio .wpdlib-radio div', function() {
 		var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
 
-		$( this ).parent().parent().find( '.radio div' ).removeClass( 'checked' );
-
-		$( this ).addClass( 'checked' );
-
-		$( '#' + input_id ).prop( 'checked', true );
+		$( '#' + input_id ).prop( 'checked', true ).trigger( 'change' );
 	});
 
-	$( document ).on( 'change', '.wpdlib-input-radio .radio input', function() {
-		$( this ).parent().parent().find( '.radio div' ).removeClass( 'checked' );
+	$( document ).on( 'change', '.wpdlib-input-radio .wpdlib-radio input', function() {
+		var input_id = $( this ).attr( 'id' );
+
+		$( this ).parent().parent().find( '.wpdlib-radio div' ).removeClass( 'checked' );
+		$( '#' + input_id ).addClass( 'checked' );
 	});
 
 	// multibox handling

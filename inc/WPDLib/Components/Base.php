@@ -34,9 +34,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function __set( $property, $value ) {
-			if ( method_exists( $this, $method = 'set_' . $property ) ) {
-				$this->$method( $value );
-			} elseif ( property_exists( $this, $property ) ) {
+			if ( property_exists( $this, $property ) ) {
 				$this->$property = $value;
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				$this->args[ $property ] = $value;
@@ -44,9 +42,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function __get( $property ) {
-			if ( method_exists( $this, $method = 'get_' . $property ) ) {
-				return $this->$method();
-			} elseif ( property_exists( $this, $property ) ) {
+			if ( property_exists( $this, $property ) ) {
 				return $this->$property;
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				return $this->args[ $property ];
@@ -56,9 +52,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		}
 
 		public function __isset( $property ) {
-			if ( method_exists( $this, 'get_' . $property ) ) {
-				return true;
-			} elseif ( property_exists( $this, $property ) ) {
+			if ( property_exists( $this, $property ) ) {
 				return true;
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				return true;

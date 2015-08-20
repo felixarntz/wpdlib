@@ -32,9 +32,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
 			$name = $this->get_sanitized_name();
 
-			$single_type = 'wpdlib-radio';
+			$single_type = 'radio';
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
-				$single_type = 'wpdlib-checkbox';
+				$single_type = 'checkbox';
 			}
 
 			$output = '<div' . FieldManager::make_html_attributes( $args, false, false ) . '>';
@@ -45,8 +45,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					'name'		=> $name,
 					'value'		=> $value,
 					'checked'	=> $this->is_value_checked_or_selected( $value, $val ),
-					'readonly'	=> $args['readonly'],
-					'disabled'	=> $args['disabled'],
+					'readonly'	=> $this->args['readonly'],
+					'disabled'	=> $this->args['disabled'],
 				);
 
 				$additional_output = $additional_class = '';
@@ -75,7 +75,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					}
 				}
 
-				$output .= '<div class="' . $single_type . $additional_class . '">';
+				$output .= '<div class="wpdlib-' . $single_type . $additional_class . '">';
 
 				$output .= '<input type="' . $single_type . '"' . FieldManager::make_html_attributes( $option_atts, false, false ) . ' />';
 
