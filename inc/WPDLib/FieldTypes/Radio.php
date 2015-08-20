@@ -44,7 +44,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					'id'		=> $args['id'] . '-' . $value,
 					'name'		=> $name,
 					'value'		=> $value,
-					'checked'	=> $this->is_value_checked_or_selected( $value, $val ),
+					'checked'	=> $this->is_value_checked_or_selected( $val, $value ),
 					'readonly'	=> $this->args['readonly'],
 					'disabled'	=> $this->args['disabled'],
 				);

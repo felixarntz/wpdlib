@@ -90,7 +90,28 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				$this->children[ $component_class ] = array();
 			}
 
-			$this->children[ $component_class ][ $component->slug ] = $component;
+			if ( null === $component->priority || 0 == count( $this->children[ $component_class ] ) ) {
+				$this->children[ $component_class ][ $component->slug ] = $component;
+			} else {
+				$new_component_arr = array();
+				$new_component_arr[ $component->slug ] = $component;
+
+				$key = 0;
+				foreach ( $this->children[ $component_class ] as $c ) {
+					if ( null === $c->priority || $c->priority > $component->priority ) {
+						break;
+					}
+					$key++;
+				}
+
+				if ( 0 == $key ) {
+					$this->children[ $component_class ] = array_merge( $new_component_arr, $this->children[ $component_class ] );
+				} else {
+					$begin = array_slice( $this->children[ $component_class ], 0, $key );
+					$end = array_slice( $this->children[ $component_class ], $key );
+					$this->children[ $component_class ] = array_merge( $begin, $new_component_arr, $end );
+				}
+			}
 
 			return $component;
 		}
@@ -120,8 +141,6 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 					$children = array_merge( $children, $ch );
 				}
 			}
-
-			uasort( $children, array( $this, '_sort_by_priority' ) );
 
 			return $children;
 		}
@@ -203,17 +222,6 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		protected abstract function supports_multiparents();
 
 		protected abstract function supports_globalslug();
-
-		protected function _sort_by_priority( $a, $b ) {
-			$pa = $a->priority;
-			$pb = $b->priority;
-
-			if ( null === $pa || null === $pb ) {
-				return 0;
-			}
-
-			return ( $pa < $pb ? -1 : 1 );
-		}
 	}
 
 }
