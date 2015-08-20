@@ -137,6 +137,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 					$children = $this->children[ $class ];
 				}
 			} else {
+				//TODO: merge children together, honoring priorities
 				foreach ( $this->children as $class => $ch ) {
 					$children = array_merge( $children, $ch );
 				}
