@@ -144,3 +144,38 @@
 .wpdlib-remove-repeatable-button {
 	color: #aa0000;
 }
+
+.wpdlib-small {
+	.form-table {
+		&,
+		> thead,
+		> tbody,
+		> tfoot {
+			display: block;
+			> tr {
+				display: block;
+				> th,
+				> td {
+					display: block;
+					padding: 0;
+					width: auto;
+				}
+				> th {
+					margin-bottom: 5px;
+				}
+				> td {
+					margin-bottom: 15px;
+				}
+			}
+		}
+	}
+
+	.wpdlib-input {
+		.wpdlib-checkbox,
+		.wpdlib-radio {
+			float: none;
+			width: 100% !important;
+			margin-left: 0;
+		}
+	}
+}

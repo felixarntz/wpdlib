@@ -167,3 +167,51 @@
 .wpdlib-remove-repeatable-button {
   color: #aa0000;
 }
+
+.wpdlib-small .form-table,
+.wpdlib-small .form-table > thead,
+.wpdlib-small .form-table > tbody,
+.wpdlib-small .form-table > tfoot {
+  display: block;
+}
+
+.wpdlib-small .form-table > tr,
+.wpdlib-small .form-table > thead > tr,
+.wpdlib-small .form-table > tbody > tr,
+.wpdlib-small .form-table > tfoot > tr {
+  display: block;
+}
+
+.wpdlib-small .form-table > tr > th,
+.wpdlib-small .form-table > thead > tr > th,
+.wpdlib-small .form-table > tbody > tr > th,
+.wpdlib-small .form-table > tfoot > tr > th,
+.wpdlib-small .form-table > tr > td,
+.wpdlib-small .form-table > thead > tr > td,
+.wpdlib-small .form-table > tbody > tr > td,
+.wpdlib-small .form-table > tfoot > tr > td {
+  display: block;
+  width: auto;
+  padding: 0;
+}
+
+.wpdlib-small .form-table > tr > th,
+.wpdlib-small .form-table > thead > tr > th,
+.wpdlib-small .form-table > tbody > tr > th,
+.wpdlib-small .form-table > tfoot > tr > th {
+  margin-bottom: 5px;
+}
+
+.wpdlib-small .form-table > tr > td,
+.wpdlib-small .form-table > thead > tr > td,
+.wpdlib-small .form-table > tbody > tr > td,
+.wpdlib-small .form-table > tfoot > tr > td {
+  margin-bottom: 15px;
+}
+
+.wpdlib-small .wpdlib-input .wpdlib-checkbox,
+.wpdlib-small .wpdlib-input .wpdlib-radio {
+  float: none;
+  width: 100% !important;
+  margin-left: 0;
+}
