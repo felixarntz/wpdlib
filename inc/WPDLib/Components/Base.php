@@ -8,7 +8,8 @@
 namespace WPDLib\Components;
 
 use WPDLib\Components\Manager as ComponentManager;
-use WPDLib\Util as UtilError;
+use WPDLib\Util\Util;
+use WPDLib\Util\Error as UtilError;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -90,28 +91,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				$this->children[ $component_class ] = array();
 			}
 
-			if ( null === $component->position || 0 == count( $this->children[ $component_class ] ) ) {
-				$this->children[ $component_class ][ $component->slug ] = $component;
-			} else {
-				$new_component_arr = array();
-				$new_component_arr[ $component->slug ] = $component;
-
-				$key = 0;
-				foreach ( $this->children[ $component_class ] as $c ) {
-					if ( null === $c->position || $c->position > $component->position ) {
-						break;
-					}
-					$key++;
-				}
-
-				if ( 0 == $key ) {
-					$this->children[ $component_class ] = array_merge( $new_component_arr, $this->children[ $component_class ] );
-				} else {
-					$begin = array_slice( $this->children[ $component_class ], 0, $key );
-					$end = array_slice( $this->children[ $component_class ], $key );
-					$this->children[ $component_class ] = array_merge( $begin, $new_component_arr, $end );
-				}
-			}
+			$this->children[ $component_class ] = Util::object_array_insert( $this->children[ $component_class ], $component, 'slug', 'position' );
 
 			return $component;
 		}
@@ -137,10 +117,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 					$children = $this->children[ $class ];
 				}
 			} else {
-				//TODO: merge children together, honoring positions
-				foreach ( $this->children as $class => $ch ) {
-					$children = array_merge( $children, $ch );
-				}
+				$children = Util::object_array_merge( $this->children, 'slug', 'position' );
 			}
 
 			return $children;
