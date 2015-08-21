@@ -33,76 +33,16 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 				return $this->added;
 			}
 
-			if ( isset( $admin_page_hooks[ $this->slug ] ) ) {
-				// check for the exact menu slug
-				$this->added = true;
-				$this->menu_slug = $this->slug;
-			} elseif ( ( $key = array_search( $this->slug, $admin_page_hooks ) ) !== false && strstr( $key, 'separator' ) === false ) {
-				// check for the sanitized menu title
-				$this->added = true;
-				$this->menu_slug = $key;
-			} elseif ( ! in_array( $this->slug, array( 'menu', 'submenu', 'object', 'utility' ) ) && function_exists( 'add_' . $this->slug . '_page' ) ) {
-				// check for submenu page function
-				$this->added = true;
-				switch ( $this->slug ) {
-					case 'posts':
-						$this->menu_slug = 'edit.php';
-						break;
-					case 'media':
-						$this->menu_slug = 'upload.php';
-						break;
-					case 'links':
-						$this->menu_slug = 'link-manager.php';
-						break;
-					case 'pages':
-						$this->menu_slug = 'edit.php?post_type=page';
-						break;
-					case 'comments':
-						$this->menu_slug = 'edit-comments.php';
-						break;
-					case 'management':
-						$this->menu_slug = 'tools.php';
-						break;
-					case 'theme':
-						$this->menu_slug = 'themes.php';
-						break;
-					case 'plugins':
-						$this->menu_slug = 'plugins.php';
-						break;
-					case 'users':
-						if ( current_user_can( 'edit_users' ) ) {
-							$this->menu_slug = 'users.php';
-						} else {
-							$this->menu_slug = 'profile.php';
-						}
-						break;
-					case 'dashboard':
-						$this->menu_slug = 'index.php';
-						break;
-					case 'options':
-					default:
-						$this->menu_slug = 'options-general.php';
+			$menu_slug = $this->check_for_admin_page( $this->slug, $admin_page_hooks );
+			if ( false === $menu_slug ) {
+				if ( isset( $admin_page_hooks[ $screen_slug ] ) ) {
+					$menu_slug = $screen_slug;
 				}
-			} elseif ( isset( $admin_page_hooks[ 'edit.php?post_type=' . $this->slug ] ) ) {
-				// check if it is a post type menu
-				$this->added = true;
-				$this->menu_slug = 'edit.php?post_type=' . $this->slug;
-			} elseif ( 'link' == $this->slug ) {
-				$this->added = true;
-				$this->menu_slug = 'link-manager.php';
-			} elseif ( 'attachment' == $this->slug ) {
-				$this->added = true;
-				$this->menu_slug = 'upload.php';
-			} elseif ( 'post' == $this->slug ) {
-				// special case: post type 'post'
-				$this->added = true;
-				$this->menu_slug = 'edit.php';
-			} elseif ( isset( $admin_page_hooks[ $screen_slug ] ) ) {
-				$this->added = true;
-				$this->menu_slug = $screen_slug;
 			}
 
-			if ( $this->added ) {
+			if ( false !== $menu_slug ) {
+				$this->added = true;
+				$this->menu_slug = $menu_slug;
 				$this->first_submenu_label = true;
 			}
 
@@ -113,40 +53,11 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			foreach ( $this->get_children() as $menu_item ) {
 				if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
 					if ( empty( $this->slug ) ) {
-						$status = $menu_item->add_to_menu( array(
-							'mode'			=> 'submenu',
-							'menu_slug'		=> null,
-						) );
+						$this->add_non_menu_page( $menu_item );
 					} elseif ( ! $this->is_already_added( $menu_item->slug ) ) {
-						$status = $menu_item->add_to_menu( array(
-							'mode'			=> 'menu',
-							'menu_label'	=> $this->args['label'],
-							'menu_icon'		=> $this->args['icon'],
-							'menu_priority'	=> $this->args['priority'],
-						) );
-						if ( $status ) {
-							$this->added = true;
-							$this->menu_slug = $menu_item->slug;
-							if ( is_callable( array( $menu_item, 'get_menu_slug' ) ) ) {
-								$this->menu_slug = $menu_item->get_menu_slug();
-							}
-							$this->first_submenu_label = $status;
-						}
+						$this->add_menu_page( $menu_item );
 					} else {
-						$status = $menu_item->add_to_menu( array(
-							'mode'			=> 'submenu',
-							'menu_slug'		=> $this->menu_slug,
-						) );
-						if ( $status ) {
-							if ( true !== $this->first_submenu_label ) {
-								global $submenu;
-
-								if ( isset( $submenu[ $this->menu_slug ] ) ) {
-									$submenu[ $this->menu_slug ][0][0] = $this->first_submenu_label;
-									$this->first_submenu_label = true;
-								}
-							}
-						}
+						$this->add_submenu_page( $menu_item );
 					}
 				}
 			}
@@ -156,15 +67,8 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			$status = parent::validate( $parent );
 
 			if ( $status === true ) {
-				if ( isset( $this->args['position'] ) ) {
-					if ( null === $this->args['priority'] ) {
-						$this->args['priority'] = $this->args['position'];
-					}
-					unset( $this->args['position'] );
-				}
-
-				if ( null !== $this->args['priority'] ) {
-					$this->args['priority'] = floatval( $this->args['priority'] );
+				if ( null !== $this->args['position'] ) {
+					$this->args['position'] = floatval( $this->args['position'] );
 				}
 
 				//TODO add special validation for icon
@@ -176,7 +80,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			$defaults = array(
 				'label'			=> __( 'Menu label', 'wpdlib' ),
 				'icon'			=> '',
-				'priority'		=> null,
+				'position'		=> null,
 			);
 
 			return apply_filters( 'wpdlib_menu_defaults', $defaults );
@@ -188,6 +92,131 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 
 		protected function supports_globalslug() {
 			return true;
+		}
+
+		protected function check_for_admin_page( $slug, $admin_page_hooks ) {
+			if ( isset( $admin_page_hooks[ $slug ] ) ) {
+				// check for the exact menu slug
+				return $slug;
+			}
+
+			if ( false !== ( $key = array_search( $slug, $admin_page_hooks ) ) && false === strstr( $key, 'separator' ) ) {
+				// check for the sanitized menu title
+				return $key;
+			}
+
+			if ( false !== ( $base = $this->check_for_admin_page_func( $slug ) ) ) {
+				// check for submenu page function
+				return $base;
+			}
+
+			if ( false !== ( $base = $this->check_for_post_type_menu( $slug, $admin_page_hooks ) ) ) {
+				// check for post type menu
+				return $base;
+			}
+
+			return false;
+		}
+
+		protected function check_for_admin_page_func( $slug ) {
+			if ( function_exists( 'add_' . $slug . '_page' ) ) {
+				switch ( $slug ) {
+					case 'dashboard':
+						return 'index.php';
+					case 'posts':
+						return 'edit.php';
+					case 'media':
+						return 'upload.php';
+					case 'links':
+						return 'link-manager.php';
+					case 'pages':
+						return 'edit.php?post_type=page';
+					case 'comments':
+						return 'edit-comments.php';
+					case 'theme':
+						return 'themes.php';
+					case 'plugins':
+						return 'plugins.php';
+					case 'users':
+						if ( current_user_can( 'edit_users' ) ) {
+							return 'users.php';
+						} else {
+							return 'profile.php';
+						}
+					case 'management':
+						return 'tools.php';
+					case 'options':
+						return 'options-general.php';
+					default:
+				}
+			}
+
+			return false;
+		}
+
+		protected function check_for_post_type_menu( $slug, $admin_page_hooks ) {
+			if ( isset( $admin_page_hooks[ 'edit.php?post_type=' . $slug ] ) ) {
+				return 'edit.php?post_type=' . $slug;
+			}
+
+			$special_post_types = array(
+				'post'			=> 'edit.php',
+				'attachment'	=> 'upload.php',
+				'link'			=> 'link-manager.php',
+			);
+
+			if ( isset( $special_post_types[ $slug ] ) ) {
+				return $special_post_types[ $slug ];
+			}
+
+			return false;
+		}
+
+		protected function add_menu_page( $menu_item ) {
+			$status = $menu_item->add_to_menu( array(
+				'mode'			=> 'menu',
+				'menu_label'	=> $this->args['label'],
+				'menu_icon'		=> $this->args['icon'],
+				'menu_position'	=> $this->args['position'],
+			) );
+			if ( $status ) {
+				$this->added = true;
+				$this->menu_slug = $menu_item->slug;
+				if ( is_callable( array( $menu_item, 'get_menu_slug' ) ) ) {
+					$this->menu_slug = $menu_item->get_menu_slug();
+				}
+				$this->first_submenu_label = $status;
+			}
+
+			return $status;
+		}
+
+		protected function add_submenu_page( $menu_item ) {
+			$status = $menu_item->add_to_menu( array(
+				'mode'			=> 'submenu',
+				'menu_slug'		=> $this->menu_slug,
+			) );
+			if ( $status ) {
+				if ( true !== $this->first_submenu_label ) {
+					global $submenu;
+
+					if ( isset( $submenu[ $this->menu_slug ] ) ) {
+						$submenu[ $this->menu_slug ][0][0] = $this->first_submenu_label;
+						$this->first_submenu_label = true;
+					}
+				}
+			}
+
+			return $status;
+		}
+
+		protected function add_non_menu_page( $menu_item ) {
+			$status = $menu_item->add_to_menu( array(
+				'mode'			=> 'submenu',
+				'menu_slug'		=> null,
+			) );
+
+			return $status;
 		}
 	}
 }

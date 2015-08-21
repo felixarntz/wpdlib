@@ -90,7 +90,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 				$this->children[ $component_class ] = array();
 			}
 
-			if ( null === $component->priority || 0 == count( $this->children[ $component_class ] ) ) {
+			if ( null === $component->position || 0 == count( $this->children[ $component_class ] ) ) {
 				$this->children[ $component_class ][ $component->slug ] = $component;
 			} else {
 				$new_component_arr = array();
@@ -98,7 +98,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 
 				$key = 0;
 				foreach ( $this->children[ $component_class ] as $c ) {
-					if ( null === $c->priority || $c->priority > $component->priority ) {
+					if ( null === $c->position || $c->position > $component->position ) {
 						break;
 					}
 					$key++;
@@ -137,7 +137,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 					$children = $this->children[ $class ];
 				}
 			} else {
-				//TODO: merge children together, honoring priorities
+				//TODO: merge children together, honoring positions
 				foreach ( $this->children as $class => $ch ) {
 					$children = array_merge( $children, $ch );
 				}
