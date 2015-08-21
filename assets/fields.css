@@ -168,49 +168,49 @@
   color: #aa0000;
 }
 
-.wpdlib-small .form-table,
-.wpdlib-small .form-table > thead,
-.wpdlib-small .form-table > tbody,
-.wpdlib-small .form-table > tfoot {
+.wpdlib-narrow .form-table,
+.wpdlib-narrow .form-table > thead,
+.wpdlib-narrow .form-table > tbody,
+.wpdlib-narrow .form-table > tfoot {
   display: block;
 }
 
-.wpdlib-small .form-table > tr,
-.wpdlib-small .form-table > thead > tr,
-.wpdlib-small .form-table > tbody > tr,
-.wpdlib-small .form-table > tfoot > tr {
+.wpdlib-narrow .form-table > tr,
+.wpdlib-narrow .form-table > thead > tr,
+.wpdlib-narrow .form-table > tbody > tr,
+.wpdlib-narrow .form-table > tfoot > tr {
   display: block;
 }
 
-.wpdlib-small .form-table > tr > th,
-.wpdlib-small .form-table > thead > tr > th,
-.wpdlib-small .form-table > tbody > tr > th,
-.wpdlib-small .form-table > tfoot > tr > th,
-.wpdlib-small .form-table > tr > td,
-.wpdlib-small .form-table > thead > tr > td,
-.wpdlib-small .form-table > tbody > tr > td,
-.wpdlib-small .form-table > tfoot > tr > td {
+.wpdlib-narrow .form-table > tr > th,
+.wpdlib-narrow .form-table > thead > tr > th,
+.wpdlib-narrow .form-table > tbody > tr > th,
+.wpdlib-narrow .form-table > tfoot > tr > th,
+.wpdlib-narrow .form-table > tr > td,
+.wpdlib-narrow .form-table > thead > tr > td,
+.wpdlib-narrow .form-table > tbody > tr > td,
+.wpdlib-narrow .form-table > tfoot > tr > td {
   display: block;
   width: auto;
   padding: 0;
 }
 
-.wpdlib-small .form-table > tr > th,
-.wpdlib-small .form-table > thead > tr > th,
-.wpdlib-small .form-table > tbody > tr > th,
-.wpdlib-small .form-table > tfoot > tr > th {
+.wpdlib-narrow .form-table > tr > th,
+.wpdlib-narrow .form-table > thead > tr > th,
+.wpdlib-narrow .form-table > tbody > tr > th,
+.wpdlib-narrow .form-table > tfoot > tr > th {
   margin-bottom: 5px;
 }
 
-.wpdlib-small .form-table > tr > td,
-.wpdlib-small .form-table > thead > tr > td,
-.wpdlib-small .form-table > tbody > tr > td,
-.wpdlib-small .form-table > tfoot > tr > td {
+.wpdlib-narrow .form-table > tr > td,
+.wpdlib-narrow .form-table > thead > tr > td,
+.wpdlib-narrow .form-table > tbody > tr > td,
+.wpdlib-narrow .form-table > tfoot > tr > td {
   margin-bottom: 15px;
 }
 
-.wpdlib-small .wpdlib-input .wpdlib-checkbox,
-.wpdlib-small .wpdlib-input .wpdlib-radio {
+.wpdlib-narrow .wpdlib-input .wpdlib-checkbox,
+.wpdlib-narrow .wpdlib-input .wpdlib-radio {
   float: none;
   width: 100% !important;
   margin-left: 0;

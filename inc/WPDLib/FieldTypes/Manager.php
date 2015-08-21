@@ -53,6 +53,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'readonly',
 				'disabled',
 				'options',
+				'label',
 				'min',
 				'max',
 				'step',

@@ -32,6 +32,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 				'readonly'		=> false,
 				'disabled'		=> false,
 			) );
+			if ( isset( $this->args['label'] ) ) {
+				unset( $this->args['label'] );
+			}
 			if ( strpos( $this->args['class'], 'wpdlib-input' ) === false ) {
 				if ( ! empty( $this->args['class'] ) ) {
 					$this->args['class'] .= ' ';
