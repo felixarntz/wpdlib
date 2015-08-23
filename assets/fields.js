@@ -124,14 +124,17 @@ jQuery( document ).ready( function( $ ) {
 		$( '.wpdlib-input-time' ).datetimepicker( dtp_time_args );
 	}
 
-	// viewer handling for fields without visible output
-	$( document ).on( 'change', '.wpdlib-input-range, .wpdlib-input-color', function() {
+	// range
+	$( document ).on( 'change', '.wpdlib-input-range', function() {
 		$( this ).prev( 'input' ).val( $( this ).val() );
 	});
 
-	$( document ).on( 'change', '.wpdlib-input-range-viewer, .wpdlib-input-color-viewer', function() {
+	$( document ).on( 'change', '.wpdlib-input-range-viewer', function() {
 		$( this ).next( 'input' ).val( $( this ).val() );
 	});
+
+	// color picker
+	$( '.wpdlib-input-color' ).wpColorPicker();
 
 	// radio handling
 	$( document ).on( 'click', '.wpdlib-input-radio .wpdlib-radio div', function() {

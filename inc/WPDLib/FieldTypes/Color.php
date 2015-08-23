@@ -19,16 +19,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 	class Color extends Base {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
+			$args['maxlength'] = 7;
 			$args['value'] = $val;
 
-			$text_args = array(
+			/*$text_args = array(
 				'id'	=> $args['id'] . '-' . $this->type . '-viewer',
 				'class'	=> 'wpdlib-input-' . $this->type . '-viewer',
 				'value'	=> $args['value'],
 			);
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
+			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';*/
+
+			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -47,6 +50,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			}
 
 			return strtolower( $val );
+		}
+
+		public function enqueue_assets() {
+			if ( self::is_enqueued( __CLASS__ ) ) {
+				return array();
+			}
+
+			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_script( 'wp-color-picker' );
+
+			return array(
+				'dependencies'	=> array( 'wp-color-picker' ),
+			);
 		}
 	}
 

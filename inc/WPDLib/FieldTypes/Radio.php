@@ -8,6 +8,7 @@
 namespace WPDLib\FieldTypes;
 
 use WPDLib\FieldTypes\Manager as FieldManager;
+use WPDLib\Util\Util;
 use WP_Error as WPError;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,6 +23,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				'options'	=> array(),
 			) );
 			parent::__construct( $type, $args );
+
+			if ( is_array( $this->args['options'] ) && count( $this->args['options'] ) == 1 ) {
+				if ( isset( $this->args['options']['posts'] ) || isset( $this->args['options']['terms'] ) || isset( $this->args['options']['users'] ) ) {
+					add_action( 'wp_loaded', array( $this, 'parse_options' ) );
+				}
+			}
 		}
 
 		public function display( $val, $echo = true ) {
@@ -199,6 +206,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				}
 
 				return FieldManager::format( $val, 'string', 'input' );
+			}
+		}
+
+		public function parse_options() {
+			if ( isset( $this->args['options']['posts'] ) ) {
+				$this->args['options'] = Util::get_posts_options( $this->args['options']['posts'] );
+			} elseif ( isset( $this->args['options']['terms'] ) ) {
+				$this->args['options'] = Util::get_terms_options( $this->args['options']['terms'] );
+			} elseif ( isset( $this->args['options']['user'] ) ) {
+				$this->args['options'] = Util::get_users_options( $this->args['options']['users'] );
 			}
 		}
 

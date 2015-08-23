@@ -16,6 +16,69 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 	final class Util {
 		private static $sort_by = '';
 
+		public static function get_posts_options( $post_type = 'any' ) {
+			if ( ! is_string( $post_type ) && ! is_array( $post_type ) ) {
+				$post_type = 'any';
+			}
+
+			$posts = get_posts( array(
+				'posts_per_page'	=> -1,
+				'post_type'			=> $post_type,
+				'post_status'		=> 'publish',
+				'orderby'			=> 'post_title',
+				'order'				=> 'asc',
+				'fields'			=> 'ids',
+			) );
+
+			$results = array();
+			foreach ( $posts as $post_id ) {
+				$results[ $post_id ] = get_the_title( $post_id );
+			}
+
+			return $results;
+		}
+
+		public static function get_terms_options( $taxonomy = array() ) {
+			if ( ! is_string( $taxonomy ) && ! is_array( $taxonomy ) ) {
+				$taxonomy = array();
+			}
+
+			return get_terms( $taxonomy, array(
+				'number'			=> 0,
+				'hide_empty'		=> false,
+				'orderby'			=> 'name',
+				'order'				=> 'asc',
+				'fields'			=> 'id=>name',
+			) );
+		}
+
+		public static function get_users_options( $role = '' ) {
+			if ( is_array( $role ) ) {
+				if ( count( $role ) > 0 ) {
+					$role = $role[0];
+				}
+			}
+
+			if ( ! is_string( $role ) ) {
+				$role = '';
+			}
+
+			$users = get_users( array(
+				'number'			=> 0,
+				'role'				=> $role,
+				'orderby'			=> 'display_name',
+				'order'				=> 'asc',
+				'fields'			=> array( 'ID', 'display_name' ),
+			) );
+
+			$results = array();
+			foreach ( $users as $user ) {
+				$results[ $user->ID ] = $user->display_name;
+			}
+
+			return $results;
+		}
+
 		// insert item into array in a sorted manner
 		public static function object_array_insert( $arr, $item, $key = 'slug', $sort_by = '' ) {
 			if ( empty( $sort_by ) ) {
