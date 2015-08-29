@@ -32,7 +32,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 				$format = 'int';
 			}
 
-			if ( $val === null ) {
+			if ( ! $val ) {
 				if ( 'int' == $format ) {
 					if ( $this->args['min'] > 0 ) {
 						return absint( $this->args['min'] );

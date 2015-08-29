@@ -17,7 +17,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Email' ) ) {
 
 	class Email extends Base {
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return '';
 			}
 

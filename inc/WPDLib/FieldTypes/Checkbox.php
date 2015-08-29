@@ -47,7 +47,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return false;
 			}
 

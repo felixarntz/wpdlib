@@ -1,290 +1,495 @@
-jQuery( document ).ready( function( $ ) {
-
-	// select2 setup
-	function formatSelect2( option ) {
-		var $option = $( option.element );
-
-		if ( $option.data().hasOwnProperty( 'image' ) ) {
-			return '<div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div>' + option.text;
-		} else if ( $option.data().hasOwnProperty( 'color' ) ) {
-			return '<div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div>' + option.text;
-		} else {
-			return option.text;
-		}
-	}
-	if ( typeof $.fn.select2 !== 'undefined' ) {
-		var select2_args = {
-			containerCss : {
-				'width': '100%',
-				'max-width': '500px'
-			},
-			closeOnSelect: false,
-			formatResult: formatSelect2,
-			formatSelection: formatSelect2,
-			escapeMarkup: function(m) { return m; },
-			minimumResultsForSearch: 8
-		};
-
-		$( '.wpdlib-input-select' ).select2( select2_args );
+( function( $ ) {
+	if ( typeof _wpdlib_data === 'undefined' ) {
+		console.error( 'WPDLib data object not found' );
 	}
 
-	if ( typeof $.fn.datetimepicker !== 'undefined' ) {
-		// datetimepicker setup
-		var dtp_datetimepicker_args = {
-			lang: _wpdlib_data.language,
-			formatDate: 'Y-m-d',
-			formatTime: 'H:i',
-			dayOfWeekStart: _wpdlib_data.start_of_week
-		};
+	var WPDLibFieldManager = {
+		/**
+		 * Global arguments coming from `wp_localize_script()`
+		 * @type object
+		 */
+		args: _wpdlib_data,
 
-		var dtp_datetime_args = $.extend({
-			format: _wpdlib_data.date_format + ' ' + _wpdlib_data.time_format,
-			onShow: function( ct, $input ) {
-				var helper = '';
-				if ( $input.attr( 'min' ) ) {
-					helper = $input.attr( 'min' ).split( ' ' );
-					if ( helper.length === 2 ) {
-						this.setOptions({
-							minDate: helper[0],
-							minTime: helper[1]
-						});
-					} else if( helper.length === 1 ) {
-						this.setOptions({
-							minDate: helper[0]
-						});
-					}
-				}
+		/**
+		 * Whether Select2 is enabled
+		 * @type bool
+		 */
+		select2_enabled: typeof $.fn.select2 !== 'undefined',
 
-				if ( $input.attr( 'max' ) ) {
-					helper = $input.attr( 'max' ).split( ' ' );
-					if ( helper.length === 2 ) {
-						this.setOptions({
-							maxDate: helper[0],
-							maxTime: helper[1]
-						});
-					} else if( helper.length === 1 ) {
-						this.setOptions({
-							maxDate: helper[0]
-						});
-					}
-				}
+		/**
+		 * Arguments for Select2 initialization
+		 * @type object
+		 */
+		select2_args: {},
 
-				if ( $input.attr( 'step' ) ) {
-					this.setOptions({
-						step: parseInt( $input.attr( 'step' ) )
-					});
-				}
-			}
-		}, dtp_datetimepicker_args );
+		/**
+		 * Whether DateTimePicker is enabled
+		 * @type bool
+		 */
+		datetimepicker_enabled: typeof $.fn.datetimepicker !== 'undefined',
 
-		var dtp_date_args = $.extend({
-			format: _wpdlib_data.date_format,
-			timepicker: false,
-			onShow: function( ct, $input ) {
-				if ( $input.attr( 'min' ) ) {
-					this.setOptions({
-						minDate: $input.attr('min')
-					});
-				}
+		/**
+		 * Arguments for DateTimePicker initialization
+		 * @type object
+		 */
+		datetimepicker_args: {},
 
-				if ( $input.attr( 'max' ) ) {
-					this.setOptions({
-						maxDate: $input.attr('max')
-					});
-				}
-			}
-		}, dtp_datetimepicker_args );
+		/**
+		 * Whether WPColorPicker is enabled
+		 * @type bool
+		 */
+		colorpicker_enabled: typeof $.fn.wpColorPicker !== 'undefined',
 
-		var dtp_time_args = $.extend({
-			format: _wpdlib_data.time_format,
-			datepicker: false,
-			onShow: function( ct, $input ) {
-				if ( $input.attr( 'min' ) ) {
-					this.setOptions({
-						minTime: $input.attr('min')
-					});
-				}
+		/**
+		 * Arguments for WPColorPicker initialization
+		 * @type object
+		 */
+		colorpicker_args: {},
 
-				if ( $input.attr( 'max' ) ) {
-					this.setOptions({
-						maxTime: $input.attr('max')
-					});
-				}
+		/**
+		 * Whether WPMediaPicker is enabled
+		 * @type bool
+		 */
+		mediapicker_enabled: typeof $.fn.wpMediaPicker !== 'undefined',
 
-				if ( $input.attr( 'step' ) ) {
-					this.setOptions({
-						step: parseInt( $input.attr( 'step' ) )
-					});
-				}
-			}
-		}, dtp_datetimepicker_args );
+		/**
+		 * Arguments for WPMediaPicker initialization
+		 * @type object
+		 */
+		mediapicker_args: {},
 
-		$( '.wpdlib-input-datetime' ).datetimepicker( dtp_datetime_args );
-		$( '.wpdlib-input-date' ).datetimepicker( dtp_date_args );
-		$( '.wpdlib-input-time' ).datetimepicker( dtp_time_args );
-	}
+		/**
+		 * Initializes all the fields.
+		 *
+		 * This is the only function that should be accessed publically.
+		 */
+		init: function() {
+			var self = WPDLibFieldManager;
 
-	// range
-	$( document ).on( 'change', '.wpdlib-input-range', function() {
-		$( this ).prev( 'input' ).val( $( this ).val() );
-	});
-
-	$( document ).on( 'change', '.wpdlib-input-range-viewer', function() {
-		$( this ).next( 'input' ).val( $( this ).val() );
-	});
-
-	// color picker
-	$( '.wpdlib-input-color' ).wpColorPicker();
-
-	// radio handling
-	$( document ).on( 'click', '.wpdlib-input-radio .wpdlib-radio div', function() {
-		var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
-
-		$( '#' + input_id ).prop( 'checked', true ).trigger( 'change' );
-	});
-
-	$( document ).on( 'change', '.wpdlib-input-radio .wpdlib-radio input', function() {
-		var input_id = $( this ).attr( 'id' );
-
-		$( this ).parent().parent().find( '.wpdlib-radio div' ).removeClass( 'checked' );
-		$( '#' + input_id ).addClass( 'checked' );
-	});
-
-	// multibox handling
-	$( document ).on( 'click', '.wpdlib-input-multibox .wpdlib-checkbox div', function() {
-		var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
-
-		if ( $( this ).hasClass( 'checked' ) ) {
-			$( this ).removeClass( 'checked' );
-
-			$( '#' + input_id ).prop( 'checked', false );
-		} else {
-			$( this ).addClass( 'checked' );
-
-			$( '#' + input_id ).prop( 'checked', true );
-		}
-	});
-
-	// media uploader
-	if ( typeof wp.media !== 'undefined' ) {
-		var _custom_media = true;
-
-		var _orig_send_attachment = wp.media.editor.send.attachment;
-
-		$( document ).on( 'click', '.wpdlib-media-button', function() {
-			var $button = $( this );
-
-			var search_id = $button.attr( 'id' ).replace( '-media-button', '' );
-
-			_custom_media = true;
-
-			wp.media.editor.send.attachment = function( props,attachment ) {
-				if ( _custom_media ) {
-					$( '#' + search_id ).val( attachment.id );
-					var name = attachment.url.split( '/' );
-					name = name[ name.length - 1 ];
-					$( '#' + search_id + '-media-title' ).val( name );
-					if ( attachment.type === 'image' ) {
-						if ( $( '#' + search_id + '-media-image' ).length > 0 ) {
-							$( '#' + search_id + '-media-image' ).attr( 'src', attachment.url );
-						} else {
-							$( '#' + search_id + '-media-button' ).after( '<img id="' + search_id + '-media-image" class="wpdlib-media-image" src="' + attachment.url + '" />' );
-						}
-					} else {
-						if ( $( '#' + search_id + '-media-link' ).length > 0 ) {
-							$( '#' + search_id + '-media-link' ).attr( 'href', attachment.url );
-						} else {
-							$( '#' + search_id + '-media-button' ).after( '<a id="' + search_id + '-media-link" class="wpdlib-media-link" href="' + attachment.url + '" target="_blank">' + _wpdlib_data.i18n_open_file + '</a>' );
-						}
-					}
-				} else {
-					return _orig_send_attachment.apply( this, [ props, attachment ] );
-				}
+			self.select2_args = {
+				containerCss : {
+					'width': '100%',
+					'max-width': '500px'
+				},
+				closeOnSelect: false,
+				formatResult: self._formatSelect2,
+				formatSelection: self._formatSelect2,
+				escapeMarkup: function( m ) { return m; },
+				minimumResultsForSearch: 8
 			};
 
-			wp.media.editor.open( $button );
+			self.datetimepicker_args = {
+				lang: self.args.language,
+				formatDate: 'Y-m-d',
+				formatTime: 'H:i',
+				dayOfWeekStart: self.args.start_of_week
+			};
 
-			return false;
-		});
+			self.colorpicker_args = {
+				mode: 'hsv'
+			};
 
-		$( '.add_media' ).on( 'click', function() {
-			_custom_media = false;
-		});
-	}
+			self.mediapicker_args = {
+				store: 'id',
+				filterable: false,
+				label_add: self.args.media_i18n_add,
+				label_replace: self.args.media_i18n_replace,
+				label_remove: self.args.media_i18n_remove,
+				label_modal: self.args.media_i18n_modal,
+				label_button: self.args.media_i18n_button
+			};
 
-	// repeatable fields
-	if ( $( '.wpdlib-input-repeatable' ).length > 0 && _wpdlib_data !== undefined ) {
-		$( '.wpdlib-input-repeatable' ).each(function() {
-			$( this ).on( 'click', '.wpdlib-new-repeatable-button', function( e ) {
-				var $parent = $( '#' + e.delegateTarget.id );
-				var limit = parseInt( $parent.data( 'limit' ));
-				var id = $parent.attr( 'id' );
-				var key = $parent.find( '.wpdlib-repeatable-row' ).length;
+			self._initJQueryPluginFields();
 
-				if ( typeof _wpdlib_data.repeatable_field_templates[ id ] !== 'undefined' ) {
-					var output = _wpdlib_data.repeatable_field_templates[ id ].replace( /{{KEY}}/g, key ).replace( /{{KEY_PLUSONE}}/g, key + 1 );
+			self._setupRange( '.wpdlib-input-range' );
+			self._setupRadio( '.wpdlib-input-radio' );
+			self._setupMultibox( '.wpdlib-input-multibox' );
+			self._setupRepeatable( '.wpdlib-input-repeatable' );
+		},
 
-					$parent.find( '.wpdlib-repeatable-table' ).show();
-					$parent.find( '.wpdlib-repeatable-table' ).append( output );
-					if ( typeof $.fn.select2 !== 'undefined' ) {
-						$parent.find( '.wpdlib-input-select' ).select2( select2_args );
-					}
-					if ( typeof $.fn.datetimepicker !== 'undefined' ) {
-						$parent.find( '.wpdlib-input-datetime' ).datetimepicker( dtp_datetime_args );
-						$parent.find( '.wpdlib-input-date' ).datetimepicker( dtp_date_args );
-						$parent.find( '.wpdlib-input-time' ).datetimepicker( dtp_time_args );
-					}
+		/**
+		 * Initializes all fields that rely on jQuery plugins.
+		 *
+		 * @param string selector_prefix an optional (parent) selector string to prefix all the selectors with
+		 */
+		_initJQueryPluginFields: function( selector_prefix ) {
+			var self = WPDLibFieldManager;
 
-					if ( limit > 0 && limit === key + 1 ) {
-						$parent.find( '.wpdlib-new-repeatable-button' ).hide();
-					}
-				}
+			if ( typeof selector_prefix !== 'string' ) {
+				selector_prefix = '';
+			} else {
+				selector_prefix += ' ';
+			}
 
-				e.preventDefault();
+			self._setupSelect2( selector_prefix + '.wpdlib-input-select' );
+			self._setupDatetimepicker( selector_prefix + '.wpdlib-input-datetime' );
+			self._setupDatepicker( selector_prefix + '.wpdlib-input-date' );
+			self._setupTimepicker( selector_prefix + '.wpdlib-input-time' );
+			self._setupColorpicker( selector_prefix + '.wpdlib-input-color' );
+			self._setupMediapicker( selector_prefix + '.wpdlib-input-media' );
+		},
+
+		/**
+		 * Initializes Select2 on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupSelect2: function( selector ) {
+			if ( ! this.select2_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.select2( this.select2_args );
+		},
+
+		/**
+		 * Initializes DateTimePicker for datetime inputs on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupDatetimepicker: function( selector ) {
+			if ( ! this.datetimepicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.datetimepicker( $.extend( {
+				format: this.args.date_format + ' ' + this.args.time_format,
+				onShow: this._datetimeOnShow
+			}, this.datetimepicker_args ) );
+		},
+
+		/**
+		 * Initializes DateTimePicker for date inputs on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupDatepicker: function( selector ) {
+			if ( ! this.datetimepicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.datetimepicker( $.extend( {
+				format: this.args.date_format,
+				timepicker: false,
+				onShow: this._dateOnShow
+			}, this.datetimepicker_args ) );
+		},
+
+		/**
+		 * Initializes DateTimePicker for time inputs on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupTimepicker: function( selector ) {
+			if ( ! this.datetimepicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.datetimepicker( $.extend( {
+				format: this.args.time_format,
+				datepicker: false,
+				onShow: this._timeOnShow
+			}, this.datetimepicker_args ) );
+		},
+
+		/**
+		 * Initializes WPColorPicker on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupColorpicker: function( selector ) {
+			if ( ! this.colorpicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.wpColorPicker( this.colorpicker_args );
+		},
+
+		/**
+		 * Initializes WPMediaPicker on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupMediapicker: function( selector ) {
+			if ( ! this.mediapicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.wpMediaPicker( this.mediapicker_args );
+		},
+
+		/**
+		 * Adds listeners to handle range inputs.
+		 *
+		 * @param string selector a selector
+		 */
+		_setupRange: function( selector ) {
+			$( document ).on( 'change', selector, function() {
+				$( this ).prev( 'input' ).val( $( this ).val() );
 			});
-			$( this ).on( 'click', '.wpdlib-remove-repeatable-button', function( e ) {
-				var $parent = $( '#' + e.delegateTarget.id );
 
-				var $rows = $parent.find( '.wpdlib-repeatable-row' );
+			$( document ).on( 'change', selector + '-viewer', function() {
+				$( this ).next( 'input' ).val( $( this ).val() );
+			});
+		},
 
-				var number = parseInt( $( this ).data( 'number' ) ) + 1;
+		/**
+		 * Adds listeners to handle radio inputs with images/colors.
+		 *
+		 * @param string selector a selector
+		 */
+		_setupRadio: function( selector ) {
+			$( document ).on( 'click', selector + ' .wpdlib-radio div', function() {
+				var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
 
-				e.preventDefault();
+				$( '#' + input_id ).prop( 'checked', true ).trigger( 'change' );
+			});
 
-				$rows.filter( ':nth-child(' + ( number + 1 ) + ')' ).remove();
+			$( document ).on( 'change', selector + ' .wpdlib-radio input', function() {
+				var input_id = $( this ).attr( 'id' );
 
-				$rows.filter( ':gt(' + ( number - 1 ) + ')' ).each(function() {
-					var $row = $( this );
+				$( this ).parent().parent().find( '.wpdlib-radio div' ).removeClass( 'checked' );
+				$( '#' + input_id ).addClass( 'checked' );
+			});
+		},
 
-					var number = parseInt( $row.find( '.wpdlib-remove-repeatable-button' ).data( 'number' ) );
+		/**
+		 * Adds listeners to handle multibox inputs with images/colors.
+		 *
+		 * @param string selector a selector
+		 */
+		_setupMultibox: function( selector ) {
+			$( document ).on( 'click', selector + ' .wpdlib-checkbox div', function() {
+				var input_id = $( this ).attr( 'id' ).replace( '-asset', '' );
 
-					var target = number - 1;
+				if ( $( this ).hasClass( 'checked' ) ) {
+					$( this ).removeClass( 'checked' );
 
-					$row.find( 'span:first' ).html( $row.find( 'span:first' ).html().replace( ( number + 1 ).toString(), ( target + 1 ).toString() ) );
+					$( '#' + input_id ).prop( 'checked', false );
+				} else {
+					$( this ).addClass( 'checked' );
 
-					$row.find( '.wpdlib-repeatable-col input, .wpdlib-repeatable-col select, .wpdlib-repeatable-col img, .wpdlib-repeatable-col a' ).each(function() {
-						if ( $( this ).attr( 'id' ) ) {
-							$( this ).attr( 'id', $( this ).attr( 'id' ).replace( number.toString(), target.toString() ) );
+					$( '#' + input_id ).prop( 'checked', true );
+				}
+			});
+		},
+
+		/**
+		 * Initializes repeatable elements
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupRepeatable: function( selector ) {
+			var self = WPDLibFieldManager;
+			var $fields = this._getJQuery( selector );
+
+			$fields.each(function() {
+				$( this ).on( 'click', '.wpdlib-new-repeatable-button', function( e ) {
+					var parent_selector = '#' + e.delegateTarget.id;
+					var $parent = $( parent_selector );
+					var limit = parseInt( $parent.data( 'limit' ));
+					var id = $parent.attr( 'id' );
+					var key = $parent.find( '.wpdlib-repeatable-row' ).length;
+
+					if ( typeof self.args.repeatable_field_templates[ id ] !== 'undefined' ) {
+						var output = self.args.repeatable_field_templates[ id ].replace( /{{KEY}}/g, key ).replace( /{{KEY_PLUSONE}}/g, key + 1 );
+
+						$parent.find( '.wpdlib-repeatable-table' ).show();
+						$parent.find( '.wpdlib-repeatable-table' ).append( output );
+
+						if ( limit > 0 && limit === key + 1 ) {
+							$parent.find( '.wpdlib-new-repeatable-button' ).hide();
 						}
 
-						if ( $( this ).attr( 'name' ) ) {
-							$( this ).attr( 'name', $( this ).attr( 'name' ).replace( number.toString(), target.toString() ) );
-						}
-					});
+						$( document ).trigger( 'wpdlib-added-repeatable-item', [ parent_selector ] );
+					}
 
-					$row.find('.wpdlib-remove-repeatable-button').data( 'number', target.toString() );
+					e.preventDefault();
 				});
 
-				var limit = parseInt( $( '#' + e.delegateTarget.id ).data( 'limit' ) );
+				$( this ).on( 'click', '.wpdlib-remove-repeatable-button', function( e ) {
+					var $parent = $( '#' + e.delegateTarget.id );
 
-				if ( limit > 0 && limit > $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length ) {
-					$( '#' + e.delegateTarget.id ).find( '.wpdlib-new-repeatable-button' ).show();
-				}
-				if ( $( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-row' ).length < 1 ) {
-					$( '#' + e.delegateTarget.id ).find( '.wpdlib-repeatable-table' ).hide();
-				}
+					var $rows = $parent.find( '.wpdlib-repeatable-row' );
+
+					var number = parseInt( $( this ).data( 'number' ) ) + 1;
+
+					e.preventDefault();
+
+					$rows.filter( ':nth-child(' + ( number + 1 ) + ')' ).remove();
+
+					$rows.filter( ':gt(' + ( number - 1 ) + ')' ).each(function() {
+						var $row = $( this );
+
+						var number = parseInt( $row.find( '.wpdlib-remove-repeatable-button' ).data( 'number' ) );
+
+						var target = number - 1;
+
+						$row.find( 'span:first' ).html( $row.find( 'span:first' ).html().replace( ( number + 1 ).toString(), ( target + 1 ).toString() ) );
+
+						$row.find( '.wpdlib-repeatable-col input, .wpdlib-repeatable-col select, .wpdlib-repeatable-col img, .wpdlib-repeatable-col a' ).each(function() {
+							if ( $( this ).attr( 'id' ) ) {
+								$( this ).attr( 'id', $( this ).attr( 'id' ).replace( number.toString(), target.toString() ) );
+							}
+
+							if ( $( this ).attr( 'name' ) ) {
+								$( this ).attr( 'name', $( this ).attr( 'name' ).replace( number.toString(), target.toString() ) );
+							}
+						});
+
+						$row.find('.wpdlib-remove-repeatable-button').data( 'number', target.toString() );
+					});
+
+					var limit = parseInt( $parent.data( 'limit' ) );
+
+					if ( limit > 0 && limit > $parent.find( '.wpdlib-repeatable-row' ).length ) {
+						$parent.find( '.wpdlib-new-repeatable-button' ).show();
+					}
+					if ( $parent.find( '.wpdlib-repeatable-row' ).length < 1 ) {
+						$parent.find( '.wpdlib-repeatable-table' ).hide();
+					}
+				});
 			});
-		});
-	}
 
-});
+			$( document ).on( 'wpdlib-added-repeatable-item', function( e, parent_selector ) {
+				self._initJQueryPluginFields( parent_selector );
+			});
+		},
+
+		/**
+		 * Returns a jQuery object from a string.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 * @return jQuery a jQuery object
+		 */
+		_getJQuery: function( selector ) {
+			if ( typeof selector === 'string' ) {
+				return $( selector );
+			}
+			return selector;
+		},
+
+		/**
+		 * Formatting function passed to Select2.
+		 *
+		 * @param object option contains information about the current option
+		 * @return string the formatted (HTML) text
+		 */
+		_formatSelect2: function( option ) {
+			var $option = $( option.element );
+
+			if ( $option.data().hasOwnProperty( 'image' ) ) {
+				return '<div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div>' + option.text;
+			} else if ( $option.data().hasOwnProperty( 'color' ) ) {
+				return '<div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div>' + option.text;
+			} else {
+				return option.text;
+			}
+		},
+
+		/**
+		 * OnShow function passed to DateTimePicker for datetime inputs.
+		 *
+		 * @param object ct contains information about the current datetime
+		 * @param jQuery $input the input element
+		 */
+		_datetimeOnShow: function( ct, $input ) {
+			var helper = '';
+			if ( $input.attr( 'min' ) ) {
+				helper = $input.attr( 'min' ).split( ' ' );
+				if ( helper.length === 2 ) {
+					this.setOptions({
+						minDate: helper[0],
+						minTime: helper[1]
+					});
+				} else if( helper.length === 1 ) {
+					this.setOptions({
+						minDate: helper[0]
+					});
+				}
+			}
+
+			if ( $input.attr( 'max' ) ) {
+				helper = $input.attr( 'max' ).split( ' ' );
+				if ( helper.length === 2 ) {
+					this.setOptions({
+						maxDate: helper[0],
+						maxTime: helper[1]
+					});
+				} else if( helper.length === 1 ) {
+					this.setOptions({
+						maxDate: helper[0]
+					});
+				}
+			}
+
+			if ( $input.attr( 'step' ) ) {
+				this.setOptions({
+					step: parseInt( $input.attr( 'step' ) )
+				});
+			}
+		},
+
+		/**
+		 * OnShow function passed to DateTimePicker for date inputs.
+		 *
+		 * @param object ct contains information about the current date
+		 * @param jQuery $input the input element
+		 */
+		_dateOnShow: function( ct, $input ) {
+			if ( $input.attr( 'min' ) ) {
+				this.setOptions({
+					minDate: $input.attr( 'min' )
+				});
+			}
+
+			if ( $input.attr( 'max' ) ) {
+				this.setOptions({
+					maxDate: $input.attr( 'max' )
+				});
+			}
+		},
+
+		/**
+		 * OnShow function passed to DateTimePicker for time inputs.
+		 *
+		 * @param object ct contains information about the current time
+		 * @param jQuery $input the input element
+		 */
+		_timeOnShow: function( ct, $input ) {
+			if ( $input.attr( 'min' ) ) {
+				this.setOptions({
+					minTime: $input.attr( 'min' )
+				});
+			}
+
+			if ( $input.attr( 'max' ) ) {
+				this.setOptions({
+					maxTime: $input.attr( 'max' )
+				});
+			}
+
+			if ( $input.attr( 'step' ) ) {
+				this.setOptions({
+					step: parseInt( $input.attr( 'step' ) )
+				});
+			}
+		}
+	};
+
+	$( document ).ready( function() {
+		WPDLibFieldManager.init();
+	});
+}( jQuery ) );

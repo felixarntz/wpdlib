@@ -38,7 +38,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return '';
 			}
 

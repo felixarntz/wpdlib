@@ -41,7 +41,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return '#000000';
 			}
 

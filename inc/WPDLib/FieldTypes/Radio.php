@@ -106,7 +106,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
 		public function validate( $val = null ) {
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
-				if ( $val === null ) {
+				if ( ! $val ) {
 					return array();
 				}
 
@@ -131,7 +131,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 
 				return $val;
 			} else {
-				if ( $val === null ) {
+				if ( ! $val ) {
 					if ( count( $this->args['options'] ) > 0 ) {
 						return key( $this->args['options'] );
 					}

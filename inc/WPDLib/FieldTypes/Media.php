@@ -7,6 +7,7 @@
 
 namespace WPDLib\FieldTypes;
 
+use WPDLib\Components\Manager as ComponentManager;
 use WPDLib\FieldTypes\Manager as FieldManager;
 use WP_Error as WPError;
 
@@ -29,42 +30,17 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			unset( $args['placeholder'] );
 			$args['value'] = $val;
 
+			if ( 'all' !== $args['mime_types'] ) {
+				$args['data-settings'] = json_encode( array(
+					'query'				=> array(
+						'post_mime_type'	=> $args['mime_types'],
+					),
+				) );
+			}
+
 			unset( $args['mime_types'] );
 
-			$text_args = array(
-				'id'	=> $args['id'] . '-media-title',
-				'class'	=> 'wpdlib-media-title',
-				'value'	=> $val ? basename( get_attached_file( $val ) ) : '',
-			);
-
-			$button_args = array(
-				'id'	=> $args['id'] . '-media-button',
-				'class'	=> 'wpdlib-media-button button',
-				'href'	=> '#',
-			);
-
-			$output = '<input type="hidden"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
-			$output .= '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<a' . FieldManager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Choose / Upload a File', 'wpdlib' ) . '</a>';
-
-			if ( $val ) {
-				if ( $this->check_filetype( $val, 'image' ) ) {
-					$image_args = array(
-						'id'	=> $args['id'] . '-media-image',
-						'class'	=> 'wpdlib-media-image',
-						'src'	=> wp_get_attachment_url( $val ),
-					);
-					$output .= '<img' . FieldManager::make_html_attributes( $image_args, false, false ) . ' />';
-				} else {
-					$link_args = array(
-						'id'	=> $args['id'] . '-media-link',
-						'class'	=> 'wpdlib-media-link',
-						'href'	=> wp_get_attachment_url( $val ),
-						'target'=> '_blank',
-					);
-					$output .= '<a' . FieldManager::make_html_attributes( $link_args, false, false ) . '>' . __( 'Open File', 'wpdlib' ) . '</a>';
-				}
-			}
+			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
 				echo $output;
@@ -74,7 +50,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return 0;
 			}
 
@@ -105,12 +81,22 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				return array();
 			}
 
+			$assets_url = ComponentManager::get_base_url() . '/assets';
+			$version = ComponentManager::get_dependency_info( 'wp-media-picker', 'version' );
+
 			wp_enqueue_media();
 
+			wp_enqueue_style( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.css', array(), $version );
+			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.js', array( 'jquery', 'media-editor' ), $version, true );
+
 			return array(
-				'dependencies'		=> array( 'media-editor' ),
+				'dependencies'		=> array( 'media-editor', 'wp-media-picker' ),
 				'script_vars'		=> array(
-					'i18n_open_file'	=> __( 'Open file', 'wpdlib' ),
+					'media_i18n_add'		=> __( 'Choose a File', 'wpdlib' ),
+					'media_i18n_replace'	=> __( 'Choose another File', 'wpdlib' ),
+					'media_i18n_remove'		=> __( 'Remove', 'wpdlib' ),
+					'media_i18n_modal'		=> __( 'Choose a File', 'wpdlib' ),
+					'media_i18n_button'		=> __( 'Insert File', 'wpdlib' ),
 				),
 			);
 		}

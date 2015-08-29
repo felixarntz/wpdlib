@@ -86,7 +86,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null || ! is_array( $val ) ) {
+			if ( ! $val || ! is_array( $val ) ) {
 				return array();
 			}
 

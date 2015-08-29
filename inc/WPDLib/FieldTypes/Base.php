@@ -78,7 +78,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		}
 
 		public function validate( $val = null ) {
-			if ( $val === null ) {
+			if ( ! $val ) {
 				return '';
 			}
 
