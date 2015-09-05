@@ -70,7 +70,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			foreach ( $this->args['repeatable']['fields'] as $slug => $args ) {
 				$output .= '<th class="wpdlib-repeatable-' . $this->args['id'] . '-' . $slug . '">' . ( isset( $args['title'] ) ? $args['title'] : '' ) . '</th>';
 			}
-			$output .= '<th></th>';
+			$output .= '<th class="wpdlib-repeatable-remove"></th>';
 			$output .= '</tr>';
 			foreach ( $val as $key => $values ) {
 				$output .= $this->display_item( $key, $values, false );
@@ -120,6 +120,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			$parsed = array();
+			$items_formatted = false;
+			if ( $formatted ) {
+				$items_formatted = array( 'mode' => 'text' );
+			}
 			foreach ( $val as $key => $values ) {
 				$parsed[ $key ] = array();
 				foreach ( $this->args['repeatable']['fields'] as $slug => $args ) {
@@ -128,9 +132,23 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 					}
 
 					if ( isset( $values[ $slug ] ) ) {
-						$parsed[ $key ][ $slug ] = $this->fields[ $slug ]->parse( $values[ $slug ], $formatted );
+						$parsed[ $key ][ $slug ] = $this->fields[ $slug ]->parse( $values[ $slug ], $items_formatted );
 					} else {
-						$parsed[ $key ][ $slug ] = $this->fields[ $slug ]->validate();
+						$parsed[ $key ][ $slug ] = $this->fields[ $slug ]->parse( $this->fields[ $slug ]->validate(), $items_formatted );
+					}
+				}
+			}
+			if ( $formatted ) {
+				if ( is_array( $formatted ) ) {
+					$formatted = wp_parse_args( $formatted, array(
+						'mode'			=> 'array',
+						'template'		=> '',
+						'before'		=> '',
+						'after'			=> '',
+					) );
+
+					if ( 'template' === $formatted['mode'] ) {
+						return $this->parse_template( $parsed, $formatted['template'], $formatted['before'], $formatted['after'] );
 					}
 				}
 			}
@@ -205,7 +223,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 				'data-number'	=> $key,
 			);
 
-			$output .= '<td>';
+			$output .= '<td class="wpdlib-repeatable-remove">';
 			$output .= '<a' . FieldManager::make_html_attributes( $button_args, false, false ) . '>' . __( 'Remove', 'wpdlib' ) . '</a>';
 			$output .= '</td>';
 
@@ -213,6 +231,26 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 
 			if ( $echo ) {
 				echo $output;
+			}
+
+			return $output;
+		}
+
+		protected function parse_template( $val, $template, $before = '', $after = '' ) {
+			$output = '';
+
+			if ( ! $this->is_empty( $val ) ) {
+				$output .= $before;
+				foreach ( $val as $key => $values ) {
+					$search = array();
+					$replace = array();
+					foreach ( $this->args['repeatable']['fields'] as $slug => $args ) {
+						$search[] = '%' . $slug . '%';
+						$replace[] = isset( $values[ $slug ] ) ? $values[ $slug ] : '';
+					}
+					$output .= str_replace( $search, $replace, $template );
+				}
+				$output .= $after;
 			}
 
 			return $output;

@@ -67,14 +67,10 @@
 			var self = WPDLibFieldManager;
 
 			self.select2_args = {
-				containerCss : {
-					'width': '100%',
-					'max-width': '500px'
-				},
-				closeOnSelect: false,
-				formatResult: self._formatSelect2,
-				formatSelection: self._formatSelect2,
-				escapeMarkup: function( m ) { return m; },
+				width: 'element',
+				closeOnSelect: true,
+				templateResult: self._formatSelect2,
+				templateSelection: self._formatSelect2,
 				minimumResultsForSearch: 8
 			};
 
@@ -122,6 +118,7 @@
 			}
 
 			self._setupSelect2( selector_prefix + '.wpdlib-input-select' );
+			self._setupSelect2( selector_prefix + '.wpdlib-input-multiselect' );
 			self._setupDatetimepicker( selector_prefix + '.wpdlib-input-datetime' );
 			self._setupDatepicker( selector_prefix + '.wpdlib-input-date' );
 			self._setupTimepicker( selector_prefix + '.wpdlib-input-time' );
@@ -384,19 +381,23 @@
 		/**
 		 * Formatting function passed to Select2.
 		 *
-		 * @param object option contains information about the current option
+		 * @param object selection contains information about the current selection
 		 * @return string the formatted (HTML) text
 		 */
-		_formatSelect2: function( option ) {
-			var $option = $( option.element );
+		_formatSelect2: function( selection ) {
+			if ( typeof selection.id === 'undefined' ) {
+				return selection.text;
+			}
+
+			var $option = $( selection.element );
 
 			if ( $option.data().hasOwnProperty( 'image' ) ) {
-				return '<div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div>' + option.text;
+				return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
 			} else if ( $option.data().hasOwnProperty( 'color' ) ) {
-				return '<div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div>' + option.text;
-			} else {
-				return option.text;
+				return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
 			}
+
+			return selection.text;
 		},
 
 		/**

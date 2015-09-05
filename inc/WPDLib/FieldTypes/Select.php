@@ -20,6 +20,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['name'] = $this->get_sanitized_name();
+			if ( ! empty( $args['placeholder'] ) ) {
+				$args['data-placeholder'] = json_encode( array( 'id' => '', 'text' => $args['placeholder'] ) );
+			}
 			unset( $args['placeholder'] );
 			unset( $args['options'] );
 
@@ -64,19 +67,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_dependency_info( 'select2', 'version' );
 
-			wp_enqueue_style( 'select2', $assets_url . '/vendor/select2/select2.css', array(), $version );
-			wp_enqueue_script( 'select2', $assets_url . '/vendor/select2/select2.min.js', array( 'jquery' ), $version, true );
+			wp_enqueue_style( 'select2', $assets_url . '/vendor/select2/dist/css/select2.min.css', array(), $version );
+			wp_enqueue_script( 'select2', $assets_url . '/vendor/select2/dist/js/select2.min.js', array( 'jquery' ), $version, true );
 
 			$dependencies = array( 'select2' );
 
 			$locale = str_replace( '_', '-', get_locale() );
 			$language = substr( $locale, 0, 2 );
 
-			if ( file_exists( $assets_dir . '/vendor/select2/select2_locale_' . $locale . '.js' ) ) {
-				wp_enqueue_script( 'select2-locale', $assets_url . '/vendor/select2/select2_locale_' . $locale . '.js', array( 'select2' ), $version, true );
+			if ( file_exists( $assets_dir . '/vendor/select2/dist/js/i18n/' . $locale . '.js' ) ) {
+				wp_enqueue_script( 'select2-locale', $assets_url . '/vendor/select2/dist/js/i18n/' . $locale . '.js', array( 'select2' ), $version, true );
 				$dependencies[] = 'select2-locale';
-			} elseif( file_exists( $assets_dir . '/vendor/select2/select2_locale_' . $language . '.js' ) ) {
-				wp_enqueue_script( 'select2-locale', $assets_url . '/vendor/select2/select2_locale_' . $language . '.js', array( 'select2' ), $version, true );
+			} elseif( file_exists( $assets_dir . '/vendor/select2/dist/js/i18n/' . $language . '.js' ) ) {
+				wp_enqueue_script( 'select2-locale', $assets_url . '/vendor/select2/dist/js/i18n/' . $language . '.js', array( 'select2' ), $version, true );
 				$dependencies[] = 'select2-locale';
 			}
 

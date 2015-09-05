@@ -61,7 +61,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'repeatable',
 			);
 
-			$field_args = array_intersect_key( $args, array_flip( $field_keys ) );
+			$data_args = array();
+			foreach ( $args as $key => $value ) {
+				if ( strpos( $key, 'data-' ) === 0 ) {
+					$data_args[ $key ] = $value;
+				}
+			}
+
+			$field_args = array_merge( $data_args, array_intersect_key( $args, array_flip( $field_keys ) ) );
 
 			if ( class_exists( 'WPDLib\FieldTypes\\' . ucfirst( $field_type ) ) ) {
 				$class_name = '\WPDLib\FieldTypes\\' . ucfirst( $field_type );
@@ -125,9 +132,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 
 			wp_enqueue_script( 'wpdlib-fields', $assets_url . '/fields.min.js', $dependencies, $version, true );
 
-			if ( count( $script_vars ) > 0 ) {
-				wp_localize_script( 'wpdlib-fields', '_wpdlib_data', $script_vars );
-			}
+			wp_localize_script( 'wpdlib-fields', '_wpdlib_data', $script_vars );
 		}
 
 		public static function make_html_attributes( $atts, $html5 = true, $echo = true ) {

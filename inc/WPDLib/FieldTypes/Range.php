@@ -24,9 +24,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
 				'id'	=> $args['id'] . '-' . $this->type . '-viewer',
 				'class'	=> 'wpdlib-input-' . $this->type . '-viewer',
 				'value'	=> $args['value'],
+				'min'	=> $args['min'],
+				'max'	=> $args['max'],
+				'step'	=> $args['step'],
 			);
 
-			$output = '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
+			$output = '<input type="number"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
 			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {

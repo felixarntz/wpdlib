@@ -47,7 +47,23 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return FieldManager::format( $val, 'html', 'output' );
+				$parsed = FieldManager::format( $val, 'html', 'input' );
+				if ( is_array( $formatted ) ) {
+					$formatted = wp_parse_args( $formatted, array(
+						'wpautop'		=> true,
+						'shortcode'		=> false,
+					) );
+
+					if ( $formatted['wpautop'] ) {
+						$parsed = wpautop( $parsed );
+					}
+
+					if ( $formatted['shortcode'] ) {
+						$parsed = do_shortcode( $parsed );
+					}
+				}
+
+				return $parsed;
 			}
 
 			return FieldManager::format( $val, 'html', 'input' );

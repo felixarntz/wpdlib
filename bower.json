@@ -18,8 +18,8 @@
     }
   ],
   "dependencies": {
-    "select2": "~3.5.2",
-    "datetimepicker": "~2.4.1",
-    "wp-media-picker": "~0.1.0"
+    "select2": "~4.0",
+    "datetimepicker": "~2.4",
+    "wp-media-picker": "~0.1"
   }
 }

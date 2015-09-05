@@ -162,7 +162,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
 				$parsed = array();
 				if ( $formatted ) {
-					foreach ( $val as $v ) {
+					if ( is_array( $formatted ) ) {
+						$formatted = wp_parse_args( $formatted, array(
+							'mode'		=> 'array',
+						) );
+					}
+					foreach ( (array) $val as $v ) {
 						if ( isset( $this->args['options'][ $v ] ) ) {
 							if ( is_array( $this->args['options'][ $v ] ) ) {
 								if ( isset( $this->args['options'][ $v ]['label'] ) && ! empty( $this->args['options'][ $v ]['label'] ) ) {
@@ -180,8 +185,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 						}
 						$parsed[] = FieldManager::format( $v, 'string', 'output' );
 					}
+
+					if ( 'text' === $formatted['mode'] ) {
+						return implode( ', ', $parsed );
+					}
 				} else {
-					foreach ( $val as $v ) {
+					foreach ( (array) $val as $v ) {
 						$parsed[] = FieldManager::format( $v, 'string', 'input' );
 					}
 				}

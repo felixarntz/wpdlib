@@ -198,7 +198,10 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 		}
 
 		public static function get_dependency_info( $dependency, $field = '' ) {
-			$bower_file = self::get_base_dir() . '/assets/vendor/' . $dependency . '/bower.json';
+			$bower_file = self::get_base_dir() . '/assets/vendor/' . $dependency . '/.bower.json';
+			if ( ! file_exists( $bower_file ) ) {
+				$bower_file = self::get_base_dir() . '/assets/vendor/' . $dependency . '/bower.json';
+			}
 			if ( ! file_exists( $bower_file ) ) {
 				if ( ! empty( $field ) ) {
 					return false;

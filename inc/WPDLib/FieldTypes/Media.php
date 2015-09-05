@@ -18,6 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 	class Media extends Base {
+		protected $temp_val = null;
+
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'mime_types'	=> 'all',
@@ -73,10 +75,41 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		public function parse( $val, $formatted = false ) {
-			return absint( $val );
+			$val = absint( $val );
+			if ( $formatted ) {
+				if ( is_array( $formatted ) ) {
+					$formatted = wp_parse_args( $formatted, array(
+						'mode'		=> 'field',
+						'field'		=> 'url',
+						'template'	=> '',
+					) );
+					switch ( $formatted['mode'] ) {
+						case 'object':
+							return get_post( $val );
+						case 'link':
+							return wp_get_attachment_link( $val, 'thumbnail', false, true );
+						case 'image':
+							return wp_get_attachment_image( $val, 'thumbnail', true );
+						case 'template':
+							if ( ! empty( $formatted['template'] ) && $val ) {
+								$this->temp_val = $val;
+								$output = preg_replace_callback( '/%([A-Za-z0-9_\-]+)%/', array( $this, 'template_replace_callback' ), $formatted['template'] );
+								$this->temp_val = null;
+								return $output;
+							}
+							return '';
+						case 'field':
+						default:
+							return $this->get_attachment_field( $val, $formatted['field'] );
+					}
+				}
+			}
+			return $val;
 		}
 
 		public function enqueue_assets() {
+			global $post;
+
 			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();
 			}
@@ -84,7 +117,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_dependency_info( 'wp-media-picker', 'version' );
 
-			wp_enqueue_media();
+			if ( $post ) {
+				wp_enqueue_media( array( 'post' => $post->ID ) );
+			} else {
+				wp_enqueue_media();
+			}
 
 			wp_enqueue_style( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.css', array(), $version );
 			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.js', array( 'jquery', 'media-editor' ), $version, true );
@@ -127,6 +164,87 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				}
 			}
 			return false;
+		}
+
+		protected function get_attachment_field( $id, $field ) {
+			switch ( $field ) {
+				case 'id':
+				case 'ID':
+					return $id;
+				case 'title':
+					return get_the_title( $id );
+				case 'alt':
+					return get_post_meta( $id, '_wp_attachment_image_alt', true );
+				case 'caption':
+				case 'description':
+					$attachment = get_post( $id );
+					if ( ! $attachment ) {
+						return '';
+					}
+					if ( 'description' === $field ) {
+						return $attachment->post_content;
+					}
+					return $attachment->post_excerpt;
+				case 'mime':
+				case 'mime_type':
+				case 'type':
+				case 'subtype':
+					$mime_type = get_post_mime_type( $id );
+					if ( false === strpos( $field, 'mime' ) && false !== strpos( $mime_type, '/' ) ) {
+						list( $type, $subtype ) = explode( '/', $mime_type );
+						if ( 'type' === $field ) {
+							return $type;
+						}
+						return $subtype;
+					}
+					return $mime_type;
+				case 'mime_icon':
+				case 'mime_type_icon':
+					return wp_mime_type_icon( $id );
+				case 'filename':
+					return wp_basename( get_attached_file( $id ) );
+				case 'link':
+					return get_attachment_link( $id );
+				case 'url':
+				case 'path':
+				default:
+					$url = wp_get_attachment_url( $id );
+					$size = false;
+					if ( '_path' === substr( $field, -5 ) ) {
+						$size = substr( $field, 0, -5 );
+						$field = 'path';
+					} elseif ( '_url' === substr( $field, -4 ) ) {
+						$size = substr( $field, 0, -4 );
+						$field = 'url';
+					}
+					if ( $size ) {
+						$src = wp_get_attachment_image_src( $id, $size, false );
+						if ( is_array( $src ) ) {
+							$url = $src[0];
+						}
+					}
+					if ( $url && 'path' === $field ) {
+						$upload_dir = wp_upload_dir();
+						$path = '';
+						if ( strpos( $url, $upload_dir['baseurl'] ) !== false ) {
+							$path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+						}
+						return $path;
+					}
+					return $url;
+			}
+		}
+
+		protected function template_replace_callback( $matches ) {
+			if ( null === $this->temp_val ) {
+				return '';
+			}
+
+			if ( ! isset( $matches[1] ) ) {
+				return '';
+			}
+
+			return $this->get_attachment_field( $this->temp_val, $matches[1] );
 		}
 	}
 

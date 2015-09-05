@@ -35,9 +35,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 			}
 
 			$output = '<label>';
-			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
-			$output = esc_html( $label );
-			$output = '</label>';
+			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
+			$output .= esc_html( $label );
+			$output .= '</label>';
 
 			if ( $echo ) {
 				echo $output;
@@ -60,7 +60,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return FieldManager::format( $val, 'boolean', 'output' );
+				if ( is_array( $formatted ) ) {
+					$formatted = wp_parse_args( array(
+						'mode'		=> 'bool',
+					) );
+					switch ( $formatted['mode'] ) {
+						case 'text':
+							return FieldManager::format( $val, 'boolean', 'output' );
+						case 'bool':
+						default:
+							return FieldManager::format( $val, 'boolean', 'input' );
+					}
+				}
 			}
 
 			return FieldManager::format( $val, 'boolean', 'input' );
