@@ -196,6 +196,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 								}
 							} else {
 								$v = $this->args['options'][ $v ];
+								$list_separator = ', ';
 							}
 						}
 						if ( $skip_string_formatting ) {
