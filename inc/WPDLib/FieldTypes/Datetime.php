@@ -43,7 +43,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 
 		public function validate( $val = null ) {
 			if ( ! $val ) {
-				return FieldManager::format( current_time( 'timestamp' ), $this->type, 'input' );
+				return '';
 			}
 
 			if ( 'time' != $this->type ) {

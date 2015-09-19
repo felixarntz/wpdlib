@@ -33,7 +33,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 
 		public function validate( $val = null ) {
 			if ( ! $val ) {
-				return '#000000';
+				return '';
 			}
 
 			if ( ! preg_match( '/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i', $val ) ) {
@@ -44,6 +44,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 		}
 
 		public function parse( $val, $formatted = false ) {
+			if ( ! $val ) {
+				return '';
+			}
+
 			if ( $formatted ) {
 				if ( ! is_array( $formatted ) ) {
 					$formatted = array();
