@@ -70,6 +70,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		}
 
 		public function parse( $val, $formatted = false ) {
+			if ( ! $val ) {
+				return '';
+			}
+
 			$timestamp = strtotime( $val );
 
 			if ( $formatted ) {
