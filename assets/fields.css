@@ -51,6 +51,13 @@
   border-color: #0074a2;
 }
 
+.wpdlib-narrow .wpdlib-input .wpdlib-checkbox,
+.wpdlib-narrow .wpdlib-input .wpdlib-radio {
+  float: none;
+  width: 100% !important;
+  margin-left: 0;
+}
+
 .meta-box-sortables .wpdlib-input-select,
 .meta-box-sortables .wpdlib-input-multiselect {
   max-width: 500px;
@@ -68,14 +75,12 @@
   max-width: 100px !important;
 }
 
-.wpdlib-input-range-viewer,
-.wpdlib-input-color-viewer {
+.wpdlib-input-range-viewer {
   height: 27px;
   text-align: right;
 }
 
-.wpdlib-input-range-viewer + input,
-.wpdlib-input-color-viewer + input {
+.wpdlib-input-range-viewer + input {
   height: 27px;
   vertical-align: bottom;
 }
@@ -83,16 +88,6 @@
 .wpdlib-input-range-viewer {
   width: 40px;
   margin-right: 5px;
-}
-
-.wpdlib-input-color-viewer {
-  width: 70px;
-  margin-right: -1px;
-}
-
-.wpdlib-input-color-viewer + input {
-  margin-left: 0;
-  background-color: #eeeeee;
 }
 
 .wpdlib-option-box-wrap {
@@ -171,6 +166,10 @@
   line-height: 16px;
 }
 
+.wpdlib-narrow .wpdlib-repeatable-table {
+  table-layout: auto;
+}
+
 .wpdlib-form-table {
   table-layout: fixed;
 }
@@ -217,13 +216,6 @@
 .wpdlib-narrow .wpdlib-form-table > tfoot > tr > td {
   padding-top: 4px;
   padding-bottom: 6px;
-}
-
-.wpdlib-narrow .wpdlib-input .wpdlib-checkbox,
-.wpdlib-narrow .wpdlib-input .wpdlib-radio {
-  float: none;
-  width: 100% !important;
-  margin-left: 0;
 }
 
 @media screen and (max-width: 782px) {

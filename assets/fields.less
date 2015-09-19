@@ -34,6 +34,12 @@
 				}
 			}
 		}
+
+		.wpdlib-narrow & {
+			float: none;
+			width: 100% !important;
+			margin-left: 0;
+		}
 	}
 }
 
@@ -56,8 +62,7 @@
 	max-width: 100px !important;
 }
 
-.wpdlib-input-range-viewer,
-.wpdlib-input-color-viewer {
+.wpdlib-input-range-viewer {
 	height: 27px;
 	text-align: right;
 	& + input {
@@ -69,15 +74,6 @@
 .wpdlib-input-range-viewer {
 	width: 40px;
 	margin-right: 5px;
-}
-
-.wpdlib-input-color-viewer {
-	width: 70px;
-	margin-right: -1px;
-	& + input {
-		margin-left: 0;
-		background-color: #eeeeee;
-	}
 }
 
 .wpdlib-option-box-wrap {
@@ -147,6 +143,10 @@
 		height: 16px;
 		line-height: 16px;
 	}
+
+	.wpdlib-narrow & {
+		table-layout: auto;
+	}
 }
 
 .wpdlib-form-table {
@@ -176,17 +176,6 @@
 					padding-bottom: 6px;
 				}
 			}
-		}
-	}
-}
-
-.wpdlib-narrow {
-	.wpdlib-input {
-		.wpdlib-checkbox,
-		.wpdlib-radio {
-			float: none;
-			width: 100% !important;
-			margin-left: 0;
 		}
 	}
 }
