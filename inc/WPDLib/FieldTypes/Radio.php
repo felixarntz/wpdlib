@@ -162,20 +162,35 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			if ( isset( $this->args['multiple'] ) && $this->args['multiple'] ) {
 				$parsed = array();
 				if ( $formatted ) {
-					if ( is_array( $formatted ) ) {
-						$formatted = wp_parse_args( $formatted, array(
-							'mode'		=> 'array',
-						) );
+					if ( ! is_array( $formatted ) ) {
+						$formatted = array();
 					}
+					$formatted = wp_parse_args( $formatted, array(
+						'mode'		=> 'text',
+						'list'		=> false,
+					) );
+					$list_separator = ( 'html' == $formatted['mode'] ) ? ' ' : ', ';
 					foreach ( (array) $val as $v ) {
+						$skip_string_formatting = false;
 						if ( isset( $this->args['options'][ $v ] ) ) {
 							if ( is_array( $this->args['options'][ $v ] ) ) {
 								if ( isset( $this->args['options'][ $v ]['label'] ) && ! empty( $this->args['options'][ $v ]['label'] ) ) {
 									$v = $this->args['options'][ $v ]['label'];
+									$list_separator = ', ';
 								} elseif ( isset( $this->args['options'][ $v ]['image'] ) ) {
-									$v = esc_url( $this->args['options'][ $v ]['image'] );
+									if ( 'html' == $formatted['mode'] ) {
+										$v = '<img src="' . esc_url( $this->args['options'][ $v ]['image'] ) . '" style="display: inline-block;width:64px;height:auto;">';
+										$skip_string_formatting = true;
+									} else {
+										$v = esc_url( $this->args['options'][ $v ]['image'] );
+									}
 								} elseif ( isset( $this->args['options'][ $v ]['color'] ) ) {
-									$v = $this->args['options'][ $v ]['color'];
+									if ( 'html' == $formatted['mode'] ) {
+										$v = '<div style="display:inline-block;width:64px;height:48px;background-color:' . $this->args['options'][ $v ]['color'] . ';"></div>';
+										$skip_string_formatting = true;
+									} else {
+										$v = $this->args['options'][ $v ]['color'];
+									}
 								} else {
 									$v = '';
 								}
@@ -183,11 +198,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 								$v = $this->args['options'][ $v ];
 							}
 						}
-						$parsed[] = FieldManager::format( $v, 'string', 'output' );
+						if ( $skip_string_formatting ) {
+							$parsed[] = $v;
+						} else {
+							$parsed[] = FieldManager::format( $v, 'string', 'output' );
+						}
 					}
 
-					if ( 'text' === $formatted['mode'] ) {
-						return implode( ', ', $parsed );
+					if ( $formatted['list'] ) {
+						return implode( $list_separator, $parsed );
 					}
 				} else {
 					foreach ( (array) $val as $v ) {
@@ -198,18 +217,38 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				return $parsed;
 			} else {
 				if ( $formatted ) {
+					if ( ! is_array( $formatted ) ) {
+						$formatted = array();
+					}
+					$formatted = wp_parse_args( $formatted, array(
+						'mode'		=> 'text',
+					) );
+					$skip_string_formatting = false;
 					if ( isset( $this->args['options'][ $val ] ) ) {
 						if ( is_array( $this->args['options'][ $val ] ) ) {
 							if ( isset( $this->args['options'][ $val ]['label'] ) && ! empty( $this->args['options'][ $val ]['label'] ) ) {
 								$val = $this->args['options'][ $val ]['label'];
 							} elseif ( isset( $this->args['options'][ $val ]['image'] ) ) {
-								$val = esc_url( $this->args['options'][ $val ]['image'] );
+								if ( 'html' == $formatted['mode'] ) {
+									$val = '<img src="' . esc_url( $this->args['options'][ $val ]['image'] ) . '" style="display: inline-block;width:64px;height:auto;">';
+									$skip_string_formatting = true;
+								} else {
+									$val = esc_url( $this->args['options'][ $val ]['image'] );
+								}
 							} elseif ( isset( $this->args['options'][ $val ]['color'] ) ) {
-								$val = $this->args['options'][ $val ]['color'];
+								if ( 'html' == $formatted['mode'] ) {
+									$val = '<div style="display:inline-block;width:64px;height:48px;background-color:' . $this->args['options'][ $val ]['color'] . ';"></div>';
+									$skip_string_formatting = true;
+								} else {
+									$val = $this->args['options'][ $val ]['color'];
+								}
 							}
 						} else {
 							$val = $this->args['options'][ $val ];
 						}
+					}
+					if ( $skip_string_formatting ) {
+						return $val;
 					}
 					return FieldManager::format( $val, 'string', 'output' );
 				}

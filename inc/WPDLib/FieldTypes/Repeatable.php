@@ -122,7 +122,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			$parsed = array();
 			$items_formatted = false;
 			if ( $formatted ) {
-				$items_formatted = array( 'mode' => 'text' );
+				$items_formatted = array( 'mode' => 'text', 'list' => true );
 			}
 			foreach ( $val as $key => $values ) {
 				$parsed[ $key ] = array();

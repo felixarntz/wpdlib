@@ -60,17 +60,21 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				if ( is_array( $formatted ) ) {
-					$formatted = wp_parse_args( array(
-						'mode'		=> 'bool',
-					) );
-					switch ( $formatted['mode'] ) {
-						case 'text':
-							return FieldManager::format( $val, 'boolean', 'output' );
-						case 'bool':
-						default:
-							return FieldManager::format( $val, 'boolean', 'input' );
-					}
+				if ( ! is_array( $formatted ) ) {
+					$formatted = array();
+				}
+				$formatted = wp_parse_args( array(
+					'mode'		=> 'text',
+				) );
+				switch ( $formatted['mode'] ) {
+					case 'tick':
+						if ( $val ) {
+							return '&#10004;';
+						}
+						return '';
+					case 'text':
+					default:
+						return FieldManager::format( $val, 'boolean', 'output' );
 				}
 			}
 

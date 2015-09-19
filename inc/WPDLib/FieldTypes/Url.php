@@ -26,7 +26,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Url' ) ) {
 
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
-				return FieldManager::format( $val, 'url', 'output' );
+				if ( ! is_array( $formatted ) ) {
+					$formatted = array();
+				}
+				$formatted = wp_parse_args( $formatted, array(
+					'mode'	=> 'text',
+				) );
+				switch ( $formatted['mode'] ) {
+					case 'link':
+						return '<a href="' . esc_url( $val ) . '" target="_blank">' . esc_url( $val ) . '</a>';
+					case 'text':
+					default:
+						return FieldManager::format( $val, 'url', 'output' );
+				}
 			}
 
 			return FieldManager::format( $val, 'url', 'input' );

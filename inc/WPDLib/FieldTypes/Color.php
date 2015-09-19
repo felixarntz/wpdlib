@@ -22,15 +22,6 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			$args['maxlength'] = 7;
 			$args['value'] = $val;
 
-			/*$text_args = array(
-				'id'	=> $args['id'] . '-' . $this->type . '-viewer',
-				'class'	=> 'wpdlib-input-' . $this->type . '-viewer',
-				'value'	=> $args['value'],
-			);
-
-			$output = '<input type="text"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';
-			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';*/
-
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
 			if ( $echo ) {
@@ -50,6 +41,26 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			}
 
 			return strtolower( $val );
+		}
+
+		public function parse( $val, $formatted = false ) {
+			if ( $formatted ) {
+				if ( ! is_array( $formatted ) ) {
+					$formatted = array();
+				}
+				$formatted = wp_parse_args( array(
+					'mode'		=> 'text',
+				) );
+				switch ( $formatted['mode'] ) {
+					case 'color':
+						return '<div style="display:inline-block;width:64px;height:48px;background-color:' . $val . ';"></div>';
+					case 'text':
+					default:
+						return FieldManager::format( $val, 'string', 'output' );
+				}
+			}
+
+			return FieldManager::format( $val, 'string', 'input' );
 		}
 
 		public function enqueue_assets() {

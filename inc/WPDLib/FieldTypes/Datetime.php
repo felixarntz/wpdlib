@@ -73,13 +73,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$timestamp = strtotime( $val );
 
 			if ( $formatted ) {
-				if ( is_array( $formatted ) ) {
-					$formatted = wp_parse_args( $formatted, array(
-						'format'		=> '',
-					) );
-					return FieldManager::format( $timestamp, $this->type, 'output', $formatted );
+				if ( ! is_array( $formatted ) ) {
+					$formatted = array();
 				}
-				return FieldManager::format( $timestamp, $this->type, 'output' );
+				$formatted = wp_parse_args( $formatted, array(
+					'format'		=> '',
+				) );
+				return FieldManager::format( $timestamp, $this->type, 'output', $formatted );
 			}
 			return FieldManager::format( $timestamp, $this->type, 'input' );
 		}

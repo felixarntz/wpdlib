@@ -77,31 +77,32 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		public function parse( $val, $formatted = false ) {
 			$val = absint( $val );
 			if ( $formatted ) {
-				if ( is_array( $formatted ) ) {
-					$formatted = wp_parse_args( $formatted, array(
-						'mode'		=> 'field',
-						'field'		=> 'url',
-						'template'	=> '',
-					) );
-					switch ( $formatted['mode'] ) {
-						case 'object':
-							return get_post( $val );
-						case 'link':
-							return wp_get_attachment_link( $val, 'thumbnail', false, true );
-						case 'image':
-							return wp_get_attachment_image( $val, 'thumbnail', true );
-						case 'template':
-							if ( ! empty( $formatted['template'] ) && $val ) {
-								$this->temp_val = $val;
-								$output = preg_replace_callback( '/%([A-Za-z0-9_\-]+)%/', array( $this, 'template_replace_callback' ), $formatted['template'] );
-								$this->temp_val = null;
-								return $output;
-							}
-							return '';
-						case 'field':
-						default:
-							return $this->get_attachment_field( $val, $formatted['field'] );
-					}
+				if ( ! is_array( $formatted ) ) {
+					$formatted = array();
+				}
+				$formatted = wp_parse_args( $formatted, array(
+					'mode'		=> 'field',
+					'field'		=> 'url',
+					'template'	=> '',
+				) );
+				switch ( $formatted['mode'] ) {
+					case 'object':
+						return get_post( $val );
+					case 'link':
+						return wp_get_attachment_link( $val, 'thumbnail', false, true );
+					case 'image':
+						return wp_get_attachment_image( $val, 'thumbnail', true );
+					case 'template':
+						if ( ! empty( $formatted['template'] ) && $val ) {
+							$this->temp_val = $val;
+							$output = preg_replace_callback( '/%([A-Za-z0-9_\-]+)%/', array( $this, 'template_replace_callback' ), $formatted['template'] );
+							$this->temp_val = null;
+							return $output;
+						}
+						return '';
+					case 'field':
+					default:
+						return $this->get_attachment_field( $val, $formatted['field'] );
 				}
 			}
 			return $val;
