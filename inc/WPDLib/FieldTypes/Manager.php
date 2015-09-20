@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				return null;
 			}
 
-			$field_type = self::validate_field_type( $args['type'] );
+			$field_type = self::validate_field_type( $args['type'], $repeatable );
 			if ( null === $field_type ) {
 				return null;
 			}
@@ -172,7 +172,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
-		private static function validate_field_type( $field_type ) {
+		private static function validate_field_type( $field_type, $repeatable = false ) {
 			$field_types = self::get_field_types();
 			if ( ! in_array( $field_type, $field_types ) ) {
 				return null;

@@ -31,7 +31,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 				$output .= '<option value=""' . ( empty( $val ) ? ' selected="selected"' : '' ) . '>' . esc_html( $this->args['placeholder'] ) . '</option>';
 			}
 			foreach ( $this->args['options'] as $value => $label ) {
-				$output .= $this->display_item( $value, $label, $val, false );
+				$output .= $this->display_item( $value, $label, 'select', $args['id'], $args['name'], $val, false );
 			}
 			$output .= '</select>';
 
@@ -72,7 +72,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			);
 		}
 
-		protected function display_item( $value, $label, $current = '', $echo = true ) {
+		protected function display_item( $value, $label, $single_type, $id, $name, $current = '', $echo = true ) {
 			$option_atts = array(
 				'value'		=> $value,
 				'selected'	=> $this->is_value_checked_or_selected( $value, $current ),
