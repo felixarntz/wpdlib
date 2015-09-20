@@ -79,6 +79,28 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 			return $results;
 		}
 
+		public static function format_unit( $value, $units, $base, $base_unit = '', $decimals = 2 ) {
+			$value = floatval( $value );
+
+			if ( empty( $base_unit ) ) {
+				$base_unit = $units[0];
+			}
+
+			if ( $base_unit != $units[0] ) {
+				$value *= pow( $base, array_search( $base_unit, $units ) );
+			}
+
+			for ( $i = count( $units ) - 1; $i >= 0; $i-- ) {
+				if ( $value > pow( $base, $i ) ) {
+					return number_format_i18n( $value / pow( $base, $i ), $decimals ) . ' ' . $units[ $i ];
+				} elseif ( 0 == $i ) {
+					return number_format_i18n( $value, $decimals ) . ' ' . $units[0];
+				}
+			}
+
+			return $value;
+		}
+
 		// insert item into array in a sorted manner
 		public static function object_array_insert( $arr, $item, $key = 'slug', $sort_by = '' ) {
 			if ( empty( $sort_by ) ) {

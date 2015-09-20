@@ -8,6 +8,7 @@
 namespace WPDLib\FieldTypes;
 
 use WPDLib\Components\Manager as ComponentManager;
+use WPDLib\Util\Util;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
@@ -162,7 +163,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				case 'date':
 				case 'time':
 				case 'datetime':
-					return self::format_datetime( $value, $mode, $args );
+					return self::format_datetime( $value, $mode, $type, $args );
 				case 'byte':
 					return self::format_byte( $value, $mode, $args );
 				default:
@@ -235,35 +236,49 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		}
 
 		private static function sort_html_attributes( $a, $b ) {
-			if ( $a != $b ) {
-				$priorities = array( 'id', 'name', 'class' );
-				if ( strpos( $a, 'data-' ) === 0 && strpos( $b, 'data-' ) !== 0 ) {
-					if ( in_array( $b, $priorities ) ) {
-						return 1;
-					}
-					return -1;
-				} elseif ( strpos( $a, 'data-' ) !== 0 && strpos( $b, 'data-' ) === 0 ) {
-					if ( in_array( $a, $priorities ) ) {
-						return -1;
-					}
-					return 1;
-				} elseif ( strpos( $a, 'data-' ) === 0 && strpos( $b, 'data-' ) === 0 ) {
-					return 0;
-				}
+			if ( $a == $b ) {
+				return 0;
+			}
 
-				$priorities = array_merge( $priorities, array( 'rel', 'type', 'value', 'href' ) );
-				if ( in_array( $a, $priorities ) && ! in_array( $b, $priorities ) ) {
-					return -1;
-				} elseif ( ! in_array( $a, $priorities ) && in_array( $b, $priorities ) ) {
+			$priorities = array( 'id', 'name', 'class' );
+
+			if ( strpos( $a, 'data-' ) === 0 || strpos( $b, 'data-' ) === 0 ) {
+				return self::sort_html_data_attributes( $a, $b, $priorities );
+			}
+
+			$priorities = array_merge( $priorities, array( 'rel', 'type', 'value', 'href' ) );
+
+			return self::sort_html_priority_attributes( $a, $b, $priorities );
+		}
+
+		private static function sort_html_data_attributes( $a, $b, $priorities = array() ) {
+			if ( strpos( $a, 'data-' ) === 0 && strpos( $b, 'data-' ) !== 0 ) {
+				if ( in_array( $b, $priorities ) ) {
 					return 1;
-				} elseif ( in_array( $a, $priorities ) && in_array( $b, $priorities ) ) {
-					$key_a = array_search( $a, $priorities );
-					$key_b = array_search( $b, $priorities );
-					if ( $key_a < $key_b ) {
-						return -1;
-					} elseif ( $key_a > $key_b ) {
-						return 1;
-					}
+				}
+				return -1;
+			} elseif ( strpos( $a, 'data-' ) !== 0 && strpos( $b, 'data-' ) === 0 ) {
+				if ( in_array( $a, $priorities ) ) {
+					return -1;
+				}
+				return 1;
+			}
+
+			return 0;
+		}
+
+		private static function sort_html_priority_attributes( $a, $b, $priorities = array() ) {
+			if ( in_array( $a, $priorities ) && ! in_array( $b, $priorities ) ) {
+				return -1;
+			} elseif ( ! in_array( $a, $priorities ) && in_array( $b, $priorities ) ) {
+				return 1;
+			} elseif ( in_array( $a, $priorities ) && in_array( $b, $priorities ) ) {
+				$key_a = array_search( $a, $priorities );
+				$key_b = array_search( $b, $priorities );
+				if ( $key_a < $key_b ) {
+					return -1;
+				} elseif ( $key_a > $key_b ) {
+					return 1;
 				}
 			}
 
@@ -295,27 +310,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		}
 
 		private static function format_bool( $value, $mode = 'input' ) {
-			$formatted = $value;
-
-			if ( is_int( $value ) ) {
-				if ( $value > 0 ) {
-					$formatted = true;
-				} else {
-					$formatted = false;
-				}
-			} elseif ( is_string( $value ) ) {
-				if ( ! empty( $value ) ) {
-					if ( strtolower( $value ) == 'false' ) {
-						$formatted = false;
-					} else {
-						$formatted = true;
-					}
-				} else {
-					$formatted = false;
-				}
-			} else {
-				$formatted = (bool) $value;
-			}
+			$formatted = self::parse_bool( $value );
 
 			if ( 'output' === $mode ) {
 				if ( $formatted ) {
@@ -331,7 +326,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		private static function format_int( $value, $mode = 'input', $args = array() ) {
 			$positive_only = isset( $args['positive_only'] ) ? (bool) $args['positive_only'] : false;
 
-			$formatted = intval( $value );
+			$formatted = self::parse_int( $value );
 			if ( $positive_only ) {
 				$formatted = abs( $formatted );
 			}
@@ -346,7 +341,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 		private static function format_float( $value, $mode = 'input', $args = array() ) {
 			$positive_only = isset( $args['positive_only'] ) ? (bool) $args['positive_only'] : false;
 
-			$formatted = floatval( $value );
+			$formatted = self::parse_float( $value );
 			if ( $positive_only ) {
 				$formatted = abs( $formatted );
 			}
@@ -364,7 +359,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
-		private static function format_datetime( $value, $mode = 'input', $args = array() ) {
+		private static function format_datetime( $value, $mode = 'input', $type = 'datetime', $args = array() ) {
 			$timestamp = $value;
 			if ( ! is_int( $timestamp ) ) {
 				$timestamp = mysql2date( 'U', $timestamp );
@@ -372,54 +367,77 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 
 			$format = isset( $args['format'] ) ? $args['format'] : '';
 			if ( empty( $format ) ) {
-				if ( 'output' === $mode ) {
-					if ( $type == 'date' ) {
-						$format = get_option( 'date_format' );
-					} elseif ( $type == 'time' ) {
-						$format = get_option( 'time_format' );
-					} else {
-						$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-					}
-				} else {
-					if ( $type == 'date' ) {
-						$format = 'Ymd';
-					} elseif ( $type == 'time' ) {
-						$format = 'His';
-					} else {
-						$format = 'YmdHis';
-					}
-				}
+				$format = self::get_default_datetime_format( $type, $mode );
 			}
 
 			return date_i18n( $format, $timestamp );
 		}
 
 		private static function format_byte( $value, $mode = 'input', $args = array() ) {
-			$formatted = floatval( $value );
-
 			if ( 'output' === $mode ) {
 				$units = array( 'B', 'kB', 'MB', 'GB', 'TB' );
 				$decimals = isset( $args['decimals'] ) ? absint( $args['decimals'] ) : 2;
 				$base_unit = isset( $args['base_unit'] ) && in_array( $args['base_unit'], $units ) ? $args['base_unit'] : 'B';
-				if ( $base_unit != 'B' ) {
-					$formatted *= pow( 1024, array_search( $base_unit, $units ) );
-				}
-				for ( $i = count( $units ) - 1; $i >= 0; $i-- ) {
-					if ( $formatted > pow( 1024, $i ) ) {
-						$formatted = number_format_i18n( $formatted / pow( 1024, $i ), $decimals ) . ' ' . $units[ $i ];
-						break;
-					} elseif ( $i == 0 ) {
-						$formatted = number_format_i18n( $formatted, $decimals ) . ' B';
-					}
-				}
-			} else {
-				$decimals = isset( $args['decimals'] ) ? absint( $args['decimals'] ) : false;
-				if ( $decimals !== false ) {
-					$formatted = number_format( $formatted, $decimals );
-				}
+
+				return Util::format_unit( $value, $units, 1024, $base_unit, $decimals );
+			}
+
+			$formatted = self::parse_float( $value );
+
+			$decimals = isset( $args['decimals'] ) ? absint( $args['decimals'] ) : false;
+			if ( $decimals !== false ) {
+				$formatted = number_format( $formatted, $decimals );
 			}
 
 			return $formatted;
+		}
+
+		private static function parse_bool( $value ) {
+			if ( is_int( $value ) ) {
+				if ( $value > 0 ) {
+					return true;
+				}
+				return false;
+			} elseif ( is_string( $value ) ) {
+				if ( ! empty( $value ) ) {
+					if ( strtolower( $value ) == 'false' ) {
+						return false;
+					}
+
+					return true;
+				}
+				return false;
+			}
+
+			return (bool) $value;
+		}
+
+		private static function parse_int( $value ) {
+			return intval( $value );
+		}
+
+		private static function parse_float( $value ) {
+			return floatval( $value );
+		}
+
+		private static function get_default_datetime_format( $type, $mode = 'input' ) {
+			if ( 'output' === $mode ) {
+				if ( $type == 'date' ) {
+					return get_option( 'date_format' );
+				} elseif ( $type == 'time' ) {
+					return get_option( 'time_format' );
+				} else {
+					return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+				}
+			}
+
+			if ( $type == 'date' ) {
+				return 'Ymd';
+			} elseif ( $type == 'time' ) {
+				return 'His';
+			} else {
+				return 'YmdHis';
+			}
 		}
 	}
 

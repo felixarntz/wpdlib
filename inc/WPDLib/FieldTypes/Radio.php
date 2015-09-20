@@ -235,7 +235,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			return $parsed;
 		}
 
-		protected function format_item( $val, $formatted = array() ) {
+		protected function format_item( $val, $args = array() ) {
 			$skip_formatting = false;
 
 			if ( isset( $this->args['options'][ $val ] ) ) {
@@ -243,14 +243,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					if ( isset( $this->args['options'][ $val ]['label'] ) && ! empty( $this->args['options'][ $val ]['label'] ) ) {
 						$val = $this->args['options'][ $val ]['label'];
 					} elseif ( isset( $this->args['options'][ $val ]['image'] ) ) {
-						if ( 'html' == $formatted['mode'] ) {
+						if ( 'html' == $args['mode'] ) {
 							$val = '<img src="' . esc_url( $this->args['options'][ $val ]['image'] ) . '" style="display: inline-block;width:64px;height:auto;">';
 							$skip_formatting = true;
 						} else {
 							$val = esc_url( $this->args['options'][ $val ]['image'] );
 						}
 					} elseif ( isset( $this->args['options'][ $val ]['color'] ) ) {
-						if ( 'html' == $formatted['mode'] ) {
+						if ( 'html' == $args['mode'] ) {
 							$val = '<div style="display:inline-block;width:64px;height:48px;background-color:' . $this->args['options'][ $val ]['color'] . ';"></div>';
 							$skip_formatting = true;
 						} else {

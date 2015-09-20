@@ -85,25 +85,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 					'field'		=> 'url',
 					'template'	=> '',
 				) );
-				switch ( $formatted['mode'] ) {
-					case 'object':
-						return get_post( $val );
-					case 'link':
-						return wp_get_attachment_link( $val, 'thumbnail', false, true );
-					case 'image':
-						return wp_get_attachment_image( $val, 'thumbnail', true );
-					case 'template':
-						if ( ! empty( $formatted['template'] ) && $val ) {
-							$this->temp_val = $val;
-							$output = preg_replace_callback( '/%([A-Za-z0-9_\-]+)%/', array( $this, 'template_replace_callback' ), $formatted['template'] );
-							$this->temp_val = null;
-							return $output;
-						}
-						return '';
-					case 'field':
-					default:
-						return $this->get_attachment_field( $val, $formatted['field'] );
-				}
+				return $this->format_attachment( $val, $formatted );
 			}
 			return $val;
 		}
@@ -140,31 +122,73 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		protected function check_filetype( $val, $desired_types = 'all' ) {
+			$extension = $this->get_attachment_extension( $val );
+
+			if ( $extension ) {
+				return $this->check_extension( $extension, $desired_types );
+			}
+
+			return false;
+		}
+
+		protected function get_attachment_extension( $id ) {
 			$filename = get_attached_file( $val );
+
 			if ( $filename ) {
 				$extension = wp_check_filetype( $filename );
 				$extension = $extension['ext'];
 				if ( $extension ) {
-					if ( 'all' == $desired_types || ! $desired_types ) {
-						return true;
-					}
-
-					if ( ! is_array( $desired_types ) ) {
-						$desired_types = array( $desired_types );
-					}
-
-					if ( in_array( strtolower( $extension ), $desired_types ) ) {
-						return true;
-					}
-
-					$type = wp_ext2type( $extension );
-
-					if ( $type !== null && in_array( $type, $desired_types ) ) {
-						return true;
-					}
+					return $extension;
 				}
 			}
+
 			return false;
+		}
+
+		protected function check_extension( $extension, $desired_types = 'all' ) {
+			if ( 'all' == $desired_types || ! $desired_types ) {
+				return true;
+			}
+
+			if ( ! is_array( $desired_types ) ) {
+				$desired_types = array( $desired_types );
+			}
+
+			if ( in_array( strtolower( $extension ), $desired_types ) ) {
+				return true;
+			}
+
+			$type = wp_ext2type( $extension );
+
+			if ( $type !== null && in_array( $type, $desired_types ) ) {
+				return true;
+			}
+
+			return false;
+		}
+
+		protected function format_attachment( $id, $args = array() ) {
+			switch ( $args['mode'] ) {
+				case 'object':
+					return get_post( $id );
+				case 'link':
+					return wp_get_attachment_link( $id, 'thumbnail', false, true );
+				case 'image':
+					return wp_get_attachment_image( $id, 'thumbnail', true );
+				case 'template':
+					if ( ! empty( $args['template'] ) && $id ) {
+						$this->temp_val = $id;
+						$output = preg_replace_callback( '/%([A-Za-z0-9_\-]+)%/', array( $this, 'template_replace_callback' ), $args['template'] );
+						$this->temp_val = null;
+						return $output;
+					}
+					return '';
+				case 'field':
+				default:
+					return $this->get_attachment_field( $id, $args['field'] );
+			}
+
+			return $id;
 		}
 
 		protected function get_attachment_field( $id, $field ) {
