@@ -156,28 +156,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 		}
 
 		public function enqueue_assets() {
-			$dependencies = array();
-			$script_vars = array();
-
-			foreach ( $this->fields as $field_slug => $field ) {
-				$asset_data = $field->enqueue_assets();
-				if ( isset( $asset_data['dependencies'] ) ) {
-					foreach ( $asset_data['dependencies'] as $dependency ) {
-						$dependencies[] = $dependency;
-					}
-				}
-				if ( isset( $asset_data['script_vars'] ) ) {
-					foreach ( $asset_data['script_vars'] as $key => $value ) {
-						if ( isset( $script_vars[ $key ] ) && is_array( $script_vars[ $key ] ) && is_array( $value ) ) {
-							$script_vars[ $key ] = array_merge( $script_vars[ $key ], $value );
-						} else {
-							$script_vars[ $key ] = $value;
-						}
-					}
-				}
-			}
-
-			$dependencies = array_unique( $dependencies );
+			list( $dependencies, $script_vars ) = FieldManager::get_dependencies_and_script_vars( $this->fields );
 
 			if ( ! isset( $script_vars['repeatable_field_templates'] ) ) {
 				$script_vars['repeatable_field_templates'] = array();

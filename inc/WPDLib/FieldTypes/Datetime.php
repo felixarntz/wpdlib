@@ -50,23 +50,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 				$val = $this->untranslate( $val );
 			}
 
-			$timestamp = strtotime( $val );
-			$timestamp_min = ! empty( $this->args['min'] ) ? strtotime( $this->args['min'] ) : null;
-			$timestamp_max = ! empty( $this->args['max'] ) ? strtotime( $this->args['max'] ) : null;
-
-			$value = FieldManager::format( $timestamp, $this->type, 'input' );
-			$value_min = $timestamp_min !== null ? FieldManager::format( $timestamp_min, $this->type, 'input' ) : null;
-			$value_max = $timestamp_max !== null ? FieldManager::format( $timestamp_max, $this->type, 'input' ) : null;
-
-			if ( $value_min !== null && $value < $value_min ) {
-				return new WPError( 'invalid_' . $this->type . '_too_small', sprintf( __( 'The date %1$s is invalid. It must not occur earlier than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_min, $this->type, 'output' ) ) );
+			$value = $this->validate_min( $val );
+			if ( is_wp_error( $value ) ) {
+				return $value;
 			}
 
-			if ( $value_max !== null && $value > $value_max ) {
-				return new WPError( 'invalid_' . $this->type . '_too_big', sprintf( __( 'The date %1$s is invalid. It must not occur later than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_max, $this->type, 'output' ) ) );
-			}
-
-			return $value;
+			return $this->validate_max( $val );
 		}
 
 		public function parse( $val, $formatted = false ) {
@@ -110,7 +99,83 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			);
 		}
 
+		protected function validate_min( $val ) {
+			$value = FieldManager::format( strtotime( $val ), $this->type, 'input' );
+
+			$timestamp_min = $this->parse_timestamp( $this->args['min'] );
+			if ( null === $timestamp_min ) {
+				return $value;
+			}
+
+			if ( $value < $this->format_timestamp( $timestamp_min ) ) {
+				return new WPError( 'invalid_' . $this->type . '_too_small', sprintf( __( 'The date %1$s is invalid. It must not occur earlier than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_min, $this->type, 'output' ) ) );
+			}
+
+			return $value;
+		}
+
+		protected function validate_max( $val ) {
+			$value = FieldManager::format( strtotime( $val ), $this->type, 'input' );
+
+			$timestamp_max = $this->parse_timestamp( $this->args['max'] );
+			if ( null === $timestamp_max ) {
+				return $value;
+			}
+
+			if ( $value > $this->format_timestamp( $timestamp_max ) ) {
+				return new WPError( 'invalid_' . $this->type . '_too_big', sprintf( __( 'The date %1$s is invalid. It must not occur later than %2$s.', 'wpdlib' ), FieldManager::format( $val, $this->type, 'output' ), FieldManager::format( $timestamp_max, $this->type, 'output' ) ) );
+			}
+
+			return $value;
+		}
+
+		protected function parse_timestamp( $val ) {
+			return ! empty( $val ) ? strtotime( $val ) : null;
+		}
+
+		protected function format_timestamp( $val ) {
+			return $val !== null ? FieldManager::format( $val, $this->type, 'input' ) : null;
+		}
+
 		protected function untranslate( $val ) {
+			self::maybe_init_locale();
+
+			return preg_replace_callback( '/[A-Za-z]+/', array( $this, 'untranslate_replace' ), $val );
+		}
+
+		protected function untranslate_replace( $matches ) {
+			$term = $matches[0];
+
+			if ( $key = array_search( $term, self::$locale['weekday_initial'] ) ) {
+				if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
+					return $key;
+				}
+			}
+
+			if ( $key = array_search( $term, self::$locale['weekday_abbrev'] ) ) {
+				if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
+					return $key;
+				}
+			}
+
+			if ( $key = array_search( $term, self::$locale['weekday'] ) ) {
+				return $key;
+			}
+
+			if ( $key = array_search( $term, self::$locale['month_abbrev'] ) ) {
+				if ( $key = array_search( $key, self::$locale['month'] ) ) {
+					return $key;
+				}
+			}
+
+			if ( $key = array_search( $term, self::$locale['month'] ) ) {
+				return $key;
+			}
+
+			return $term;
+		}
+
+		protected static function maybe_init_locale() {
 			if ( self::$locale === null ) {
 				global $wp_locale;
 
@@ -143,40 +208,6 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 					'month_abbrev'		=> $wp_locale->month_abbrev,
 				);
 			}
-
-			$val = preg_replace_callback( '/[A-Za-z]+/', function( $matches ) {
-				$term = $matches[0];
-
-				if ( $key = array_search( $term, self::$locale['weekday_initial'] ) ) {
-					if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
-						return $key;
-					}
-				}
-
-				if ( $key = array_search( $term, self::$locale['weekday_abbrev'] ) ) {
-					if ( $key = array_search( $key, self::$locale['weekday'] ) ) {
-						return $key;
-					}
-				}
-
-				if ( $key = array_search( $term, self::$locale['weekday'] ) ) {
-					return $key;
-				}
-
-				if ( $key = array_search( $term, self::$locale['month_abbrev'] ) ) {
-					if ( $key = array_search( $key, self::$locale['month'] ) ) {
-						return $key;
-					}
-				}
-
-				if ( $key = array_search( $term, self::$locale['month'] ) ) {
-					return $key;
-				}
-
-				return $term;
-			}, $val );
-
-			return $val;
 		}
 	}
 

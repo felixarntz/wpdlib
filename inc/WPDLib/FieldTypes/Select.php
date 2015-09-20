@@ -31,23 +31,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 				$output .= '<option value=""' . ( empty( $val ) ? ' selected="selected"' : '' ) . '>' . esc_html( $this->args['placeholder'] ) . '</option>';
 			}
 			foreach ( $this->args['options'] as $value => $label ) {
-				$option_atts = array(
-					'value'		=> $value,
-					'selected'	=> $this->is_value_checked_or_selected( $value, $val ),
-				);
-				if ( is_array( $label ) ) {
-					if ( isset( $label['image'] ) ) {
-						$option_atts['data-image'] = esc_url( $label['image'] );
-					} elseif ( isset( $label['color'] ) ) {
-						$option_atts['data-color'] = ltrim( $label['color'], '#' );
-					}
-					if ( isset( $label['label'] ) ) {
-						$label = $label['label'];
-					} else {
-						$label = '';
-					}
-				}
-				$output .= '<option' . FieldManager::make_html_attributes( $option_atts, false, false ) . '>' . esc_html( $label ) . '</option>';
+				$output .= $this->display_item( $value, $label, $val, false );
 			}
 			$output .= '</select>';
 
@@ -86,6 +70,34 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			return array(
 				'dependencies'	=> $dependencies,
 			);
+		}
+
+		protected function display_item( $value, $label, $current = '', $echo = true ) {
+			$option_atts = array(
+				'value'		=> $value,
+				'selected'	=> $this->is_value_checked_or_selected( $value, $current ),
+			);
+
+			if ( is_array( $label ) ) {
+				if ( isset( $label['image'] ) ) {
+					$option_atts['data-image'] = esc_url( $label['image'] );
+				} elseif ( isset( $label['color'] ) ) {
+					$option_atts['data-color'] = ltrim( $label['color'], '#' );
+				}
+				if ( isset( $label['label'] ) ) {
+					$label = $label['label'];
+				} else {
+					$label = '';
+				}
+			}
+
+			$output = '<option' . FieldManager::make_html_attributes( $option_atts, false, false ) . '>' . esc_html( $label ) . '</option>';
+
+			if ( $echo ) {
+				echo $output;
+			}
+
+			return $output;
 		}
 	}
 

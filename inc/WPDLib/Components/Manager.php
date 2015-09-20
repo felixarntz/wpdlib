@@ -121,26 +121,7 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 			$class_path_children = isset( $class_path[1] ) ? $class_path[1] : '';
 
-			$results = array();
-
-			if ( '*' == $component_path[0] ) {
-				if ( isset( $component_path[1] ) ) {
-					foreach ( $toplevel_components as $current ) {
-						$current = self::get_components_recursive( $component_path[1], $current, $class_path_children );
-						$results = array_merge( $results, $current );
-					}
-				} else {
-					$results = array_merge( $results, array_values( $toplevel_components ) );
-				}
-			} elseif ( isset( $toplevel_components[ $component_path[0] ] ) ) {
-				$current = $toplevel_components[ $component_path[0] ];
-				if ( isset( $component_path[1] ) ) {
-					$current = self::get_components_recursive( $component_path[1], $current, $class_path_children );
-					$results = array_merge( $results, $current );
-				} else {
-					$results[] = $current;
-				}
-			}
+			$results = self::get_components_results( $component_path, $toplevel_components, $class_path_children );
 
 			if ( $single ) {
 				if ( count( $results ) > 0 ) {
@@ -254,6 +235,10 @@ if ( ! class_exists( 'WPDLib\Components\Manager' ) ) {
 
 			$class_path_children = isset( $class_path[1] ) ? $class_path[1] : '';
 
+			return self::get_components_results( $component_path, $current_children, $class_path_children );
+		}
+
+		private static function get_components_results( $component_path, $current_children, $class_path_children ) {
 			$results = array();
 
 			if ( '*' == $component_path[0] ) {

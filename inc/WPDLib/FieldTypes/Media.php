@@ -177,28 +177,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				case 'alt':
 					return get_post_meta( $id, '_wp_attachment_image_alt', true );
 				case 'caption':
+					return $this->get_post_field( $id, 'post_excerpt' );
 				case 'description':
-					$attachment = get_post( $id );
-					if ( ! $attachment ) {
-						return '';
-					}
-					if ( 'description' === $field ) {
-						return $attachment->post_content;
-					}
-					return $attachment->post_excerpt;
+					return $this->get_post_field( $id, 'post_content' );
 				case 'mime':
 				case 'mime_type':
 				case 'type':
 				case 'subtype':
-					$mime_type = get_post_mime_type( $id );
-					if ( false === strpos( $field, 'mime' ) && false !== strpos( $mime_type, '/' ) ) {
-						list( $type, $subtype ) = explode( '/', $mime_type );
-						if ( 'type' === $field ) {
-							return $type;
-						}
-						return $subtype;
-					}
-					return $mime_type;
+					return $this->get_attachment_mime_type( $id, $field );
 				case 'mime_icon':
 				case 'mime_type_icon':
 					return wp_mime_type_icon( $id );
@@ -209,31 +195,61 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				case 'url':
 				case 'path':
 				default:
-					$url = wp_get_attachment_url( $id );
-					$size = false;
 					if ( '_path' === substr( $field, -5 ) ) {
-						$size = substr( $field, 0, -5 );
-						$field = 'path';
+						return $this->get_attachment_path( $id, 'path', substr( $field, 0, -5 ) );
 					} elseif ( '_url' === substr( $field, -4 ) ) {
-						$size = substr( $field, 0, -4 );
-						$field = 'url';
+						return $this->get_attachment_path( $id, 'url', substr( $field, 0, -4 ) );
 					}
-					if ( $size ) {
-						$src = wp_get_attachment_image_src( $id, $size, false );
-						if ( is_array( $src ) ) {
-							$url = $src[0];
-						}
-					}
-					if ( $url && 'path' === $field ) {
-						$upload_dir = wp_upload_dir();
-						$path = '';
-						if ( strpos( $url, $upload_dir['baseurl'] ) !== false ) {
-							$path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
-						}
-						return $path;
-					}
-					return $url;
+					return $this->get_attachment_path( $id, $field );
 			}
+		}
+
+		protected function get_post_field( $id, $field ) {
+			$attachment = get_post( $id );
+			if ( ! $attachment ) {
+				return '';
+			}
+
+			if ( ! isset( $attachment->$field ) ) {
+				return '';
+			}
+
+			return $attachment->$field;
+		}
+
+		protected function get_attachment_mime_type( $id, $mode = 'all' ) {
+			$mime_type = get_post_mime_type( $id );
+
+			if ( in_array( $mode, array( 'type', 'subtype' ) ) ) {
+				list( $type, $subtype ) = explode( '/', $mime_type );
+				if ( 'type' === $mode ) {
+					return $type;
+				}
+				return $subtype;
+			}
+
+			return $mime_type;
+		}
+
+		protected function get_attachment_path( $id, $mode = 'url', $size = false ) {
+			$url = wp_get_attachment_url( $id );
+			if ( $size ) {
+				$src = wp_get_attachment_image_src( $id, $size, false );
+				if ( is_array( $src ) ) {
+					$url = $src[0];
+				}
+			}
+
+			if ( $url && 'path' === $mode ) {
+				$upload_dir = wp_upload_dir();
+				$path = '';
+				if ( strpos( $url, $upload_dir['baseurl'] ) !== false ) {
+					$path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+				}
+				return $path;
+			}
+
+			return $url;
 		}
 
 		protected function template_replace_callback( $matches ) {

@@ -83,104 +83,30 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		public static function object_array_insert( $arr, $item, $key = 'slug', $sort_by = '' ) {
 			if ( empty( $sort_by ) ) {
 				$arr[ $item->$key ] = $item;
-			} else {
-				if ( ! isset( $item->$sort_by ) || null === $item->$sort_by || 0 == count( $arr ) ) {
-					$arr[ $item->$key ] = $item;
-				} else {
-					$new_arr = array();
-					$new_arr[ $item->$key ] = $item;
-
-					$split_key = 0;
-					foreach ( $arr as $c ) {
-						if ( null === $c->$sort_by || $c->$sort_by > $item->$sort_by ) {
-							break;
-						}
-						$split_key++;
-					}
-
-					if ( 0 == $split_key ) {
-						$arr = array_merge( $new_arr, $arr );
-					} else {
-						$begin_arr = array_slice( $arr, 0, $split_key );
-						$end_arr = array_slice( $arr, $split_key );
-						$arr = array_merge( $begin_arr, $new_arr, $end_arr );
-					}
-				}
+				return $arr;
+			} elseif ( ! isset( $item->$sort_by ) || null === $item->$sort_by || 0 == count( $arr ) ) {
+				$arr[ $item->$key ] = $item;
+				return $arr;
 			}
 
-			return $arr;
+			return self::object_array_insert_sorted( $arr, $item, $sort_by, $key );
 		}
 
 		// merge multiple sorted arrays into a single sorted array
 		// PHP unstable sort will be run on the items that have the $sort_by property defined
 		// so it is "almost" stable
 		public static function object_array_merge( $arrs, $key = 'slug', $sort_by = '' ) {
-			$result = array();
-
-			$instance_counts = array();
-
 			if ( empty( $sort_by ) ) {
-				foreach ( $arrs as $arr ) {
-					foreach ( $arr as $item ) {
-						if ( ! isset( $result[ $item->$key ] ) ) {
-							$result[ $item->$key ] = $item;
-						} else {
-							if ( ! isset( $instance_counts[ $item->$key ] ) ) {
-								$instance_counts[ $item->$key ] = 1;
-							}
-							$instance_counts[ $item->$key ]++;
-							$result[ $item->$key . '-' . $instance_counts[ $item->$key ] ] = $item;
-						}
-					}
-					unset( $item );
-				}
-				unset( $arr );
-			} else {
-				$sortables = array();
-				$nulls = array();
+				$result = $instance_counts = array();
 
 				foreach ( $arrs as $arr ) {
-					foreach ( $arr as $item ) {
-						if ( ! isset( $item->$sort_by ) || null === $item->$sort_by ) {
-							$nulls[] = $item;
-						} else {
-							$sortables[] = $item;
-						}
-					}
-					unset( $item );
+					$result = self::object_array_merge_items( $arr, $result, $instance_counts, $key );
 				}
-				unset( $arr );
 
-				$sortables = self::object_array_sort( $sortables, $sort_by );
-
-				foreach ( $sortables as $item ) {
-					if ( ! isset( $result[ $item->$key ] ) ) {
-						$result[ $item->$key ] = $item;
-					} else {
-						if ( ! isset( $instance_counts[ $item->$key ] ) ) {
-							$instance_counts[ $item->$key ] = 1;
-						}
-						$instance_counts[ $item->$key ]++;
-						$result[ $item->$key . '-' . $instance_counts[ $item->$key ] ] = $item;
-					}
-				}
-				unset( $item );
-
-				foreach ( $nulls as $item ) {
-					if ( ! isset( $result[ $item->$key ] ) ) {
-						$result[ $item->$key ] = $item;
-					} else {
-						if ( ! isset( $instance_counts[ $item->$key ] ) ) {
-							$instance_counts[ $item->$key ] = 1;
-						}
-						$instance_counts[ $item->$key ]++;
-						$result[ $item->$key . '-' . $instance_counts[ $item->$key ] ] = $item;
-					}
-				}
-				unset( $item );
+				return $result;
 			}
 
-			return $result;
+			return self::object_array_merge_sorted( $arrs, $sort_by, $key );
 		}
 
 		// PHP unstable sort; do not use this on arrays containing objects without the $sort_by property defined
@@ -198,6 +124,76 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 			}
 
 			return $arr;
+		}
+
+		private static function object_array_insert_sorted( $arr, $item, $sort_by, $key = 'slug' ) {
+			$new_arr = array();
+			$new_arr[ $item->$key ] = $item;
+
+			$split_key = 0;
+			foreach ( $arr as $c ) {
+				if ( null === $c->$sort_by || $c->$sort_by > $item->$sort_by ) {
+					break;
+				}
+				$split_key++;
+			}
+
+			if ( 0 == $split_key ) {
+				$arr = array_merge( $new_arr, $arr );
+			} else {
+				$begin_arr = array_slice( $arr, 0, $split_key );
+				$end_arr = array_slice( $arr, $split_key );
+				$arr = array_merge( $begin_arr, $new_arr, $end_arr );
+			}
+
+			return $arr;
+		}
+
+		private static function object_array_merge_sorted( $arrs, $sort_by, $key = 'slug' ) {
+			$result = $instance_counts = array();
+
+			list( $sortables, $nulls ) = self::object_array_merge_split( $arrs, $sort_by );
+
+			$result = self::object_array_merge_items( $sortables, $result, $instance_counts, $key );
+
+			$result = self::object_array_merge_items( $nulls, $result, $instance_counts, $key );
+
+			return $result;
+		}
+
+		private static function object_array_merge_split( $arrs, $sort_by ) {
+			$sortables = array();
+			$nulls = array();
+
+			foreach ( $arrs as $arr ) {
+				foreach ( $arr as $item ) {
+					if ( ! isset( $item->$sort_by ) || null === $item->$sort_by ) {
+						$nulls[] = $item;
+					} else {
+						$sortables[] = $item;
+					}
+				}
+			}
+
+			$sortables = self::object_array_sort( $sortables, $sort_by );
+
+			return array( $sortables, $nulls );
+		}
+
+		private static function object_array_merge_items( $items, $result, &$instance_counts, $key = 'slug' ) {
+			foreach ( $items as $item ) {
+				if ( ! isset( $result[ $item->$key ] ) ) {
+					$result[ $item->$key ] = $item;
+				} else {
+					if ( ! isset( $instance_counts[ $item->$key ] ) ) {
+						$instance_counts[ $item->$key ] = 1;
+					}
+					$instance_counts[ $item->$key ]++;
+					$result[ $item->$key . '-' . $instance_counts[ $item->$key ] ] = $item;
+				}
+			}
+
+			return $result;
 		}
 
 		private static function sort_objects_callback( $a, $b ) {
