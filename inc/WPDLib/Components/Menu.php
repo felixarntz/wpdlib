@@ -173,12 +173,16 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		}
 
 		protected function add_menu_page( $menu_item ) {
-			$status = $menu_item->add_to_menu( array(
-				'mode'			=> 'menu',
-				'menu_label'	=> $this->args['label'],
-				'menu_icon'		=> $this->args['icon'],
-				'menu_position'	=> $this->args['position'],
-			) );
+			$status = false;
+			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
+				$status = $menu_item->add_to_menu( array(
+					'mode'			=> 'menu',
+					'menu_label'	=> $this->args['label'],
+					'menu_icon'		=> $this->args['icon'],
+					'menu_position'	=> $this->args['position'],
+				) );
+			}
+
 			if ( $status ) {
 				$this->added = true;
 				$this->menu_slug = $menu_item->slug;
@@ -192,10 +196,14 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		}
 
 		protected function add_submenu_page( $menu_item ) {
-			$status = $menu_item->add_to_menu( array(
-				'mode'			=> 'submenu',
-				'menu_slug'		=> $this->menu_slug,
-			) );
+			$status = false;
+			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
+				$status = $menu_item->add_to_menu( array(
+					'mode'			=> 'submenu',
+					'menu_slug'		=> $this->menu_slug,
+				) );
+			}
+
 			if ( $status ) {
 				if ( true !== $this->first_submenu_label ) {
 					global $submenu;
@@ -211,10 +219,13 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		}
 
 		protected function add_non_menu_page( $menu_item ) {
-			$status = $menu_item->add_to_menu( array(
-				'mode'			=> 'submenu',
-				'menu_slug'		=> null,
-			) );
+			$status = false;
+			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
+				$status = $menu_item->add_to_menu( array(
+					'mode'			=> 'submenu',
+					'menu_slug'		=> null,
+				) );
+			}
 
 			return $status;
 		}
