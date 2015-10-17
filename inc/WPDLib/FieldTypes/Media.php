@@ -132,7 +132,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		}
 
 		protected function get_attachment_extension( $id ) {
-			$filename = get_attached_file( $val );
+			$filename = get_attached_file( $id );
 
 			if ( $filename ) {
 				$extension = wp_check_filetype( $filename );
