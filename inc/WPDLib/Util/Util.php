@@ -16,6 +16,20 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 	final class Util {
 		private static $sort_by = '';
 
+		public static function component_to_slug( $component ) {
+			return $component->slug;
+		}
+
+		public static function current_user_can( $component ) {
+			$cap = $component->capability;
+
+			if ( null === $cap || current_user_can( $cap ) ) {
+				return true;
+			}
+
+			return false;
+		}
+
 		public static function get_posts_options( $post_type = 'any' ) {
 			if ( ! is_string( $post_type ) && ! is_array( $post_type ) ) {
 				$post_type = 'any';
