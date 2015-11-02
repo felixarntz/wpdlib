@@ -190,6 +190,8 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 					$this->menu_slug = $menu_item->get_menu_slug();
 				}
 				$this->first_submenu_label = $status;
+
+				$this->maybe_adjust_first_submenu_label();
 			}
 
 			return $status;
@@ -205,14 +207,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			}
 
 			if ( $status ) {
-				if ( true !== $this->first_submenu_label ) {
-					global $submenu;
-
-					if ( isset( $submenu[ $this->menu_slug ] ) ) {
-						$submenu[ $this->menu_slug ][0][0] = $this->first_submenu_label;
-						$this->first_submenu_label = true;
-					}
-				}
+				$this->maybe_adjust_first_submenu_label();
 			}
 
 			return $status;
@@ -228,6 +223,17 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			}
 
 			return $status;
+		}
+
+		protected function maybe_adjust_first_submenu_label() {
+			global $submenu;
+
+			if ( true !== $this->first_submenu_label ) {
+				if ( isset( $submenu[ $this->menu_slug ] ) ) {
+					$submenu[ $this->menu_slug ][0][0] = $this->first_submenu_label;
+					$this->first_submenu_label = true;
+				}
+			}
 		}
 	}
 }
