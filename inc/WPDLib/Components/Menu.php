@@ -14,18 +14,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
-
+	/**
+	 * Class for a menu component.
+	 *
+	 * This denotes a top level menu item in the WordPress admin menu.
+	 * The component's children need to have an `add_to_menu()` method so that they can be added to the menu automatically.
+	 *
+	 * @internal
+	 * @since 0.5.0
+	 */
 	class Menu extends Base {
 
+		/**
+		 * @since 0.5.0
+		 * @var bool Stores whether the menu has been added yet.
+		 */
 		protected $added = false;
+
+		/**
+		 * @since 0.5.0
+		 * @var string Holds the actual menu slug of the menu.
+		 */
 		protected $menu_slug = '';
+
+		/**
+		 * @since 0.5.0
+		 * @var string|bool Temporarily holds the first submenu label of the menu (true if it has been already set, false it it has not been detected yet).
+		 */
 		protected $first_submenu_label = false;
 
+		/**
+		 * Class constructor.
+		 *
+		 * @since 0.5.0
+		 * @param string $slug the menu slug
+		 * @param array $args array of menu properties
+		 */
 		public function __construct( $slug, $args ) {
 			parent::__construct( $slug, $args );
 			$this->validate_filter = 'wpdlib_menu_validated';
 		}
 
+		/**
+		 * Checks whether the menu already exists (for example when it is a WordPress Core menu).
+		 *
+		 * If it has already been added, the class variables are set up accordingly.
+		 *
+		 * @since 0.5.0
+		 * @param string $screen_slug a screen slug (slug of one of the menu component's child components)
+		 * @return bool whether the menu has already been added
+		 */
 		public function is_already_added( $screen_slug ) {
 			global $admin_page_hooks;
 
@@ -49,6 +87,17 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return $this->added;
 		}
 
+		/**
+		 * Creates the admin menu.
+		 *
+		 * If the menu has an empty slug, the children are added as a page, but not added into any menu.
+		 * Otherwise the children will simply be added to the menu. The first child will be added using `add_menu_page()`.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\Components\Menu::add_non_menu_page()
+		 * @see WPDLib\Components\Menu::add_menu_page()
+		 * @see WPDLib\Components\Menu::add_submenu_page()
+		 */
 		public function create() {
 			foreach ( $this->get_children() as $menu_item ) {
 				if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
@@ -63,6 +112,13 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			}
 		}
 
+		/**
+		 * Validates the arguments array.
+		 *
+		 * @since 0.5.0
+		 * @param null $parent null (since a menu is a top-level component)
+		 * @return bool|WPDLib\Util\Error an error object if an error occurred during validation, true if it was validated, false if it did not need to be validated
+		 */
 		public function validate( $parent = null ) {
 			$status = parent::validate( $parent );
 
@@ -70,12 +126,19 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 				if ( null !== $this->args['position'] ) {
 					$this->args['position'] = floatval( $this->args['position'] );
 				}
-
-				//TODO add special validation for icon
 			}
 
 			return $status;
 		}
+
+		/**
+		 * Returns the keys of the arguments array and their default values.
+		 *
+		 * Read the plugin guide for more information about the menu arguments.
+		 *
+		 * @since 0.5.0
+		 * @return array
+		 */
 		protected function get_defaults() {
 			$defaults = array(
 				'label'			=> __( 'Menu label', 'wpdlib' ),
@@ -83,17 +146,48 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 				'position'		=> null,
 			);
 
+			/**
+			 * This filter can be used by the developer to modify the default values for each menu component.
+			 *
+			 * @since 0.5.0
+			 * @param array the associative array of default values
+			 */
 			return apply_filters( 'wpdlib_menu_defaults', $defaults );
 		}
 
+		/**
+		 * Returns whether this component supports multiple parents.
+		 *
+		 * @since 0.5.0
+		 * @return bool
+		 */
 		protected function supports_multiparents() {
 			return false;
 		}
 
+		/**
+		 * Returns whether this component supports global slugs.
+		 *
+		 * If it does not support global slugs, the function either returns false for the slug to be globally unique
+		 * or the class name of a parent component to ensure the slug is unique within that parent's scope.
+		 *
+		 * @since 0.5.0
+		 * @return bool|string
+		 */
 		protected function supports_globalslug() {
 			return true;
 		}
 
+		/**
+		 * Searches for an existing admin page for a specific slug.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\Components\Menu::check_for_admin_page_func()
+		 * @see WPDLib\Components\Menu::check_for_post_type_menu()
+		 * @param string $slug the slug to check for
+		 * @param array $admin_page_hooks array of all the existing page hooks
+		 * @return string|false either the page hook of the page or false if no admin page was found
+		 */
 		protected function check_for_admin_page( $slug, $admin_page_hooks ) {
 			if ( isset( $admin_page_hooks[ $slug ] ) ) {
 				// check for the exact menu slug
@@ -118,6 +212,13 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return false;
 		}
 
+		/**
+		 * Checks whether a slug matches a specific WordPress `add_{slug}_page()` function.
+		 *
+		 * @since 0.5.0
+		 * @param string $slug the slug to check for
+		 * @return string|false either the page hook of the page or false if no admin page was found
+		 */
 		protected function check_for_admin_page_func( $slug ) {
 			if ( function_exists( 'add_' . $slug . '_page' ) ) {
 				switch ( $slug ) {
@@ -154,6 +255,14 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return false;
 		}
 
+		/**
+		 * Searches for an existing post type admin page for a specific slug.
+		 *
+		 * @since 0.5.0
+		 * @param string $slug the slug to check for
+		 * @param array $admin_page_hooks array of all the existing page hooks
+		 * @return string|false either the page hook of the page or false if no admin page was found
+		 */
 		protected function check_for_post_type_menu( $slug, $admin_page_hooks ) {
 			if ( isset( $admin_page_hooks[ 'edit.php?post_type=' . $slug ] ) ) {
 				return 'edit.php?post_type=' . $slug;
@@ -172,6 +281,16 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return false;
 		}
 
+		/**
+		 * Adds a new menu page.
+		 *
+		 * This function is only executed once for each menu component.
+		 * The first child will be added using this function.
+		 *
+		 * @since 0.5.0
+		 * @param WPDLib\Components\Base $menu_item the component to add to the menu
+		 * @return string|bool either the first submenu label (defined by the child component) or a boolean whether the component was successfully added
+		 */
 		protected function add_menu_page( $menu_item ) {
 			$status = false;
 			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
@@ -197,6 +316,17 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return $status;
 		}
 
+		/**
+		 * Adds a new submenu page.
+		 *
+		 * All component children except for the first one will be added using this function.
+		 * The function will also adjust the menu so that the first submenu item (which was actually added by `add_menu_page()`) has the proper label.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\Components\Menu::maybe_adjust_first_submenu_label()
+		 * @param WPDLib\Components\Base $menu_item the component to add to the menu
+		 * @return bool whether the component was successfully added
+		 */
 		protected function add_submenu_page( $menu_item ) {
 			$status = false;
 			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
@@ -213,6 +343,16 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return $status;
 		}
 
+		/**
+		 * Adds a new page to the WordPress admin which should not be part of any menu.
+		 *
+		 * This function is only used for the special case when a menu component's slug is empty.
+		 * This allows you to add pages that are not visible in any menu.
+		 *
+		 * @since 0.5.0
+		 * @param WPDLib\Components\Base $menu_item the component to add to the menu
+		 * @return bool whether the component was successfully added
+		 */
 		protected function add_non_menu_page( $menu_item ) {
 			$status = false;
 			if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
@@ -225,6 +365,11 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 			return $status;
 		}
 
+		/**
+		 * Adjusts the menu so that the first submenu item has the proper label.
+		 *
+		 * @since 0.5.0
+		 */
 		protected function maybe_adjust_first_submenu_label() {
 			global $submenu;
 

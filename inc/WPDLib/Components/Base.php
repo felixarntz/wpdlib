@@ -16,24 +16,83 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
-
+	/**
+	 * The base class for all components.
+	 *
+	 * @internal
+	 * @since 0.5.0
+	 */
 	abstract class Base {
+
+		/**
+		 * @since 0.5.0
+		 * @var string Holds the slug of the component.
+		 */
 		protected $slug = '';
+
+		/**
+		 * @since 0.5.0
+		 * @var array Holds the properties of the component.
+		 */
 		protected $args = array();
 
+		/**
+		 * @since 0.5.0
+		 * @var string Holds the scope the component belongs to.
+		 */
 		protected $scope = '';
+
+		/**
+		 * @since 0.5.0
+		 * @var array Holds the component's parent components (in most cases it will be just one), separated by class name.
+		 */
 		protected $parents = array();
+
+		/**
+		 * @since 0.5.0
+		 * @var array Holds the component's child components, separated by class name.
+		 */
 		protected $children = array();
 
+		/**
+		 * @since 0.5.0
+		 * @var bool Stores whether the component has been validated yet.
+		 */
 		protected $validated = false;
+
+		/**
+		 * @since 0.5.0
+		 * @var bool|null Stores whether the component slug is valid (if it has already been validated).
+		 */
 		protected $valid_slug = null;
+
+		/**
+		 * @since 0.5.0
+		 * @var string Holds the name of the filter that should be executed once the component has been validated.
+		 */
 		protected $validate_filter = '';
 
+		/**
+		 * Class constructor.
+		 *
+		 * @since 0.5.0
+		 * @param string $slug the field slug
+		 * @param array $args array of field properties
+		 */
 		public function __construct( $slug, $args ) {
 			$this->slug = $slug;
 			$this->args = (array) $args;
 		}
 
+		/**
+		 * Magic set method.
+		 *
+		 * This function provides direct access to the component properties.
+		 *
+		 * @since 0.5.0
+		 * @param string $property name of the property to get
+		 * @param mixed $value new value for the property
+		 */
 		public function __set( $property, $value ) {
 			if ( property_exists( $this, $property ) ) {
 				$this->$property = $value;
@@ -42,6 +101,15 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			}
 		}
 
+		/**
+		 * Magic get method.
+		 *
+		 * This function provides direct access to the component properties.
+		 *
+		 * @since 0.5.0
+		 * @param string $property name of the property to get
+		 * @return mixed value of the property or null if it does not exist
+		 */
 		public function __get( $property ) {
 			if ( property_exists( $this, $property ) ) {
 				return $this->$property;
@@ -52,6 +120,15 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return null;
 		}
 
+		/**
+		 * Magic isset method.
+		 *
+		 * This function provides direct access to the component properties.
+		 *
+		 * @since 0.5.0
+		 * @param string $property name of the property to check
+		 * @return bool true if the property exists, otherwise false
+		 */
 		public function __isset( $property ) {
 			if ( property_exists( $this, $property ) ) {
 				return true;
@@ -62,6 +139,18 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return false;
 		}
 
+		/**
+		 * Adds a component as a child to the component.
+		 *
+		 * The function also validates the component.
+		 *
+		 * The function checks multiple things and only adds the component if all requirements are met.
+		 * It returns the added component or an error object.
+		 *
+		 * @since 0.5.0
+		 * @param WPDLib\Components\Base the component to add as a child
+		 * @return WPDLib\Components\Base|WPDLib\Util\Error either the added component or an error object
+		 */
 		public function add( $component ) {
 			if ( ComponentManager::is_too_late() ) {
 				return new UtilError( 'too_late_component', sprintf( __( 'Components must not be added later than the %s hook.', 'wpdlib' ), '<code>init</code>' ), '', ComponentManager::get_scope() );
@@ -96,6 +185,14 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return $component;
 		}
 
+		/**
+		 * Returns the slug path to the component.
+		 *
+		 * This path consists of the slugs that lead to this component, each separated by a dot.
+		 *
+		 * @since 0.5.0
+		 * @return string the slug path to the component
+		 */
 		public function get_path() {
 			$path = array();
 
@@ -109,6 +206,15 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return implode( '.', array_reverse( $path ) );
 		}
 
+		/**
+		 * Returns the child components of the component.
+		 *
+		 * If a class is specified, only children of that class are returned.
+		 *
+		 * @since 0.5.0
+		 * @param string $class the class the children should have (default is an empty string for no restrictions)
+		 * @return array the array of child components, or an empty array if nothing found
+		 */
 		public function get_children( $class = '' ) {
 			$children = array();
 
@@ -123,6 +229,17 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return $children;
 		}
 
+		/**
+		 * Returns the parent of the component.
+		 *
+		 * If a component has multiple parents, the $index parameter can be used to get a specific parent (by default it will return the first one).
+		 * The $depth parameter can be used to get another ancestor, for example a grandparent component ($depth would need to be 2 in this case).
+		 *
+		 * @since 0.5.0
+		 * @param integer $index the index of the parent to get (default is 0)
+		 * @param integer $depth the generation depth to get (default is 1)
+		 * @return WPDLib\Components\Base|null the parent component, or null if nothing found
+		 */
 		public function get_parent( $index = 0, $depth = 1 ) {
 			$current = $this;
 			for ( $i = 0; $i < $depth; $i++ ) {
@@ -136,6 +253,18 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return $current;
 		}
 
+		/**
+		 * Validates the component.
+		 *
+		 * This method should be overwritten in the component class itself.
+		 * However it must call the original method from within.
+		 *
+		 * It will throw an error when trying to add an additional parent to a component that does not support multiple parents.
+		 *
+		 * @since 0.5.0
+		 * @param WPDLib\Components\Base $parent the parent component of the component
+		 * @return bool|WPDLib\Util\Error an error object if an error occurred during validation, true if it was validated, false if it did not need to be validated
+		 */
 		public function validate( $parent = null ) {
 			if ( $parent !== null ) {
 				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
@@ -162,6 +291,12 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return false;
 		}
 
+		/**
+		 * Checks if the slug of the component is valid.
+		 *
+		 * @since 0.5.0
+		 * @return bool whether the component slug is valid
+		 */
 		public function is_valid_slug() {
 			if ( $this->valid_slug === null ) {
 				$globalnames = $this->supports_globalslug();
@@ -195,10 +330,37 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			return $this->valid_slug;
 		}
 
+		/**
+		 * Returns the keys of the arguments array and their default values.
+		 *
+		 * This abstract method must be implemented in the actual component.
+		 *
+		 * @since 0.5.0
+		 * @return array
+		 */
 		protected abstract function get_defaults();
 
+		/**
+		 * Returns whether this component supports multiple parents.
+		 *
+		 * This abstract method must be implemented in the actual component.
+		 *
+		 * @since 0.5.0
+		 * @return bool
+		 */
 		protected abstract function supports_multiparents();
 
+		/**
+		 * Returns whether this component supports global slugs.
+		 *
+		 * This abstract method must be implemented in the actual component.
+		 *
+		 * If the component does not support global slugs, the function must either return false for the slug to be globally unique
+		 * or the class name of a parent component to ensure the slug is unique within that parent's scope.
+		 *
+		 * @since 0.5.0
+		 * @return bool|string
+		 */
 		protected abstract function supports_globalslug();
 	}
 
