@@ -15,8 +15,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
-
+	/**
+	 * This class manages all field types and provides some utility functions for fields.
+	 *
+	 * @internal
+	 * @since 0.5.0
+	 */
 	final class Manager {
+
+		/**
+		 * Returns a new field type instance.
+		 *
+		 * @since 0.5.0
+		 * @param array $args the field arguments
+		 * @param bool $repeatable whether the field will be part of a repeatable field (default is false)
+		 * @return WPDLib\FieldTypes\Base|null the field type instance or null if the field type is invalid or missing
+		 */
 		public static function get_instance( $args, $repeatable = false ) {
 			if ( ! isset( $args['type'] ) ) {
 				return null;
@@ -37,6 +51,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return new Base( $field_type, $field_args );
 		}
 
+		/**
+		 * Returns a list of available field types.
+		 *
+		 * @since 0.5.0
+		 * @return array an array of available field types
+		 */
 		public static function get_field_types() {
 			return array(
 				'checkbox',
@@ -61,6 +81,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			);
 		}
 
+		/**
+		 * Enqueues assets for one or more fields.
+		 *
+		 * This function should be used from all places in the WordPress admin that contain field types from WPDLib.
+		 * All fields active on the screen should be passed to the function.
+		 *
+		 * @since 0.5.0
+		 * @param array $fields the field type objects to enqueue assets for
+		 */
 		public static function enqueue_assets( $fields = array() ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_info( 'version' );
@@ -77,6 +106,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			wp_localize_script( 'wpdlib-fields', '_wpdlib_data', $script_vars );
 		}
 
+		/**
+		 * Returns an array of Javascript dependencies and script variables for several field types.
+		 *
+		 * All dependencies must be loaded, otherwise the main WPDLib script will not be loaded.
+		 * The field type classes should handle that automatically though.
+		 *
+		 * The script vars are put into a JSON object '_wpdlib_data' by `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @param array $fields the field type objects to get dependencies and script vars for
+		 * @return array an array containing a dependencies array and a script vars array
+		 */
 		public static function get_dependencies_and_script_vars( $fields = array() ) {
 			$dependencies = array();
 			$script_vars = array();
@@ -104,6 +145,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return array( $dependencies, $script_vars );
 		}
 
+		/**
+		 * Transforms an array of HTML attributes into an attributes string.
+		 *
+		 * The attributes are printed in a nicely-sorted format.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\FieldTypes\Manager::sort_html_attributes()
+		 * @param array $atts array of arguments and their values
+		 * @param bool $html5 whether to output arguments in html5 syntax (default is true)
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML attributes string
+		 */
 		public static function make_html_attributes( $atts, $html5 = true, $echo = true ) {
 			$output = '';
 
@@ -139,6 +192,28 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Formats a value depending on certain criteria.
+		 *
+		 * Valid types are:
+		 * - string
+		 * - html
+		 * - url
+		 * - boolean / bool
+		 * - integer / int
+		 * - float / double
+		 * - datetime
+		 * - date
+		 * - time
+		 * - byte
+		 *
+		 * @since 0.5.0
+		 * @param mixed $value the value to format
+		 * @param string $type the type of the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @param array $args additional formatting args (optional, they depend on the $type)
+		 * @return mixed the formatted value
+		 */
 		public static function format( $value, $type, $mode = 'input', $args = array() ) {
 			$mode = 'output' === $mode ? 'output' : 'input';
 
@@ -172,6 +247,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Validates a field type.
+		 *
+		 * If the field type should be part of a repeatable, some additional checks must be made.
+		 *
+		 * @since 0.5.0
+		 * @param string $field_type the field type to validate
+		 * @param bool $repeatable whether the field will be part of a repeatable field (default is false)
+		 * @return string|null the validated field type or null if the field type is invalid
+		 */
 		private static function validate_field_type( $field_type, $repeatable = false ) {
 			$field_types = self::get_field_types();
 			if ( ! in_array( $field_type, $field_types ) ) {
@@ -185,6 +270,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $field_type;
 		}
 
+		/**
+		 * Checks a field type for inclusion in a repeatable field.
+		 *
+		 * There are a few field types which are not allowed in a repeatable fields.
+		 * Some others are automatically replaced by different field types with a similar data structure.
+		 *
+		 * @since 0.5.0
+		 * @param string $field_type the field type to validate
+		 * @return string|null the validated field type or null if the field type is invalid
+		 */
 		private static function map_repeatable_type( $field_type ) {
 			$non_repeatable_types = array(
 				'wysiwyg',
@@ -207,6 +302,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $field_type;
 		}
 
+		/**
+		 * Validates arguments for a field type.
+		 *
+		 * The function checks a whitelist of arguments.
+		 * The only other thing it allows are data attributes.
+		 *
+		 * @since 0.5.0
+		 * @param array $args the field type arguments
+		 * @return array the validated field type arguments
+		 */
 		private static function validate_field_args( $args ) {
 			$field_keys = array(
 				'id',
@@ -235,6 +340,30 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return array_merge( $data_args, array_intersect_key( $args, array_flip( $field_keys ) ) );
 		}
 
+		/**
+		 * Callback function to sort HTML attributes.
+		 *
+		 * Attributes have the following order:
+		 * - id
+		 * - name
+		 * - class
+		 * - any data attributes
+		 * - rel
+		 * - type
+		 * - value
+		 * - href
+		 * - any other attributes
+		 *
+		 * Boolean attributes are not handled by this function.
+		 * They are automatically appended as the last attributes.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\FieldTypes\Manager::sort_html_data_attributes()
+		 * @see WPDLib\FieldTypes\Manager::sort_html_priority_attributes()
+		 * @param string $a the first attribute to compare
+		 * @param string $b the second attribute to compare
+		 * @return integer -1 if $a < $b, 1 if $a > $b, otherwise 0
+		 */
 		private static function sort_html_attributes( $a, $b ) {
 			if ( $a == $b ) {
 				return 0;
@@ -251,6 +380,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return self::sort_html_priority_attributes( $a, $b, $priorities );
 		}
 
+		/**
+		 * Sorts HTML data attributes.
+		 *
+		 * Attributes within the $priorities should show before the data attributes.
+		 * All other attributes should appear after them.
+		 *
+		 * @since 0.5.0
+		 * @param string $a the first attribute to compare
+		 * @param string $b the second attribute to compare
+		 * @param array $priorities array of high-priority attributes
+		 * @return integer -1 if $a < $b, 1 if $a > $b, otherwise 0
+		 */
 		private static function sort_html_data_attributes( $a, $b, $priorities = array() ) {
 			if ( strpos( $a, 'data-' ) === 0 && strpos( $b, 'data-' ) !== 0 ) {
 				if ( in_array( $b, $priorities ) ) {
@@ -267,6 +408,17 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return 0;
 		}
 
+		/**
+		 * Sorts HTML attributes by priority.
+		 *
+		 * Attributes within the $priorities should show before the other attributes (in that particular order).
+		 *
+		 * @since 0.5.0
+		 * @param string $a the first attribute to compare
+		 * @param string $b the second attribute to compare
+		 * @param array $priorities array of high-priority attributes
+		 * @return integer -1 if $a < $b, 1 if $a > $b, otherwise 0
+		 */
 		private static function sort_html_priority_attributes( $a, $b, $priorities = array() ) {
 			if ( in_array( $a, $priorities ) && ! in_array( $b, $priorities ) ) {
 				return -1;
@@ -285,10 +437,26 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return 0;
 		}
 
+		/**
+		 * Formats a string.
+		 *
+		 * @since 0.5.0
+		 * @param string $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @return string the formatted value
+		 */
 		private static function format_string( $value, $mode = 'input' ) {
 			return esc_html( $value );
 		}
 
+		/**
+		 * Formats a HTML string.
+		 *
+		 * @since 0.5.0
+		 * @param string $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @return string the formatted value
+		 */
 		private static function format_html( $value, $mode = 'input' ) {
 			$formatted = wp_kses_post( $value );
 
@@ -299,6 +467,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Formats a URL.
+		 *
+		 * @since 0.5.0
+		 * @param string $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @return string the formatted value
+		 */
 		private static function format_url( $value, $mode = 'input' ) {
 			$formatted = esc_html( $value );
 
@@ -309,6 +485,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return esc_url_raw( $formatted );
 		}
 
+		/**
+		 * Formats a boolean.
+		 *
+		 * @since 0.5.0
+		 * @param bool $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @return bool|string the formatted value (if $mode == 'output', the bool is formatted as a string)
+		 */
 		private static function format_bool( $value, $mode = 'input' ) {
 			$formatted = self::parse_bool( $value );
 
@@ -323,6 +507,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Formats an integer.
+		 *
+		 * Possible $args:
+		 * - positive_only (bool)
+		 *
+		 * @since 0.5.0
+		 * @param integer $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @param array $args additional formatting args (optional)
+		 * @return integer|string the formatted value (if $mode == 'output', the integer is formatted as a string)
+		 */
 		private static function format_int( $value, $mode = 'input', $args = array() ) {
 			$positive_only = isset( $args['positive_only'] ) ? (bool) $args['positive_only'] : false;
 
@@ -338,6 +534,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Formats a float.
+		 *
+		 * Possible $args:
+		 * - positive_only (bool)
+		 * - decimals (integer)
+		 *
+		 * @since 0.5.0
+		 * @param float $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @param array $args additional formatting args (optional)
+		 * @return float|string the formatted value (if $mode == 'output', the float is formatted as a string)
+		 */
 		private static function format_float( $value, $mode = 'input', $args = array() ) {
 			$positive_only = isset( $args['positive_only'] ) ? (bool) $args['positive_only'] : false;
 
@@ -359,6 +568,22 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Formats a date.
+		 *
+		 * Possible $args:
+		 * - format (string)
+		 *
+		 * The default format is selected depending on the $type parameter.
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\FieldTypes\Manager::get_default_datetime_format()
+		 * @param int|string $value the value to format
+		 * @param string $type the formating type; either 'datetime' (default), 'date' or 'time'
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @param array $args additional formatting args (optional)
+		 * @return string the formatted value
+		 */
 		private static function format_datetime( $value, $mode = 'input', $type = 'datetime', $args = array() ) {
 			$timestamp = $value;
 			if ( ! is_int( $timestamp ) ) {
@@ -373,6 +598,20 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return date_i18n( $format, $timestamp );
 		}
 
+		/**
+		 * Formats a numeric value as a byte value.
+		 *
+		 * Possible $args:
+		 * - decimals (integer)
+		 * - base_unit (string, either 'B', 'kB', 'MB', 'GB' or 'TB')
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\Util\Util::format_unit()
+		 * @param integer|float $value the value to format
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @param array $args additional formatting args (optional)
+		 * @return float|string the formatted value (if $mode == 'output', the float is formatted as a string)
+		 */
 		private static function format_byte( $value, $mode = 'input', $args = array() ) {
 			if ( 'output' === $mode ) {
 				$units = array( 'B', 'kB', 'MB', 'GB', 'TB' );
@@ -392,6 +631,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return $formatted;
 		}
 
+		/**
+		 * Parses a value into a boolean.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $value the value to parse
+		 * @return bool the parsed value
+		 */
 		private static function parse_bool( $value ) {
 			if ( is_int( $value ) ) {
 				if ( $value > 0 ) {
@@ -412,14 +658,36 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			return (bool) $value;
 		}
 
+		/**
+		 * Parses a value into an integer.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $value the value to parse
+		 * @return integer the parsed value
+		 */
 		private static function parse_int( $value ) {
 			return intval( $value );
 		}
 
+		/**
+		 * Parses a value into a float.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $value the value to parse
+		 * @return float the parsed value
+		 */
 		private static function parse_float( $value ) {
 			return floatval( $value );
 		}
 
+		/**
+		 * Returns the default date / time format.
+		 *
+		 * @since 0.5.0
+		 * @param string $type the formating type; either 'datetime', 'date' or 'time'
+		 * @param string $mode the formatting mode; either 'input' (default) or 'output'
+		 * @return string date format string
+		 */
 		private static function get_default_datetime_format( $type, $mode = 'input' ) {
 			if ( 'output' === $mode ) {
 				if ( $type == 'date' ) {
