@@ -15,8 +15,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
-
+	/**
+	 * Class for a select field.
+	 *
+	 * @since 0.5.0
+	 */
 	class Select extends Radio {
+
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param string|array $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['name'] = $this->get_sanitized_name();
@@ -42,6 +55,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Enqueues required assets for the field type.
+		 *
+		 * The function also generates script vars to be applied in `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @return array array which can (possibly) contain a 'dependencies' array and a 'script_vars' array
+		 */
 		public function enqueue_assets() {
 			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();
@@ -72,6 +93,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			);
 		}
 
+		/**
+		 * Displays a single item in the select.
+		 *
+		 * @since 0.5.0
+		 * @param string $value the value of the item
+		 * @param string|array $label the label of the item
+		 * @param string $id the overall field's ID attribute
+		 * @param string $name the overall field's name attribute
+		 * @param string|array $current the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the item
+		 */
 		protected function display_item( $value, $label, $single_type, $id, $name, $current = '', $echo = true ) {
 			$option_atts = array(
 				'value'		=> $value,

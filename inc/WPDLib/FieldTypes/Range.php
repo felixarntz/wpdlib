@@ -14,8 +14,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
-
+	/**
+	 * Class for a number field.
+	 *
+	 * @since 0.5.0
+	 */
 	class Range extends Number {
+
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param integer|float $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $val;

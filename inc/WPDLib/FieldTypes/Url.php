@@ -14,8 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Url' ) ) {
-
+	/**
+	 * Class for a URL field.
+	 *
+	 * @since 0.5.0
+	 */
 	class Url extends Base {
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return '';
@@ -24,6 +35,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Url' ) ) {
 			return FieldManager::format( $val, 'url', 'input' );
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return string the correctly parsed value
+		 */
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
 				if ( ! is_array( $formatted ) ) {

@@ -15,8 +15,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
-
+	/**
+	 * Class for a color picker field.
+	 *
+	 * @since 0.5.0
+	 */
 	class Color extends Base {
+
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param string $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['maxlength'] = 7;
@@ -31,6 +44,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return '';
@@ -43,6 +63,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			return strtolower( $val );
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return string the correctly parsed value
+		 */
 		public function parse( $val, $formatted = false ) {
 			if ( ! $val ) {
 				return '';
@@ -58,6 +86,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 				switch ( $formatted['mode'] ) {
 					case 'color':
 						return '<div style="display:inline-block;width:64px;height:48px;background-color:' . $val . ';"></div>';
+					case 'color-text':
+						return '<div style="display:inline-block;padding:5px 10px;background-color:' . $val . ';">' . FieldManager::format( $val, 'string', 'output' ) . '</div>';
 					case 'text':
 					default:
 						return FieldManager::format( $val, 'string', 'output' );
@@ -67,6 +97,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			return FieldManager::format( $val, 'string', 'input' );
 		}
 
+		/**
+		 * Enqueues required assets for the field type.
+		 *
+		 * The function also generates script vars to be applied in `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @return array array which can (possibly) contain a 'dependencies' array and a 'script_vars' array
+		 */
 		public function enqueue_assets() {
 			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();

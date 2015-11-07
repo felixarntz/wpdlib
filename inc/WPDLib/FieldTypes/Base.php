@@ -19,7 +19,6 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 	 *
 	 * Every field type that does not have its own class will be instantiated with this class.
 	 *
-	 * @internal
 	 * @since 0.5.0
 	 */
 	class Base {
@@ -171,6 +170,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		/**
 		 * Checks whether a value for the field is considered empty.
 		 *
+		 * This function is needed to check whether a required field has been properly filled.
+		 *
 		 * @since 0.5.0
 		 * @param string $val the current value of the field
 		 * @return bool whether the value is considered empty
@@ -183,9 +184,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		 * Parses a value for the field.
 		 *
 		 * @since 0.5.0
-		 * @param string $val the current value of the field
+		 * @param mixed $val the current value of the field
 		 * @param bool|array $formatted whether to also format the value (default is false)
-		 * @return string the HTML output of the field control
+		 * @return string the correctly parsed value
 		 */
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {

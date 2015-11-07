@@ -16,10 +16,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
-
+	/**
+	 * Class for a datetime field.
+	 *
+	 * The class is also used as base class for date fields and time fields.
+	 *
+	 * @since 0.5.0
+	 */
 	class Datetime extends Base {
+
+		/**
+		 * @since 0.5.0
+		 * @var array Holds the locale settings related to date formatting.
+		 */
 		protected static $locale = null;
 
+		/**
+		 * Class constructor.
+		 *
+		 * For an overview of the supported arguments, please read the Field Types Reference.
+		 *
+		 * @since 0.5.0
+		 * @param string $type the field type
+		 * @param array $args array of field type arguments
+		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'min'	=> '',
@@ -28,6 +48,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			parent::__construct( $type, $args );
 		}
 
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param string $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $this->parse( $val, true );
@@ -41,6 +69,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return '';
@@ -58,6 +93,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return $this->validate_max( $val );
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return string the correctly parsed value
+		 */
 		public function parse( $val, $formatted = false ) {
 			if ( ! $val ) {
 				return '';
@@ -77,6 +120,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return FieldManager::format( $timestamp, $this->type, 'input' );
 		}
 
+		/**
+		 * Enqueues required assets for the field type.
+		 *
+		 * The function also generates script vars to be applied in `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @return array array which can (possibly) contain a 'dependencies' array and a 'script_vars' array
+		 */
 		public function enqueue_assets() {
 			if ( self::is_enqueued( __CLASS__ ) ) {
 				return array();
@@ -99,6 +150,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			);
 		}
 
+		/**
+		 * Validates that a value is not lower than the minimum allowed.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		protected function validate_min( $val ) {
 			$value = FieldManager::format( strtotime( $val ), $this->type, 'input' );
 
@@ -114,6 +172,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return $value;
 		}
 
+		/**
+		 * Validates that a value is not higher than the maximum allowed.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		protected function validate_max( $val ) {
 			$value = FieldManager::format( strtotime( $val ), $this->type, 'input' );
 
@@ -129,20 +194,56 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return $value;
 		}
 
+		/**
+		 * Parses date format string into a timestamp.
+		 *
+		 * @since 0.5.0
+		 * @param string $val the value to parse
+		 * @return integer|null the timestamp or null if transforming not possible
+		 */
 		protected function parse_timestamp( $val ) {
 			return ! empty( $val ) ? strtotime( $val ) : null;
 		}
 
+		/**
+		 * Formats a timestamp into a date format string ready for saving to the database.
+		 *
+		 * @since 0.5.0
+		 * @param integer $val the timestamp to format
+		 * @return string|null the date format string or null if formatting not possible
+		 */
 		protected function format_timestamp( $val ) {
 			return $val !== null ? FieldManager::format( $val, $this->type, 'input' ) : null;
 		}
 
+		/**
+		 * Untranslates a date format string.
+		 *
+		 * WordPress localizes date format strings.
+		 * In the actual field controls, the value is displayed in proper localization.
+		 * This function tries to untranslate everything using the locale settings.
+		 * This is needed so that it can be correctly parsed into a timestamp (since non-English months are not recognized for example).
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\FieldTypes\Datetime::untranslate_replace()
+		 * @param string $val the date format string to untranslate
+		 * @return string the date format string in English language
+		 */
 		protected function untranslate( $val ) {
 			self::maybe_init_locale();
 
 			return preg_replace_callback( '/[A-Za-z]+/', array( $this, 'untranslate_replace' ), $val );
 		}
 
+		/**
+		 * Callback for the `preg_replace_callback()` call in the `untranslate()` method.
+		 *
+		 * It looks at the localized parts of the date format string and replaces them by their English equivalents.
+		 *
+		 * @since 0.5.0
+		 * @param array $matches the matches from the regular expression
+		 * @return string the replacement
+		 */
 		protected function untranslate_replace( $matches ) {
 			$term = $matches[0];
 
@@ -175,6 +276,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			return $term;
 		}
 
+		/**
+		 * Sets up the class' static locale object if it has not been setup yet.
+		 *
+		 * @since 0.5.0
+		 */
 		protected static function maybe_init_locale() {
 			if ( self::$locale === null ) {
 				global $wp_locale;

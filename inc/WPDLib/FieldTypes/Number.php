@@ -15,8 +15,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
-
+	/**
+	 * Class for a number field.
+	 *
+	 * The class is also used as base class for range fields.
+	 *
+	 * @since 0.5.0
+	 */
 	class Number extends Base {
+
+		/**
+		 * Class constructor.
+		 *
+		 * For an overview of the supported arguments, please read the Field Types Reference.
+		 *
+		 * @since 0.5.0
+		 * @param string $type the field type
+		 * @param array $args array of field type arguments
+		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'min'	=> '',
@@ -26,6 +42,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 			parent::__construct( $type, $args );
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return integer|float|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			$format = 'float';
 			if ( is_int( $this->args['step'] ) ) {
@@ -63,6 +86,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 			return $val;
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return integer|float|string the correctly parsed value (string if $formatted is true)
+		 */
 		public function parse( $val, $formatted = false ) {
 			$format = 'float';
 			if ( is_int( $this->args['step'] ) ) {

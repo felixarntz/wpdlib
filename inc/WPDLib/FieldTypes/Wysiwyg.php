@@ -14,8 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
-
+	/**
+	 * Class for a WYSIWYG field.
+	 *
+	 * This field uses the default WordPress editor as field control.
+	 *
+	 * @since 0.5.0
+	 */
 	class Wysiwyg extends Textarea {
+
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param string $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$wp_editor_settings = array(
 				'wpautop'		=> true,
@@ -37,6 +52,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string the validated field value
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return '';
@@ -45,6 +67,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 			return FieldManager::format( $value, 'html', 'input' );;
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return string the correctly parsed value
+		 */
 		public function parse( $val, $formatted = false ) {
 			if ( $formatted ) {
 				$parsed = FieldManager::format( $val, 'html', 'input' );

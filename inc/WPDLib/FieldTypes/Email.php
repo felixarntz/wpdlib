@@ -14,8 +14,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Email' ) ) {
-
+	/**
+	 * Class for an email field.
+	 *
+	 * @since 0.5.0
+	 */
 	class Email extends Base {
+
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return '';

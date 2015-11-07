@@ -14,10 +14,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
-
+	/**
+	 * Class for a repeatable field.
+	 *
+	 * A repeatable field is a special field type that actually bundles multiple fields together.
+	 * These fields are display in a row as one group, and you can define multiple of such groups.
+	 *
+	 * Each bundled field must have a unique slug so that they can be referenced.
+	 *
+	 * The value of a repeatable field is always an array that contains arrays itself.
+	 * Each inner array represents a group and contains the field slugs alongside with their values.
+	 *
+	 * Internally, a repeatable field object contains instances of all field type objects that are part of it.
+	 * It uses each field object's methods to display, validate and parse the field's values.
+	 *
+	 * @since 0.5.0
+	 */
 	class Repeatable extends Base {
+
+		/**
+		 * @since 0.5.0
+		 * @var array Holds the field type objects that belong to the repeatable.
+		 */
 		protected $fields = array();
 
+		/**
+		 * Class constructor.
+		 *
+		 * For an overview of the supported arguments, please read the Field Types Reference.
+		 *
+		 * @since 0.5.0
+		 * @param string $type the field type
+		 * @param array $args array of field type arguments
+		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'repeatable'	=> array(),
@@ -43,6 +72,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			}
 		}
 
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * The individual fields are rendered inside a table.
+		 * Each row represents a group and each column represents a field.
+		 *
+		 * The function will also render button controls to add / remove groups.
+		 *
+		 * @since 0.5.0
+		 * @param string $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			if ( ! is_array( $val ) ) {
 				$val = array();
@@ -85,6 +127,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * The function calls the validation functions of each field for each group and composes the value from those.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return array the validated field value
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val || ! is_array( $val ) ) {
 				return array();
@@ -114,10 +165,32 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			return $val;
 		}
 
+		/**
+		 * Checks whether a value for the field is considered empty.
+		 *
+		 * This function is needed to check whether a required field has been properly filled.
+		 *
+		 * @since 0.5.0
+		 * @param array $val the current value of the field
+		 * @return bool whether the value is considered empty
+		 */
 		public function is_empty( $val ) {
 			return count( (array) $val ) < 1;
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * If you specify an array for the $formatted parameter and that array contains a 'mode' key with 'template' as value,
+		 * you should specify an additional key 'template' which holds the template as an HTML string.
+		 * This template will be printed for every group currently in the repeatable.
+		 * You can use field slugs wrapped in percent signs as template tags (for example '%background_color%' if the repeatable contains a field with the slug 'background color').
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return array the correctly parsed value
+		 */
 		public function parse( $val, $formatted = false ) {
 			$parsed = array();
 			$items_formatted = false;
@@ -155,6 +228,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			return $parsed;
 		}
 
+		/**
+		 * Enqueues required assets for the field type.
+		 *
+		 * The function also generates script vars to be applied in `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @return array array which can (possibly) contain a 'dependencies' array and a 'script_vars' array
+		 */
 		public function enqueue_assets() {
 			list( $dependencies, $script_vars ) = FieldManager::get_dependencies_and_script_vars( $this->fields );
 
@@ -169,6 +250,17 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			);
 		}
 
+		/**
+		 * Displays a single group of fields.
+		 *
+		 * The function is also used to generate a dynamic template which is used in Javascript when appending new groups.
+		 *
+		 * @since 0.5.0
+		 * @param integer $key the index of the group
+		 * @param array $values the values of the group as `$field_slug => $value`
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the group
+		 */
 		protected function display_item( $key, $values = array(), $echo = true ) {
 			$output = '<tr class="wpdlib-repeatable-row">';
 
@@ -215,6 +307,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Parses a template for repeatable values.
+		 *
+		 * This function is used by the `parse()` method (with mode 'template').
+		 *
+		 * @since 0.5.0
+		 * @param array $val the current value of the field
+		 * @param string $template the template to parse
+		 * @param string $before content to print before the template (optional, default is an empty string)
+		 * @param string $after content to print after the template (optional, default is an empty string)
+		 * @return string the parsed template containing the repeatable values
+		 */
 		protected function parse_template( $val, $template, $before = '', $after = '' ) {
 			$output = '';
 

@@ -16,10 +16,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
-
+	/**
+	 * Class for a media picker field.
+	 *
+	 * This implementation uses attachment IDs as field values (no URLs!).
+	 *
+	 * @since 0.5.0
+	 */
 	class Media extends Base {
+
+		/**
+		 * @since 0.5.0
+		 * @var integer|null Temporarily stores an attachment ID.
+		 */
 		protected $temp_val = null;
 
+		/**
+		 * Class constructor.
+		 *
+		 * For an overview of the supported arguments, please read the Field Types Reference.
+		 *
+		 * @since 0.5.0
+		 * @param string $type the field type
+		 * @param array $args array of field type arguments
+		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
 				'mime_types'	=> 'all',
@@ -27,6 +47,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			parent::__construct( $type, $args );
 		}
 
+		/**
+		 * Displays the input control for the field.
+		 *
+		 * @since 0.5.0
+		 * @param integer $val the current value of the field
+		 * @param bool $echo whether to echo the output (default is true)
+		 * @return string the HTML output of the field control
+		 */
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			unset( $args['placeholder'] );
@@ -51,6 +79,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return integer|WP_Error the validated field value or an error object
+		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
 				return 0;
@@ -70,10 +105,27 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $val;
 		}
 
+		/**
+		 * Checks whether a value for the field is considered empty.
+		 *
+		 * This function is needed to check whether a required field has been properly filled.
+		 *
+		 * @since 0.5.0
+		 * @param integer $val the current value of the field
+		 * @return bool whether the value is considered empty
+		 */
 		public function is_empty( $val ) {
 			return absint( $val ) < 1;
 		}
 
+		/**
+		 * Parses a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @param bool|array $formatted whether to also format the value (default is false)
+		 * @return integer|string the correctly parsed value (string if $formatted is true)
+		 */
 		public function parse( $val, $formatted = false ) {
 			$val = absint( $val );
 			if ( $formatted ) {
@@ -90,6 +142,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $val;
 		}
 
+		/**
+		 * Enqueues required assets for the field type.
+		 *
+		 * The function also generates script vars to be applied in `wp_localize_script()`.
+		 *
+		 * @since 0.5.0
+		 * @return array array which can (possibly) contain a 'dependencies' array and a 'script_vars' array
+		 */
 		public function enqueue_assets() {
 			global $post;
 
@@ -121,16 +181,29 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			);
 		}
 
-		protected function check_filetype( $val, $desired_types = 'all' ) {
+		/**
+		 * Checks a filetype of an attachment.
+		 *
+		 * @param integer $val the current field value (attachment ID)
+		 * @param string|array $accepted_types a string or an array of accepted types (default is 'all' to allow everything)
+		 * @return bool whether the file type is valid
+		 */
+		protected function check_filetype( $val, $accepted_types = 'all' ) {
 			$extension = $this->get_attachment_extension( $val );
 
 			if ( $extension ) {
-				return $this->check_extension( $extension, $desired_types );
+				return $this->check_extension( $extension, $accepted_types );
 			}
 
 			return false;
 		}
 
+		/**
+		 * Returns the file extension of an attachment.
+		 *
+		 * @param integer $id the current field value (attachment ID)
+		 * @return string|false the file extension or false if it could not be detected
+		 */
 		protected function get_attachment_extension( $id ) {
 			$filename = get_attached_file( $id );
 
@@ -145,28 +218,58 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return false;
 		}
 
-		protected function check_extension( $extension, $desired_types = 'all' ) {
-			if ( 'all' == $desired_types || ! $desired_types ) {
+		/**
+		 * Checks whether a file extension is among the accepted file types.
+		 *
+		 * @param string the file extension to check
+		 * @param string|array $accepted_types a string or an array of accepted types (default is 'all' to allow everything)
+		 * @return bool whether the file type is valid
+		 */
+		protected function check_extension( $extension, $accepted_types = 'all' ) {
+			if ( 'all' == $accepted_types || ! $accepted_types ) {
 				return true;
 			}
 
-			if ( ! is_array( $desired_types ) ) {
-				$desired_types = array( $desired_types );
+			if ( ! is_array( $accepted_types ) ) {
+				$accepted_types = array( $accepted_types );
 			}
 
-			if ( in_array( strtolower( $extension ), $desired_types ) ) {
+			if ( in_array( strtolower( $extension ), $accepted_types ) ) {
 				return true;
 			}
 
 			$type = wp_ext2type( $extension );
 
-			if ( $type !== null && in_array( $type, $desired_types ) ) {
+			if ( $type !== null && in_array( $type, $accepted_types ) ) {
 				return true;
 			}
 
 			return false;
 		}
 
+		/**
+		 * Formats an attachment for output.
+		 *
+		 * The 'mode' key in the $args array specifies in which format it should be returned:
+		 * - object (returns the attachment's post object)
+		 * - link (returns a link to the attachment)
+		 * - image (returns the attachment image, or a mime type icon image if the attachment is not an image)
+		 * - template (returns an HTML string where it replaces the template tags by actual attachment values)
+		 * - field (returns the value of a specific attachment field)
+		 *
+		 * If using 'template', you also need to specify a 'template' key in the array which holds the template as an HTML string.
+		 * Use attachment field names wrapped in percent signs as template tags (for example '%medium_url%').
+		 *
+		 * If using 'field', you also need to specify a 'field' key in the array.
+		 * Its value will specify which field to retrieve (for example 'medium_url').
+		 *
+		 * @since 0.5.0
+		 * @see WPDLib\FieldTypes\Media::template_replace()
+		 * @see WPDLib\FieldTypes\Media::get_attachment_field()
+		 * @param integer $id the current value of the field (attachment ID)
+		 * @param array $args arguments on how to format
+		 * @return integer|string the correctly parsed value (string if $formatted is true)
+		 */
 		protected function format_attachment( $id, $args = array() ) {
 			switch ( $args['mode'] ) {
 				case 'object':
@@ -191,7 +294,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $id;
 		}
 
-		protected function get_attachment_field( $id, $field ) {
+		/**
+		 * Returns the value of a specific attachment field.
+		 *
+		 * @param integer $id the current field value (attachment ID)
+		 * @param string $field the field to get the value for (default is 'url')
+		 * @return string the attachment field's value
+		 */
+		protected function get_attachment_field( $id, $field = 'url' ) {
 			switch ( $field ) {
 				case 'id':
 				case 'ID':
@@ -228,6 +338,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			}
 		}
 
+		/**
+		 * Returns the value of a specific post field.
+		 *
+		 * @param integer $id the current field value (attachment ID)
+		 * @param string $field the field to get the value for
+		 * @return string the post field value (or an empty string if not found)
+		 */
 		protected function get_post_field( $id, $field ) {
 			$attachment = get_post( $id );
 			if ( ! $attachment ) {
@@ -241,6 +358,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $attachment->$field;
 		}
 
+		/**
+		 * Returns the mime type of a specific attachment.
+		 *
+		 * The second parameter can be set to:
+		 * - all (returns for example 'image/jpeg')
+		 * - type (returns for example 'image')
+		 * - subtype (returns for example 'jpeg')
+		 *
+		 * @param integer $id the current field value (attachment ID)
+		 * @param string $field in which form to return the mime type (default is 'all')
+		 * @return string the attachment's mime type
+		 */
 		protected function get_attachment_mime_type( $id, $mode = 'all' ) {
 			$mime_type = get_post_mime_type( $id );
 
@@ -255,6 +384,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $mime_type;
 		}
 
+		/**
+		 * Returns the directory path or the URL to a specific attachment file.
+		 *
+		 * @param integer $id the current field value (attachment ID)
+		 * @param string $field whether to return a 'path' or a 'url' (default is 'url')
+		 * @param string|false $size the image size to return (or false to simply return the original file path/URL)
+		 * @return string the path or URL to the desired attachment file
+		 */
 		protected function get_attachment_path( $id, $mode = 'url', $size = false ) {
 			$url = wp_get_attachment_url( $id );
 			if ( $size ) {
@@ -276,6 +413,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			return $url;
 		}
 
+		/**
+		 * Callback for the `preg_replace_callback()` call in the `format_attachment()` method (with mode 'template').
+		 *
+		 * @since 0.5.0
+		 * @param array $matches the matches from the regular expression
+		 * @return string the replacement
+		 */
 		protected function template_replace_callback( $matches ) {
 			if ( null === $this->temp_val ) {
 				return '';
