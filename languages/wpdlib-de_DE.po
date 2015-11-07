@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wpdlib 0.5.0\n"
 "Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
-"POT-Creation-Date: 2015-08-15 15:00:29+00:00\n"
-"PO-Revision-Date: 2015-08-15 17:01+0100\n"
+"POT-Creation-Date: 2015-11-07 17:07:07+00:00\n"
+"PO-Revision-Date: 2015-11-07 18:07+0100\n"
 "Last-Translator: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language-Team: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language: de_DE\n"
@@ -22,30 +22,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: inc/WPDLib/Components/Base.php:71 inc/WPDLib/Components/Manager.php:73
-#: inc/WPDLib/FieldTypes/Base.php:71
+#: inc/WPDLib/Components/Base.php:156 inc/WPDLib/Components/Manager.php:173
 msgid "Components must not be added later than the %s hook."
 msgstr ""
 "Komponenten dürfen nicht nach Ausführung des %s Hooks hinzugefügt werden."
 
-#: inc/WPDLib/Components/Base.php:75 inc/WPDLib/Components/Manager.php:77
-#: inc/WPDLib/FieldTypes/Base.php:75
+#: inc/WPDLib/Components/Base.php:160 inc/WPDLib/Components/Manager.php:177
 msgid "The object is not a component."
 msgstr "Das Objekt ist keine Komponente."
 
-#: inc/WPDLib/Components/Base.php:82 inc/WPDLib/FieldTypes/Base.php:82
+#: inc/WPDLib/Components/Base.php:167
 msgid ""
 "The component %1$s of class %2$s is not a valid child for the component %3$s."
 msgstr ""
 "Die Komponente %1$s der Klasse %2$s ist kein erlaubtes Kind für die "
 "Komponente %3$s."
 
-#: inc/WPDLib/Components/Base.php:91 inc/WPDLib/Components/Manager.php:91
-#: inc/WPDLib/FieldTypes/Base.php:91
+#: inc/WPDLib/Components/Base.php:176 inc/WPDLib/Components/Manager.php:191
 msgid "A component of class %1$s with slug %2$s already exists."
 msgstr "Eine Komponente der Klasse %1$s mit dem Slug %2$s existiert bereits."
 
-#: inc/WPDLib/Components/Base.php:148 inc/WPDLib/FieldTypes/Base.php:148
+#: inc/WPDLib/Components/Base.php:271
 msgid ""
 "The component %1$s of class %2$s already has a parent assigned and is not a "
 "multiparent component."
@@ -53,77 +50,89 @@ msgstr ""
 "Die Komponente %1$s der Klasse %2$s besitzt bereits ein Elternteil und "
 "erlaubt keine mehrfachen Eltern."
 
-#: inc/WPDLib/Components/Manager.php:82
+#: inc/WPDLib/Components/Base.php:277
+msgid "A component with an empty slug is not allowed."
+msgstr "Eine Komponente mit leerem Slug ist nicht erlaubt."
+
+#: inc/WPDLib/Components/Manager.php:182
 msgid "The component %1$s of class %2$s is not a valid toplevel component."
 msgstr ""
 "Die Komponente %1$s der Klasse %2$s ist keine gültige Top Level-Komponente."
 
-#: inc/WPDLib/Components/Menu.php:82
+#: inc/WPDLib/Components/Menu.php:144
 msgid "Menu label"
 msgstr "Menü-Label"
 
-#: inc/WPDLib/FieldTypes/Color.php:46
+#: inc/WPDLib/FieldTypes/Checkbox.php:38
+msgid "Enable?"
+msgstr "Aktivieren?"
+
+#: inc/WPDLib/FieldTypes/Color.php:60
 msgid "%s is not a valid hexadecimal color."
 msgstr "%s ist keine gültige Hexadezimal-Farbe."
 
-#: inc/WPDLib/FieldTypes/Datetime.php:62
+#: inc/WPDLib/FieldTypes/Datetime.php:169
 msgid "The date %1$s is invalid. It must not occur earlier than %2$s."
 msgstr "Das Datum %1$s ist ungültig. Es darf nicht früher als %2$s liegen."
 
-#: inc/WPDLib/FieldTypes/Datetime.php:66
+#: inc/WPDLib/FieldTypes/Datetime.php:191
 msgid "The date %1$s is invalid. It must not occur later than %2$s."
 msgstr "Das Datum %1$s ist ungültig. Es darf nicht später als %2$s liegen."
 
-#: inc/WPDLib/FieldTypes/Email.php:27
+#: inc/WPDLib/FieldTypes/Email.php:39
 msgid "%s is not a valid email address."
 msgstr "%s ist keine gültige Email-Adresse."
 
-#: inc/WPDLib/FieldTypes/Media.php:48
-msgid "Choose / Upload a File"
-msgstr "Datei auswählen / hochladen"
-
-#: inc/WPDLib/FieldTypes/Media.php:65
-msgid "Open File"
-msgstr "Datei öffnen"
-
-#: inc/WPDLib/FieldTypes/Media.php:84
+#: inc/WPDLib/FieldTypes/Media.php:97
 msgid "The post with ID %s is not a valid WordPress media file."
 msgstr "Der Post mit ID %s ist keine gültige WordPress Mediendatei."
 
-#: inc/WPDLib/FieldTypes/Media.php:89
+#: inc/WPDLib/FieldTypes/Media.php:102
 msgid "The media item with ID %1$s is neither of the valid formats (%2$s)."
 msgstr ""
 "Die Mediendatei mit ID %1$s besitzt keines der gültigen Formate (%2$s)."
 
-#: inc/WPDLib/FieldTypes/Media.php:113
-msgid "Open file"
-msgstr "Datei öffnen"
+#: inc/WPDLib/FieldTypes/Media.php:175 inc/WPDLib/FieldTypes/Media.php:178
+msgid "Choose a File"
+msgstr "Datei auswählen"
 
-#: inc/WPDLib/FieldTypes/Number.php:42
+#: inc/WPDLib/FieldTypes/Media.php:176
+msgid "Choose another File"
+msgstr "Andere Datei auswählen"
+
+#: inc/WPDLib/FieldTypes/Media.php:177
+#: inc/WPDLib/FieldTypes/Repeatable.php:298
+msgid "Remove"
+msgstr "Löschen"
+
+#: inc/WPDLib/FieldTypes/Media.php:179
+msgid "Insert File"
+msgstr "Datei einfügen"
+
+#: inc/WPDLib/FieldTypes/Number.php:75
 msgid "The number %1$s is invalid since it is not divisible by %2$s."
 msgstr "Die Nummer %1$s ist ungültig, da sie nicht durch %2$s teilbar ist."
 
-#: inc/WPDLib/FieldTypes/Number.php:46
+#: inc/WPDLib/FieldTypes/Number.php:79
 msgid "The number %1$s is invalid. It must be greater than or equal to %2$s."
 msgstr "Die Nummer %1$s ist ungültig. Sie muss größer oder gleich %2$s sein."
 
-#: inc/WPDLib/FieldTypes/Number.php:50
+#: inc/WPDLib/FieldTypes/Number.php:83
 msgid "The number %1$s is invalid. It must be lower than or equal to %2$s."
 msgstr "Die Nummer %1$s ist ungültig. Sie muss kleiner oder gleich %2$s sein."
 
-#: inc/WPDLib/FieldTypes/Radio.php:118 inc/WPDLib/FieldTypes/Radio.php:137
+#: inc/WPDLib/FieldTypes/Radio.php:240 inc/WPDLib/FieldTypes/Radio.php:275
 msgid "%s is not a valid option."
 msgstr "%s ist keine gültige Option."
 
-#: inc/WPDLib/FieldTypes/Repeatable.php:66
+#: inc/WPDLib/FieldTypes/Repeatable.php:108
 msgid "Add new"
 msgstr "Neu hinzufügen"
 
-#: inc/WPDLib/FieldTypes/Repeatable.php:180
-#: inc/WPDLib/FieldTypes/Repeatable.php:183
+#: inc/WPDLib/FieldTypes/Repeatable.php:269
+#: inc/WPDLib/FieldTypes/Repeatable.php:272
 msgid "%s."
 msgstr "%s."
 
-#: inc/WPDLib/FieldTypes/Repeatable.php:209
-msgid "Remove"
-msgstr "Löschen"
+#~ msgid "Open file"
+#~ msgstr "Datei öffnen"

@@ -90,7 +90,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		/**
 		 * Creates the admin menu.
 		 *
-		 * If the menu has an empty slug, the children are added as a page, but not added into any menu.
+		 * If the menu has the slug 'none', the children are added as a page, but not added into any menu.
 		 * Otherwise the children will simply be added to the menu. The first child will be added using `add_menu_page()`.
 		 *
 		 * @since 0.5.0
@@ -101,7 +101,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		public function create() {
 			foreach ( $this->get_children() as $menu_item ) {
 				if ( is_callable( array( $menu_item, 'add_to_menu' ) ) ) {
-					if ( empty( $this->slug ) ) {
+					if ( 'none' == $this->slug ) {
 						$this->add_non_menu_page( $menu_item );
 					} elseif ( ! $this->is_already_added( $menu_item->slug ) ) {
 						$this->add_menu_page( $menu_item );
@@ -346,7 +346,7 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		/**
 		 * Adds a new page to the WordPress admin which should not be part of any menu.
 		 *
-		 * This function is only used for the special case when a menu component's slug is empty.
+		 * This function is only used for the special case when a menu component's slug is set to 'none'.
 		 * This allows you to add pages that are not visible in any menu.
 		 *
 		 * @since 0.5.0

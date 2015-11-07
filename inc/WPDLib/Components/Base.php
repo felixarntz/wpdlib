@@ -266,13 +266,16 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		 * @return bool|WPDLib\Util\Error an error object if an error occurred during validation, true if it was validated, false if it did not need to be validated
 		 */
 		public function validate( $parent = null ) {
-			if ( $parent !== null ) {
+			if ( null !== $parent ) {
 				if ( count( $this->parents ) > 0 && ! $this->supports_multiparents() ) {
 					return new UtilError( 'no_multiparent_component', sprintf( __( 'The component %1$s of class %2$s already has a parent assigned and is not a multiparent component.', 'wpdlib' ), $this->slug, get_class( $this ) ), '', ComponentManager::get_scope() );
 				}
 				$this->parents[ $parent->slug ] = $parent;
 			}
 			if ( ! $this->validated ) {
+				if ( empty( $this->slug ) ) {
+					return new UtilError( 'empty_slug_component', __( 'A component with an empty slug is not allowed.', 'wpdlib' ), '', ComponentManager::get_scope() );
+				}
 				$defaults = $this->get_defaults();
 				foreach ( $defaults as $key => $default ) {
 					if ( ! isset( $this->args[ $key ] ) ) {
@@ -295,9 +298,10 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		 * Checks if the slug of the component is valid.
 		 *
 		 * @since 0.5.0
+		 * @param WPDLib\Components\Base $parent the parent component of the component
 		 * @return bool whether the component slug is valid
 		 */
-		public function is_valid_slug() {
+		public function is_valid_slug( $parent = null ) {
 			if ( $this->valid_slug === null ) {
 				$globalnames = $this->supports_globalslug();
 				if ( $globalnames !== true ) {
