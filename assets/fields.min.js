@@ -1,5 +1,5 @@
 /*!
- * wpdlib version 0.5.1
+ * wpdlib version 0.5.2
  * 
  * Felix Arntz <felix-arntz@leaves-and-love.net>
  */

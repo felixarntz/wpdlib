@@ -1,7 +1,7 @@
 <?php
 /**
  * @package WPDLib
- * @version 0.5.1
+ * @version 0.5.2
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
  */
 
@@ -36,7 +36,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 				'wpautop'		=> true,
 				'media_buttons'	=> false,
 				'textarea_name'	=> $this->args['name'],
-				'textarea_rows'	=> absint( $this->args['rows'],
+				'textarea_rows'	=> absint( $this->args['rows'] ),
 				'editor_class'	=> $this->args['class'],
 				'tinymce'		=> array( 'plugins' => 'wordpress' ),
 			);
