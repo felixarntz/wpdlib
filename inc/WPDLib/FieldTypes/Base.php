@@ -142,6 +142,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $val;
+			if ( isset( $args['rows'] ) ) {
+				unset( $args['rows'] );
+			}
 
 			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 

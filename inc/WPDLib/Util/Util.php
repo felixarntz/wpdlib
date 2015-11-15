@@ -60,11 +60,11 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		 * Those can be used to generate dropdown options for example.
 		 *
 		 * @since 0.5.0
-		 * @param string $post_type the post type to get posts for
+		 * @param string|array $post_type the post type / post types to get posts for
 		 * @return array the array of `$post_id => $post_title`
 		 */
 		public static function get_posts_options( $post_type = 'any' ) {
-			if ( ! is_string( $post_type ) && ! is_array( $post_type ) ) {
+			if ( ! is_string( $post_type ) && ! is_array( $post_type ) || empty( $post_type ) ) {
 				$post_type = 'any';
 			}
 
@@ -91,11 +91,11 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		 * Those can be used to generate dropdown options for example.
 		 *
 		 * @since 0.5.0
-		 * @param string $taxonomy the taxonomy to get terms for
+		 * @param string|array $taxonomy the taxonomy / taxonomies to get terms for
 		 * @return array the array of `$term_id => $term_name`
 		 */
 		public static function get_terms_options( $taxonomy = array() ) {
-			if ( ! is_string( $taxonomy ) && ! is_array( $taxonomy ) ) {
+			if ( ! is_string( $taxonomy ) && ! is_array( $taxonomy ) || empty( $taxonomy ) ) {
 				$taxonomy = array();
 			}
 
