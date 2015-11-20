@@ -33,8 +33,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['name'] = $this->get_sanitized_name();
+
+			$args = array_merge( $args, $this->data_atts );
+
 			if ( ! empty( $args['placeholder'] ) ) {
-				$args['data-placeholder'] = json_encode( array( 'id' => '', 'text' => $args['placeholder'] ) );
+				$data_placeholder = array(
+					'id'	=> '',
+					'text'	=> $args['placeholder'],
+				);
+				if ( isset( $args['data-placeholder'] ) ) {
+					$data_placeholder = array_merge_recursive( json_decode( $args['data-placeholder'], true ), $data_placeholder );
+				}
+				$args['data-placeholder'] = json_encode( $data_placeholder );
 			}
 			unset( $args['placeholder'] );
 			unset( $args['options'] );

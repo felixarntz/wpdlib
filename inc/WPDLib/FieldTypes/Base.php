@@ -36,6 +36,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		protected $args = array();
 
 		/**
+		 * @since 0.5.3
+		 * @var array Holds the field's data attributes (if any).
+		 */
+		protected $data_atts = array();
+
+		/**
 		 * @since 0.5.0
 		 * @var string Stores whether assets for this type have been enqueued yet.
 		 */
@@ -73,6 +79,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			if ( strpos( $this->args['class'], 'wpdlib-input-' . $this->type ) === false ) {
 				$this->args['class'] .= ' wpdlib-input-' . $this->type;
 			}
+
+			// create data attribuets from arguments
+			foreach ( array_keys( $this->args ) as $key ) {
+				if ( 0 !== strpos( $key, 'data-' ) ) {
+					continue;
+				}
+				$this->data_atts[ $key ] = $this->args[ $key ];
+				unset( $this->args[ $key ] );
+			}
 		}
 
 		/**
@@ -88,7 +103,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		 * @param mixed $value new value for the property
 		 */
 		public function __set( $property, $value ) {
-			if ( in_array( $property, array( 'id', 'name' ) ) ) {
+			if ( in_array( $property, array( 'id', 'name' ) ) || 0 === strpos( $property, 'data-' ) ) {
 				$this->args[ $property ] = $value;
 			}
 		}
@@ -145,6 +160,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			if ( isset( $args['rows'] ) ) {
 				unset( $args['rows'] );
 			}
+			$args = array_merge( $args, $this->data_atts );
 
 			$output = '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 

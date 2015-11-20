@@ -59,6 +59,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		public function display( $val, $echo = true ) {
 			$args = $this->args;
 			$args['value'] = $this->parse( $val, true );
+			$args = array_merge( $args, $this->data_atts );
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 

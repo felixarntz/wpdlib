@@ -152,6 +152,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 				'disabled'	=> $this->args['disabled'],
 			);
 
+			$option_atts = array_merge( $option_atts, $this->data_atts );
+
 			$additional_output = $additional_class = '';
 			if ( is_array( $label ) ) {
 				list( $additional_output, $additional_class, $label ) = $this->maybe_generate_additional_item_output( $option_atts['id'], $label, $option_atts['checked'] );

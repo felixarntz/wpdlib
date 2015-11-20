@@ -33,6 +33,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
 			$args = $this->args;
 			$args['value'] = $val;
 
+			$args = array_merge( $args, $this->data_atts );
+
 			$text_args = array(
 				'id'	=> $args['id'] . '-' . $this->type . '-viewer',
 				'class'	=> 'wpdlib-input-' . $this->type . '-viewer',

@@ -55,6 +55,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Checkbox' ) ) {
 			if ( $val ) {
 				$args['checked'] = true;
 			}
+			$args = array_merge( $args, $this->data_atts );
 
 			$output = '<label>';
 			$output .= '<input type="' . $this->type . '"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
