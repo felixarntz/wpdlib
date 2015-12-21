@@ -60,14 +60,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			unset( $args['placeholder'] );
 			$args['value'] = $val;
 
-			if ( 'all' !== $args['mime_types'] ) {
+			$mime_types = $this->verify_mime_types( $args['mime_types'] );
+			if ( $mime_types ) {
 				$args['data-settings'] = json_encode( array(
 					'query'				=> array(
-						'post_mime_type'	=> $args['mime_types'],
+						'post_mime_type'	=> $mime_types,
 					),
 				) );
 			}
-
 			unset( $args['mime_types'] );
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
@@ -184,6 +184,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		/**
 		 * Checks a filetype of an attachment.
 		 *
+		 * @since 0.5.0
 		 * @param integer $val the current field value (attachment ID)
 		 * @param string|array $accepted_types a string or an array of accepted types (default is 'all' to allow everything)
 		 * @return bool whether the file type is valid
@@ -201,6 +202,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		/**
 		 * Returns the file extension of an attachment.
 		 *
+		 * @since 0.5.0
 		 * @param integer $id the current field value (attachment ID)
 		 * @return string|false the file extension or false if it could not be detected
 		 */
@@ -221,7 +223,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		/**
 		 * Checks whether a file extension is among the accepted file types.
 		 *
-		 * @param string the file extension to check
+		 * @since 0.5.0
+		 * @param string $extension the file extension to check
 		 * @param string|array $accepted_types a string or an array of accepted types (default is 'all' to allow everything)
 		 * @return bool whether the file type is valid
 		 */
@@ -234,17 +237,115 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				$accepted_types = array( $accepted_types );
 			}
 
+			// check the file extension
 			if ( in_array( strtolower( $extension ), $accepted_types ) ) {
 				return true;
 			}
 
+			// check the file type (not MIME type!)
 			$type = wp_ext2type( $extension );
-
 			if ( $type !== null && in_array( $type, $accepted_types ) ) {
 				return true;
 			}
 
+			// check the file MIME type (and first part of MIME type)
+			$allowed_mime_types = $this->get_all_mime_types();
+			if ( isset( $allowed_mime_types[ $extension ] ) ) {
+				if ( in_array( $allowed_mime_types[ $extension ], $accepted_types ) ) {
+					return true;
+				}
+
+				$general_type = explode( '/', $allowed_mime_types[ $extension ] )[0];
+				if ( in_array( $general_type, $accepted_types ) ) {
+					return true;
+				}
+			}
+
 			return false;
+		}
+
+		/**
+		 * Verifies the MIME types whitelist.
+		 *
+		 * The function ensures that only valid MIME types (full or only general) are provided.
+		 * File extensions are parsed into their MIME types while invalid MIME types are stripped out.
+		 *
+		 * @since 0.5.3
+		 * @param string|array $accepted_types a string or an array of accepted types (providing 'all' will allow everything, returning an empty array)
+		 * @return array an array of valid MIME types
+		 */
+		protected function verify_mime_types( $accepted_types ) {
+			if ( 'all' === $accepted_types ) {
+				return array();
+			}
+
+			$validated_mime_types = array();
+
+			if ( ! is_array( $accepted_types ) ) {
+				$accepted_types = array( $accepted_types );
+			}
+
+			$allowed_mime_types = $this->get_all_mime_types();
+
+			foreach ( $accepted_types as $mime_type ) {
+				if ( false === strpos( $mime_type, '/' ) ) {
+					switch ( $mime_type ) {
+						case 'document':
+						case 'spreadsheet':
+						case 'interactive':
+						case 'archive':
+							// documents, spreadsheets, interactive and archive are always MIME type application
+							$validated_mime_types[] = 'application';
+							break;
+						case 'code':
+							// code is always MIME type text
+							$validated_mime_types[] = 'text';
+							break;
+						case 'image':
+						case 'audio':
+						case 'video':
+						case 'text':
+						case 'application':
+							// a valid MIME type
+							$validated_mime_types[] = $mime_type;
+							break;
+						default:
+							if ( isset( $allowed_mime_types[ $mime_type ] ) ) {
+								// a MIME type for a file extension
+								$validated_mime_types[] = $allowed_mime_types[ $mime_type ];
+							}
+					}
+				} elseif ( in_array( $mime_type, $allowed_mime_types ) ) {
+					// a fully qualified MIME type (with subtype)
+					$validated_mime_types[] = $mime_type;
+				}
+			}
+
+			return array_unique( $validated_mime_types );
+		}
+
+		/**
+		 * Returns an array of all MIME types which are allowed by WordPress.
+		 *
+		 * The array has a file extension as key and its MIME type as value.
+		 * Note that therefore it may contain duplicate values.
+		 *
+		 * @since 0.5.3
+		 * @return array an array of generally allowed MIME types
+		 */
+		protected function get_all_mime_types() {
+			$allowed_mime_types = array();
+
+			$_allowed_mime_types = get_allowed_mime_types();
+
+			foreach ( $_allowed_mime_types as $_extensions => $_mime_type ) {
+				$extensions = explode( '|', $_extensions );
+				foreach ( $extensions as $extension ) {
+					$allowed_mime_types[ $extension ] = $_mime_type;
+				}
+			}
+
+			return $allowed_mime_types;
 		}
 
 		/**
