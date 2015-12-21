@@ -103,8 +103,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		 * @param mixed $value new value for the property
 		 */
 		public function __set( $property, $value ) {
-			if ( in_array( $property, array( 'id', 'name' ) ) || 0 === strpos( $property, 'data-' ) ) {
+			if ( in_array( $property, array( 'id', 'name' ) ) ) {
 				$this->args[ $property ] = $value;
+			} elseif ( 0 === strpos( $property, 'data-' ) ) {
+				$this->data_atts[ $property ] = $value;
 			}
 		}
 
@@ -122,6 +124,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 				return $this->$property;
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				return $this->args[ $property ];
+			} elseif ( isset( $this->data_atts[ $property ] ) ) {
+				return $this->data_atts[ $property ];
 			}
 
 			return null;
@@ -140,6 +144,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			if ( property_exists( $this, $property ) ) {
 				return true;
 			} elseif ( isset( $this->args[ $property ] ) ) {
+				return true;
+			} elseif ( isset( $this->data_atts[ $property ] ) ) {
 				return true;
 			}
 

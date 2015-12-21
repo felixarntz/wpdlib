@@ -64,7 +64,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 			$mime_types = $this->verify_mime_types( $args['mime_types'] );
 			if ( $mime_types ) {
-				$args['data-settings'] = json_encode( array(
+				$data_settings = array(
 					'query'				=> array(
 						'post_mime_type'	=> $mime_types,
 					),
