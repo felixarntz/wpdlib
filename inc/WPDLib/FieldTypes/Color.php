@@ -34,6 +34,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Color' ) ) {
 			$args = $this->args;
 			$args['maxlength'] = 7;
 			$args['value'] = $val;
+			$args = array_merge( $args, $this->data_atts );
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 

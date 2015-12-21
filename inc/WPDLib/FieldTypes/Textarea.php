@@ -48,7 +48,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Textarea' ) ) {
 		 * @return string the HTML output of the field control
 		 */
 		public function display( $val, $echo = true ) {
-			$output = '<textarea' . FieldManager::make_html_attributes( $this->args, false, false ) . '>';
+			$args = $this->args;
+
+			$args = array_merge( $args, $this->data_atts );
+
+			$output = '<textarea' . FieldManager::make_html_attributes( $args, false, false ) . '>';
 			$output .= esc_textarea( $val );
 			$output .= '</textarea>';
 
