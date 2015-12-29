@@ -1,7 +1,7 @@
 <?php
 /**
  * @package WPDLib
- * @version 0.5.2
+ * @version 0.5.3
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
  */
 

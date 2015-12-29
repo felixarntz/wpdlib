@@ -1,10 +1,10 @@
 # Copyright (c) 2014-2015 Felix Arntz
 msgid ""
 msgstr ""
-"Project-Id-Version: wpdlib 0.5.2\n"
+"Project-Id-Version: wpdlib 0.5.3\n"
 "Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
-"POT-Creation-Date: 2015-11-12 01:36:13+00:00\n"
-"PO-Revision-Date: 2015-11-12 02:37+0100\n"
+"POT-Creation-Date: 2015-12-29 12:30:16+00:00\n"
+"PO-Revision-Date: 2015-12-29 13:31+0100\n"
 "Last-Translator: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language-Team: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language: de_DE\n"
@@ -67,15 +67,15 @@ msgstr "Menü-Label"
 msgid "Enable?"
 msgstr "Aktivieren?"
 
-#: inc/WPDLib/FieldTypes/Color.php:60
+#: inc/WPDLib/FieldTypes/Color.php:61
 msgid "%s is not a valid hexadecimal color."
 msgstr "%s ist keine gültige Hexadezimal-Farbe."
 
-#: inc/WPDLib/FieldTypes/Datetime.php:169
+#: inc/WPDLib/FieldTypes/Datetime.php:170
 msgid "The date %1$s is invalid. It must not occur earlier than %2$s."
 msgstr "Das Datum %1$s ist ungültig. Es darf nicht früher als %2$s liegen."
 
-#: inc/WPDLib/FieldTypes/Datetime.php:191
+#: inc/WPDLib/FieldTypes/Datetime.php:192
 msgid "The date %1$s is invalid. It must not occur later than %2$s."
 msgstr "Das Datum %1$s ist ungültig. Es darf nicht später als %2$s liegen."
 
@@ -83,29 +83,29 @@ msgstr "Das Datum %1$s ist ungültig. Es darf nicht später als %2$s liegen."
 msgid "%s is not a valid email address."
 msgstr "%s ist keine gültige Email-Adresse."
 
-#: inc/WPDLib/FieldTypes/Media.php:97
+#: inc/WPDLib/FieldTypes/Media.php:103
 msgid "The post with ID %s is not a valid WordPress media file."
 msgstr "Der Post mit ID %s ist keine gültige WordPress Mediendatei."
 
-#: inc/WPDLib/FieldTypes/Media.php:102
+#: inc/WPDLib/FieldTypes/Media.php:108
 msgid "The media item with ID %1$s is neither of the valid formats (%2$s)."
 msgstr ""
 "Die Mediendatei mit ID %1$s besitzt keines der gültigen Formate (%2$s)."
 
-#: inc/WPDLib/FieldTypes/Media.php:175 inc/WPDLib/FieldTypes/Media.php:178
+#: inc/WPDLib/FieldTypes/Media.php:181 inc/WPDLib/FieldTypes/Media.php:184
 msgid "Choose a File"
 msgstr "Datei auswählen"
 
-#: inc/WPDLib/FieldTypes/Media.php:176
+#: inc/WPDLib/FieldTypes/Media.php:182
 msgid "Choose another File"
 msgstr "Andere Datei auswählen"
 
-#: inc/WPDLib/FieldTypes/Media.php:177
+#: inc/WPDLib/FieldTypes/Media.php:183
 #: inc/WPDLib/FieldTypes/Repeatable.php:298
 msgid "Remove"
 msgstr "Löschen"
 
-#: inc/WPDLib/FieldTypes/Media.php:179
+#: inc/WPDLib/FieldTypes/Media.php:185
 msgid "Insert File"
 msgstr "Datei einfügen"
 
@@ -121,7 +121,7 @@ msgstr "Die Nummer %1$s ist ungültig. Sie muss größer oder gleich %2$s sein."
 msgid "The number %1$s is invalid. It must be lower than or equal to %2$s."
 msgstr "Die Nummer %1$s ist ungültig. Sie muss kleiner oder gleich %2$s sein."
 
-#: inc/WPDLib/FieldTypes/Radio.php:240 inc/WPDLib/FieldTypes/Radio.php:275
+#: inc/WPDLib/FieldTypes/Radio.php:242 inc/WPDLib/FieldTypes/Radio.php:277
 msgid "%s is not a valid option."
 msgstr "%s ist keine gültige Option."
 
