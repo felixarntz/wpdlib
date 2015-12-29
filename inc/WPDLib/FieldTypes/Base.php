@@ -43,7 +43,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 		/**
 		 * @since 0.5.0
-		 * @var string Stores whether assets for this type have been enqueued yet.
+		 * @var string Stores whether assets for this type have been enqueued.
 		 */
 		private static $enqueued = array();
 
