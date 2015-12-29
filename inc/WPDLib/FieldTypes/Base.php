@@ -43,7 +43,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 
 		/**
 		 * @since 0.5.0
-		 * @var string Stores whether assets for this type have been enqueued.
+		 * @var string Stores whether assets for this type have been enqueued yet.
 		 */
 		private static $enqueued = array();
 
@@ -125,7 +125,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				return $this->args[ $property ];
 			} elseif ( isset( $this->data_atts[ $property ] ) ) {
-				return $this->data_atts[ $property ];
+				return $this->data_atts[ $property ];
 			}
 
 			return null;
