@@ -40,7 +40,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 			) );
 			parent::__construct( $type, $args );
 
-			if ( is_array( $this->args['options'] ) && count( $this->args['options'] ) == 1 ) {
+			if ( is_array( $this->args['options'] ) && 1 === count( $this->args['options'] ) ) {
 				if ( isset( $this->args['options']['posts'] ) || isset( $this->args['options']['terms'] ) || isset( $this->args['options']['users'] ) ) {
 					add_action( 'wp_loaded', array( $this, 'parse_options' ) );
 				}

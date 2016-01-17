@@ -94,8 +94,8 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		 * @param string|array $taxonomy the taxonomy / taxonomies to get terms for
 		 * @return array the array of `$term_id => $term_name`
 		 */
-		public static function get_terms_options( $taxonomy = array() ) {
-			if ( ! is_string( $taxonomy ) && ! is_array( $taxonomy ) || empty( $taxonomy ) ) {
+		public static function get_terms_options( $taxonomy = 'any' ) {
+			if ( ! is_string( $taxonomy ) && ! is_array( $taxonomy ) || empty( $taxonomy ) || 'any' === $taxonomy ) {
 				$taxonomy = array();
 			}
 
@@ -117,14 +117,14 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		 * @param string $role the role to get users for
 		 * @return array the array of `$user_id => $user_display_name`
 		 */
-		public static function get_users_options( $role = '' ) {
+		public static function get_users_options( $role = 'any' ) {
 			if ( is_array( $role ) ) {
 				if ( count( $role ) > 0 ) {
 					$role = $role[0];
 				}
 			}
 
-			if ( ! is_string( $role ) ) {
+			if ( ! is_string( $role ) || 'any' === $role ) {
 				$role = '';
 			}
 
