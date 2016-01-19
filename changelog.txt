@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 0.6.0 =
+* Added: new field type map (can store either address or latitude and longitude)
+* Enhanced: media field type can now alternatively store URL instead of attachment ID
+* Enhanced: options keys 'terms' and 'users' (for related objects) now accept 'any' as value (similar to 'posts')
+* Fixed: critical validation bug in WYSIWYG
+* Fixed: step validation for decimal numbers
+
 = 0.5.3 =
 * Enhanced: field types now accept any kind of data attributes
 * Fixed: posts and terms dropdown options now properly handle an empty value

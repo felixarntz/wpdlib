@@ -186,6 +186,45 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		}
 
 		/**
+		 * A flexible PHP modulo function.
+		 *
+		 * Modulo for integers works properly using the % operator, but for floating point numbers it is not as accurate.
+		 * Using `fmod()` does not actually provide the expected results.
+		 *
+		 * This function correctly calculates the rest of a division for both integers and floats.
+		 *
+		 * If both arguments are integers, the function will return an integer.
+		 * Otherwise it will return a float.
+		 *
+		 * @internal
+		 * @since 0.6.0
+		 * @param integer|float $divident the divident
+		 * @param integer|float $divisor the divisor
+		 * @return integer|float the rest of the division (modulo)
+		 */
+		public static function mod( $divident, $divisor ) {
+			if ( is_int( $divident ) && is_int( $divisor ) ) {
+				// prevent division by zero
+				if ( 0 === $divisor ) {
+					return 0;
+				}
+				return $divident % $divisor;
+			}
+
+			$divident = floatval( $divident );
+			$divisor = floatval( $divisor );
+
+			// prevent division by zero
+			if ( 0.0 === $divisor ) {
+				return 0.0;
+			}
+
+			$i = round( $divident / $divisor );
+
+			return $divident - $i * $divisor;
+		}
+
+		/**
 		 * Inserts an object into an array in a sorted manner.
 		 *
 		 * If no $sort_by parameter is provided, the arrays won't be sorted.

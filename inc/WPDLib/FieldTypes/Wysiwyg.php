@@ -64,7 +64,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 				return '';
 			}
 
-			return FieldManager::format( $value, 'html', 'input' );;
+			return FieldManager::format( $val, 'html', 'input' );;
 		}
 
 		/**

@@ -8,6 +8,7 @@
 namespace WPDLib\FieldTypes;
 
 use WPDLib\FieldTypes\Manager as FieldManager;
+use WPDLib\Util as Util;
 use WP_Error as WPError;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,7 +72,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 
 			$val = FieldManager::format( $val, $format, 'input' );
 
-			if ( ! empty( $this->args['step'] ) && $val % FieldManager::format( $this->args['step'], $format, 'input' ) != 0 ) {
+			if ( ! empty( $this->args['step'] ) && FieldManager::format( 0.0, $format, 'input' ) !== Util::mod( $val, FieldManager::format( $this->args['step'], $format, 'input' ) ) ) {
 				return new WPError( 'invalid_number_step', sprintf( __( 'The number %1$s is invalid since it is not divisible by %2$s.', 'wpdlib' ), FieldManager::format( $val, $format, 'output' ), FieldManager::format( $this->args['step'], $format, 'output' ) ) );
 			}
 
