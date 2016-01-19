@@ -42,8 +42,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
+				'store'			=> 'id',
 				'mime_types'	=> 'all',
 			) );
+
+			if ( 'url' !== $args['store'] ) {
+				$args['store'] = 'id';
+			}
+
 			parent::__construct( $type, $args );
 		}
 
@@ -51,7 +57,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 * Displays the input control for the field.
 		 *
 		 * @since 0.5.0
-		 * @param integer $val the current value of the field
+		 * @param integer|string $val the current value of the field
 		 * @param bool $echo whether to echo the output (default is true)
 		 * @return string the HTML output of the field control
 		 */
@@ -62,18 +68,23 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 			$args = array_merge( $args, $this->data_atts );
 
+			$data_settings = array(
+				'store'	=> $args['store'],
+			);
+
 			$mime_types = $this->verify_mime_types( $args['mime_types'] );
 			if ( $mime_types ) {
-				$data_settings = array(
-					'query'				=> array(
-						'post_mime_type'	=> $mime_types,
-					),
+				$data_settings['query'] = array(
+					'post_mime_type'	=> $mime_types,
 				);
-				if ( isset( $args['data-settings'] ) ) {
-					$data_settings = array_merge_recursive( json_decode( $args['data-settings'], true ), $data_settings );
-				}
-				$args['data-settings'] = json_encode( $data_settings );
 			}
+
+			if ( isset( $args['data-settings'] ) ) {
+				$data_settings = array_merge_recursive( json_decode( $args['data-settings'], true ), $data_settings );
+			}
+			$args['data-settings'] = json_encode( $data_settings );
+
+			unset( $args['store'] );
 			unset( $args['mime_types'] );
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
@@ -94,12 +105,25 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
+				if ( 'url' === $this->args['store'] ) {
+					return '';
+				}
 				return 0;
 			}
 
-			$val = absint( $val );
+			$orig_val = $val;
+			if ( 'url' === $this->args['store'] ) {
+				$orig_val = esc_url( $orig_val );
+				$val = attachment_url_to_postid( $orig_val );
+				if ( ! $val ) {
+					return new WPError( 'invalid_media_url', sprintf( __( 'The URL %s does not point to a WordPress media file.', 'post-types-definitely' ), $orig_val ) );
+				}
+			} else {
+				$orig_val = absint( $orig_val );
+				$val = $orig_val;
+			}
 
-			if ( 'attachment' != get_post_type( $val ) ) {
+			if ( 'attachment' !== get_post_type( $val ) ) {
 				return new WPError( 'invalid_media_post_type', sprintf( __( 'The post with ID %s is not a valid WordPress media file.', 'wpdlib' ), $val ) );
 			}
 
@@ -108,7 +132,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				return new WPError( 'invalid_media_mime_type', sprintf( __( 'The media item with ID %1$s is neither of the valid formats (%2$s).', 'wpdlib' ), $val, $valid_formats ) );
 			}
 
-			return $val;
+			return $orig_val;
 		}
 
 		/**
@@ -117,10 +141,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 * This function is needed to check whether a required field has been properly filled.
 		 *
 		 * @since 0.5.0
-		 * @param integer $val the current value of the field
+		 * @param integer|string $val the current value of the field
 		 * @return bool whether the value is considered empty
 		 */
 		public function is_empty( $val ) {
+			if ( 'url' === $this->args['store'] ) {
+				return empty( $val );
+			}
 			return absint( $val ) < 1;
 		}
 
@@ -133,6 +160,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 * @return integer|string the correctly parsed value (string if $formatted is true)
 		 */
 		public function parse( $val, $formatted = false ) {
+			//TODO: adjust for store=url
 			$val = absint( $val );
 			if ( $formatted ) {
 				if ( ! is_array( $formatted ) ) {

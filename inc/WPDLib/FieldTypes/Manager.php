@@ -327,6 +327,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'min',
 				'max',
 				'step',
+				'store',
 				'mime_types',
 				'repeatable',
 			);
