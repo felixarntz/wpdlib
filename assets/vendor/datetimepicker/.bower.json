@@ -56,6 +56,6 @@
     "commit": "72ff0b43e50e066088303ea8ddb9445b1ec99d1d"
   },
   "_source": "git://github.com/xdan/datetimepicker.git",
-  "_target": "~2.4",
+  "_target": "2.4.5",
   "_originalSource": "datetimepicker"
 }

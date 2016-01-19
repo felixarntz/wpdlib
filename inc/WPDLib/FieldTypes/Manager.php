@@ -24,6 +24,31 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 	final class Manager {
 
 		/**
+		 * Status whether the class has been initialized.
+		 *
+		 * @since 0.6.0
+		 * @var boolean
+		 */
+		private static $initialized = false;
+
+		/**
+		 * Initialization function.
+		 *
+		 * This has to be called by every plugin using WPDLib.
+		 *
+		 * @since 0.6.0
+		 */
+		public static function init() {
+			if ( self::$initialized ) {
+				return;
+			}
+
+			add_action( 'wp_ajax_get-attachment-by-url', array( __CLASS__, 'ajax_get_attachment_by_url' ), 15 );
+
+			self::$initialized = true;
+		}
+
+		/**
 		 * Returns a new field type instance.
 		 *
 		 * @since 0.5.0
@@ -245,6 +270,30 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			}
 
 			return $formatted;
+		}
+
+		/**
+		 * AJAX handler to retrieve an attachment by URL.
+		 *
+		 * WordPress does not have an AJAX function like this, so WPDLib adds it.
+		 * This is required for the media field type to work properly.
+		 *
+		 * @since 0.6.0
+		 */
+		public static function ajax_get_attachment_by_url() {
+			if ( ! isset( $_REQUEST['url'] ) ) {
+				wp_send_json_error();
+			}
+
+			$id = attachment_url_to_postid( $_REQUEST['url'] );
+			if ( ! $id ) {
+				wp_send_json_error();
+			}
+
+			$_REQUEST['id'] = $id;
+
+			wp_ajax_get_attachment();
+			die();
 		}
 
 		/**

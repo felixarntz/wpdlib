@@ -6,6 +6,7 @@
 * Enhanced: options keys 'terms' and 'users' (for related objects) now accept 'any' as value (similar to 'posts')
 * Fixed: critical validation bug in WYSIWYG
 * Fixed: step validation for decimal numbers
+* Fixed: images now display correctly in media preview
 
 = 0.5.3 =
 * Enhanced: field types now accept any kind of data attributes
