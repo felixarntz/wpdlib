@@ -113,7 +113,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 			$orig_val = $val;
 			if ( 'url' === $this->args['store'] ) {
-				$orig_val = esc_url( $orig_val );
+				$orig_val = FieldManager::format( $orig_val, 'url', 'input' );
 				$val = attachment_url_to_postid( $orig_val );
 				if ( ! $val ) {
 					return new WPError( 'invalid_media_url', sprintf( __( 'The URL %s does not point to a WordPress media file.', 'post-types-definitely' ), $orig_val ) );
@@ -160,8 +160,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 * @return integer|string the correctly parsed value (string if $formatted is true)
 		 */
 		public function parse( $val, $formatted = false ) {
-			//TODO: adjust for store=url
-			$val = absint( $val );
+			if ( 'url' === $this->args['store'] ) {
+				$val = FieldManager::format( $val, 'url', 'input' );
+			} else {
+				$val = absint( $val );
+			}
 			if ( $formatted ) {
 				if ( ! is_array( $formatted ) ) {
 					$formatted = array();
@@ -171,7 +174,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 					'field'		=> 'url',
 					'template'	=> '',
 				) );
-				return $this->format_attachment( $val, $formatted );
+				$attachment_id = $val;
+				if ( 'url' === $this->args['store'] ) {
+					if ( 'field' === $formatted['mode'] && 'url' === $formatted['field'] ) {
+						return $val;
+					}
+					$attachment_id = attachment_url_to_postid( $val );
+				}
+				return $this->format_attachment( $attachment_id, $formatted );
 			}
 			return $val;
 		}
