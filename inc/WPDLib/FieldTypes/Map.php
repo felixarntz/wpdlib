@@ -1,7 +1,7 @@
 <?php
 /**
  * @package WPDLib
- * @version 0.5.3
+ * @version 0.6.0
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
  */
 
@@ -42,7 +42,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 			if ( 'coords' !== $args['store'] ) {
 				$args['store'] = 'address';
 			} elseif ( ! isset( $args['placeholder'] ) ) {
-				$args['placeholder'] = '0.0|0.0';
+				$args['placeholder'] = __( 'Enter coords in the format &quot;latitude|longitude&quot;', 'wpdlib' );
 			}
 
 			parent::__construct( $type, $args );
@@ -198,7 +198,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_dependency_info( 'wp-map-picker', 'version' );
 
-			wp_enqueue_script( 'google-maps', 'https://maps.google.com/maps/api/js', array(), '', true );
+			$gmaps_url = 'https://maps.google.com/maps/api/js';
+			$gmaps_args = array(
+				'language'	=> str_replace( '_', '-', get_locale() ),
+			);
+			if ( ( $api_key = self::get_api_key() ) ) {
+				$gmaps_args['key'] = $api_key;
+			}
+			$gmaps_url = add_query_arg( $gmaps_args, $gmaps_url );
+
+			wp_enqueue_script( 'google-maps', $gmaps_url, array(), false, true );
 
 			wp_enqueue_style( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker.min.css', array(), $version );
 			wp_enqueue_script( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker.min.js', array( 'jquery', 'jquery-ui-autocomplete', 'google-maps' ), $version, true );
@@ -206,6 +215,19 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 			return array(
 				'dependencies'		=> array( 'wp-map-picker' ),
 			);
+		}
+
+		/**
+		 * Returns the API key for Google Maps.
+		 *
+		 * This function contains an empty string by default, but the filter in
+		 * the function can be used to add an API key to append to all maps requests.
+		 *
+		 * @since 0.6.0
+		 * @return string Google Maps API Key or an empty string
+		 */
+		public static function get_api_key() {
+			return apply_filters( 'wpdlib_google_maps_api_key', '', get_current_blog_id() );
 		}
 	}
 
