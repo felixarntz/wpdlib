@@ -20,6 +20,7 @@
   "dependencies": {
     "select2": "4.0.0",
     "datetimepicker": "2.4.5",
-    "wp-media-picker": "0.2.0"
+    "wp-media-picker": "0.2.0",
+    "wp-map-picker": "0.1.0"
   }
 }

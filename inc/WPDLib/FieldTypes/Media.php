@@ -19,7 +19,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 	/**
 	 * Class for a media picker field.
 	 *
-	 * This implementation uses attachment IDs as field values (no URLs!).
+	 * This implementation can either store an attachment ID (default) or URL.
 	 *
 	 * @since 0.5.0
 	 */
@@ -101,7 +101,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 *
 		 * @since 0.5.0
 		 * @param mixed $val the current value of the field
-		 * @return integer|WP_Error the validated field value or an error object
+		 * @return integer|string|WP_Error the validated field value or an error object
 		 */
 		public function validate( $val = null ) {
 			if ( ! $val ) {
@@ -116,7 +116,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				$orig_val = FieldManager::format( $orig_val, 'url', 'input' );
 				$val = attachment_url_to_postid( $orig_val );
 				if ( ! $val ) {
-					return new WPError( 'invalid_media_url', sprintf( __( 'The URL %s does not point to a WordPress media file.', 'post-types-definitely' ), $orig_val ) );
+					return new WPError( 'invalid_media_url', sprintf( __( 'The URL %s does not point to a WordPress media file.', 'wpdlib' ), $orig_val ) );
 				}
 			} else {
 				$orig_val = absint( $orig_val );

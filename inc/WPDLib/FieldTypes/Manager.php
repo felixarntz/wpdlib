@@ -90,6 +90,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'select',
 				'multiselect',
 				'media',
+				'map',
 				'textarea',
 				'wysiwyg',
 				'datetime',

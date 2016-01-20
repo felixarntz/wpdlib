@@ -59,6 +59,18 @@
 		mediapicker_args: {},
 
 		/**
+		 * Whether WPMapPicker is enabled
+		 * @type bool
+		 */
+		mappicker_enabled: typeof $.fn.wpMapPicker !== 'undefined',
+
+		/**
+		 * Arguments for WPMapPicker initialization
+		 * @type object
+		 */
+		mappicker_args: {},
+
+		/**
 		 * Initializes all the fields.
 		 *
 		 * This is the only function that should be accessed publically.
@@ -95,6 +107,10 @@
 				label_button: self.args.media_i18n_button
 			};
 
+			self.mappicker_args = {
+				store: 'address'
+			};
+
 			self._initJQueryPluginFields();
 
 			self._setupRange( '.wpdlib-input-range' );
@@ -124,6 +140,7 @@
 			self._setupTimepicker( selector_prefix + '.wpdlib-input-time' );
 			self._setupColorpicker( selector_prefix + '.wpdlib-input-color' );
 			self._setupMediapicker( selector_prefix + '.wpdlib-input-media' );
+			self._setupMappicker( selector_prefix + '.wpdlib-input-map' );
 		},
 
 		/**
@@ -225,6 +242,21 @@
 			var $fields = this._getJQuery( selector );
 
 			$fields.wpMediaPicker( this.mediapicker_args );
+		},
+
+		/**
+		 * Initializes WPMapPicker on a selection of fields.
+		 *
+		 * @param string|jQuery selector a selector or a jQuery object
+		 */
+		_setupMappicker: function( selector ) {
+			if ( ! this.mappicker_enabled ) {
+				return;
+			}
+
+			var $fields = this._getJQuery( selector );
+
+			$fields.wpMapPicker( this.mappicker_args );
 		},
 
 		/**

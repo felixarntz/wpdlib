@@ -126,22 +126,23 @@
 		}
 	}
 
-	.wp-mediapicker-content-wrap {
+	.wp-mediapicker-content-wrap,
+	.wp-mappicker-map-canvas-wrap {
 		width: 160px;
 	}
 
-	.wp-mediapicker-content .mime-type-icon {
-		margin-top: -24px;
-		height: 48px;
-	}
-
-	.wp-mediapicker-content .mime-type-icon img {
-		height: 32px;
-	}
-
-	.wp-mediapicker-content .mime-type-icon span {
-		height: 16px;
-		line-height: 16px;
+	.wp-mediapicker-content {
+		.mime-type-icon {
+			margin-top: -24px;
+			height: 48px;
+			img {
+				height: 32;
+			}
+			span {
+				height: 16px;
+				line-height: 16px;
+			}
+		}
 	}
 
 	.wpdlib-narrow & {
