@@ -44,7 +44,7 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 
 		/**
 		 * @since 0.5.0
-		 * @var array Holds the component's parent components (in most cases it will be just one), separated by class name.
+		 * @var array Holds the component's parent components (in most cases it will be just one).
 		 */
 		protected $parents = array();
 
@@ -94,7 +94,11 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 		 * @param mixed $value new value for the property
 		 */
 		public function __set( $property, $value ) {
-			if ( property_exists( $this, $property ) ) {
+			if ( ComponentManager::is_too_late() ) {
+				return;
+			}
+
+			if ( in_array( $property, array( 'scope', 'args', 'children', 'parents', 'validate_filter' ) ) ) {
 				$this->$property = $value;
 			} elseif ( isset( $this->args[ $property ] ) ) {
 				$this->args[ $property ] = $value;
@@ -200,6 +204,27 @@ if ( ! class_exists( 'WPDLib\Components\Base' ) ) {
 			while ( count( $parents ) > 0 ) {
 				$parent_slug = key( $parents );
 				$path[] = $parent_slug;
+				$parents = $parents[ $parent_slug ]->parents;
+			}
+
+			return implode( '.', array_reverse( $path ) );
+		}
+
+		/**
+		 * Returns the class path to the component.
+		 *
+		 * This path consists of the class names that lead to this component, each separated by a dot.
+		 *
+		 * @since 0.6.1
+		 * @return string the class path to the component
+		 */
+		public function get_class_path() {
+			$path = array();
+
+			$parents = $this->parents;
+			while ( count( $parents ) > 0 ) {
+				$parent_slug = key( $parents );
+				$path[] = get_class( $parents[ $parent_slug ] );
 				$parents = $parents[ $parent_slug ]->parents;
 			}
 
