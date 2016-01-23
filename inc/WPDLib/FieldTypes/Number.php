@@ -8,7 +8,7 @@
 namespace WPDLib\FieldTypes;
 
 use WPDLib\FieldTypes\Manager as FieldManager;
-use WPDLib\Util as Util;
+use WPDLib\Util\Util;
 use WP_Error as WPError;
 
 if ( ! defined( 'ABSPATH' ) ) {
