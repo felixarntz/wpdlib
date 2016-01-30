@@ -52,14 +52,16 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 		 */
 		public function validate( $val = null ) {
 			$format = 'float';
+			$zero = 0.0;
 			if ( is_int( $this->args['step'] ) ) {
 				$format = 'int';
+				$zero = 0;
 			}
 
 			if ( ! $val ) {
-				if ( 'int' == $format ) {
+				if ( 'int' === $format ) {
 					if ( $this->args['min'] > 0 ) {
-						return absint( $this->args['min'] );
+						return intval( $this->args['min'] );
 					}
 					return 0;
 				} else {
@@ -70,9 +72,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 				}
 			}
 
-			$val = FieldManager::format( $val, $format, 'input' );
+			if ( 'int' === $format ) {
+				$val = intval( $val );
+			} else {
+				$val = floatval( $val );
+			}
 
-			if ( ! empty( $this->args['step'] ) && FieldManager::format( 0.0, $format, 'input' ) !== Util::mod( $val, FieldManager::format( $this->args['step'], $format, 'input' ) ) ) {
+			if ( ! empty( $this->args['step'] ) && ! Util::is_rest_zero( $val, $this->args['step'] ) ) {
 				return new WPError( 'invalid_number_step', sprintf( __( 'The number %1$s is invalid since it is not divisible by %2$s.', 'wpdlib' ), FieldManager::format( $val, $format, 'output' ), FieldManager::format( $this->args['step'], $format, 'output' ) ) );
 			}
 

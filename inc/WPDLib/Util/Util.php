@@ -186,6 +186,40 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		}
 
 		/**
+		 * Checks whether the rest of a division of two numbers equals zero.
+		 *
+		 * This is a reliable implementation that checks the rest for both integers and floats.
+		 * While the check for integers is trivial, floating point numbers work differently.
+		 * This function works around that to get proper results.
+		 *
+		 * @internal
+		 * @since 0.6.1
+		 * @param integer|float $divident the divident
+		 * @param integer|float $divisor the divisor
+		 * @return boolean true if the rest of the division is zero, otherwise false
+		 */
+		public static function is_rest_zero( $divident, $divisor ) {
+			$divident = abs( $divident );
+			$divisor = abs( $divisor );
+
+			if ( is_int( $divident ) && is_int( $divisor ) ) {
+				// prevent division by zero
+				if ( 0 === $divisor ) {
+					return false;
+				}
+				return 0 === $divident % $divisor;
+			}
+
+			if ( 0.0 === $divisor ) {
+				return false;
+			}
+
+			$compare = round( $divident / $divisor ) * $divisor;
+
+			return strval( $divident ) === strval( $compare );
+		}
+
+		/**
 		 * A flexible PHP modulo function.
 		 *
 		 * Modulo for integers works properly using the % operator, but for floating point numbers it is not as accurate.
@@ -196,8 +230,12 @@ if ( ! class_exists( 'WPDLib\Util\Util' ) ) {
 		 * If both arguments are integers, the function will return an integer.
 		 * Otherwise it will return a float.
 		 *
+		 * Note: This function still only works in some cases.
+		 * Therefore it has been deprecated. WPDLib now uses `WPDLib\Util\Util::is_rest_zero()`.
+		 *
 		 * @internal
 		 * @since 0.6.0
+		 * @deprecated 0.6.1
 		 * @param integer|float $divident the divident
 		 * @param integer|float $divisor the divisor
 		 * @return integer|float the rest of the division (modulo)

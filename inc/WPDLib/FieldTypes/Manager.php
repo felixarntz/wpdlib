@@ -607,14 +607,20 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				$formatted = abs( $formatted );
 			}
 
+			$decimals = 0;
+			if ( isset( $args['decimals'] ) ) {
+				$decimals = absint( $args['decimals'] );
+			} else {
+				$detector = explode( '.', '' . $formatted );
+				if ( isset( $detector[1] ) ) {
+					$decimals = strlen( $detector[1] );
+				}
+			}
+
 			if ( 'output' === $mode ) {
-				$decimals = isset( $args['decimals'] ) ? absint( $args['decimals'] ) : 2;
 				$formatted = number_format_i18n( $formatted, $decimals );
 			} else {
-				$decimals = isset( $args['decimals'] ) ? absint( $args['decimals'] ) : false;
-				if ( $decimals !== false ) {
-					$formatted = number_format( $formatted, $decimals );
-				}
+				$formatted = number_format( $formatted, $decimals );
 			}
 
 			return $formatted;
