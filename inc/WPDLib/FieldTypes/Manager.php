@@ -620,7 +620,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			if ( 'output' === $mode ) {
 				$formatted = number_format_i18n( $formatted, $decimals );
 			} else {
-				$formatted = number_format( $formatted, $decimals );
+				$formatted = round( $formatted, $decimals );
 			}
 
 			return $formatted;
