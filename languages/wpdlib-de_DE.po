@@ -1,10 +1,10 @@
 # Copyright (c) 2014-2015 Felix Arntz
 msgid ""
 msgstr ""
-"Project-Id-Version: wpdlib 0.6.0\n"
+"Project-Id-Version: wpdlib 0.6.1\n"
 "Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
-"POT-Creation-Date: 2016-01-20 13:15:31+00:00\n"
-"PO-Revision-Date: 2016-01-20 14:20+0100\n"
+"POT-Creation-Date: 2016-02-07 13:47:09+00:00\n"
+"PO-Revision-Date: 2016-02-07 14:48+0100\n"
 "Last-Translator: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language-Team: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
 "Language: de_DE\n"
@@ -22,27 +22,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: inc/WPDLib/Components/Base.php:156 inc/WPDLib/Components/Manager.php:173
+#: inc/WPDLib/Components/Base.php:160 inc/WPDLib/Components/Manager.php:173
 msgid "Components must not be added later than the %s hook."
 msgstr ""
 "Komponenten dürfen nicht nach Ausführung des %s Hooks hinzugefügt werden."
 
-#: inc/WPDLib/Components/Base.php:160 inc/WPDLib/Components/Manager.php:177
+#: inc/WPDLib/Components/Base.php:164 inc/WPDLib/Components/Manager.php:177
 msgid "The object is not a component."
 msgstr "Das Objekt ist keine Komponente."
 
-#: inc/WPDLib/Components/Base.php:167
+#: inc/WPDLib/Components/Base.php:171
 msgid ""
 "The component %1$s of class %2$s is not a valid child for the component %3$s."
 msgstr ""
 "Die Komponente %1$s der Klasse %2$s ist kein erlaubtes Kind für die "
 "Komponente %3$s."
 
-#: inc/WPDLib/Components/Base.php:176 inc/WPDLib/Components/Manager.php:191
+#: inc/WPDLib/Components/Base.php:180 inc/WPDLib/Components/Manager.php:191
 msgid "A component of class %1$s with slug %2$s already exists."
 msgstr "Eine Komponente der Klasse %1$s mit dem Slug %2$s existiert bereits."
 
-#: inc/WPDLib/Components/Base.php:271
+#: inc/WPDLib/Components/Base.php:296
 msgid ""
 "The component %1$s of class %2$s already has a parent assigned and is not a "
 "multiparent component."
@@ -50,7 +50,7 @@ msgstr ""
 "Die Komponente %1$s der Klasse %2$s besitzt bereits ein Elternteil und "
 "erlaubt keine mehrfachen Eltern."
 
-#: inc/WPDLib/Components/Base.php:277
+#: inc/WPDLib/Components/Base.php:302
 msgid "A component with an empty slug is not allowed."
 msgstr "Eine Komponente mit leerem Slug ist nicht erlaubt."
 
@@ -135,15 +135,15 @@ msgstr "Löschen"
 msgid "Insert File"
 msgstr "Datei einfügen"
 
-#: inc/WPDLib/FieldTypes/Number.php:76
+#: inc/WPDLib/FieldTypes/Number.php:82
 msgid "The number %1$s is invalid since it is not divisible by %2$s."
 msgstr "Die Nummer %1$s ist ungültig, da sie nicht durch %2$s teilbar ist."
 
-#: inc/WPDLib/FieldTypes/Number.php:80
+#: inc/WPDLib/FieldTypes/Number.php:86
 msgid "The number %1$s is invalid. It must be greater than or equal to %2$s."
 msgstr "Die Nummer %1$s ist ungültig. Sie muss größer oder gleich %2$s sein."
 
-#: inc/WPDLib/FieldTypes/Number.php:84
+#: inc/WPDLib/FieldTypes/Number.php:90
 msgid "The number %1$s is invalid. It must be lower than or equal to %2$s."
 msgstr "Die Nummer %1$s ist ungültig. Sie muss kleiner oder gleich %2$s sein."
 
