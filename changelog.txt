@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 0.6.1 =
+* Fixed: numeric validation of floating point numbers
+* Fixed: formatting floating point numbers more precise than 2 digits
+
 = 0.6.0 =
 * Added: new field type map (can store either address or latitude and longitude)
 * Enhanced: media field type can now alternatively store URL instead of attachment ID
