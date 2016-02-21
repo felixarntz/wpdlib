@@ -98,7 +98,6 @@
 			};
 
 			self.mediapicker_args = {
-				store: 'id',
 				filterable: false,
 				label_add: self.args.media_i18n_add,
 				label_replace: self.args.media_i18n_replace,
@@ -107,9 +106,7 @@
 				label_button: self.args.media_i18n_button
 			};
 
-			self.mappicker_args = {
-				store: 'address'
-			};
+			self.mappicker_args = {};
 
 			self._initJQueryPluginFields();
 

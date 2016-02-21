@@ -68,21 +68,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 
 			$args = array_merge( $args, $this->data_atts );
 
-			$data_settings = array(
-				'store'	=> $args['store'],
-			);
-
+			$args['data-store'] = $args['store'];
 			$mime_types = $this->verify_mime_types( $args['mime_types'] );
 			if ( $mime_types ) {
-				$data_settings['query'] = array(
+				$args['data-query'] = json_encode( array(
 					'post_mime_type'	=> $mime_types,
-				);
+				) );
 			}
-
-			if ( isset( $args['data-settings'] ) ) {
-				$data_settings = array_merge_recursive( json_decode( $args['data-settings'], true ), $data_settings );
-			}
-			$args['data-settings'] = json_encode( $data_settings );
 
 			unset( $args['store'] );
 			unset( $args['mime_types'] );

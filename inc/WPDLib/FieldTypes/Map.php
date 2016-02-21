@@ -68,17 +68,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 
 			$args = array_merge( $args, $this->data_atts );
 
-			$data_settings = array(
-				'store'				=> $args['store'],
-				'decimal_separator'	=> $wp_locale->number_format['decimal_point'],
-			);
-			if ( isset( $args['data-settings'] ) ) {
-				$data_settings = array_merge_recursive( json_decode( $args['data-settings'], true ), $data_settings );
-			}
-			$args['data-settings'] = json_encode( $data_settings );
+			$args['data-store'] = $args['store'];
+			$args['data-decimal_separator'] = $wp_locale->number_format['decimal_point'];
 
 			unset( $args['store'] );
-			unset( $args['mime_types'] );
 
 			$output = '<input type="text"' . FieldManager::make_html_attributes( $args, false, false ) . ' />';
 
