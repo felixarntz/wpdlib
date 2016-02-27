@@ -203,7 +203,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 			wp_enqueue_script( 'google-maps', $gmaps_url, array(), false, true );
 
 			wp_enqueue_style( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker.min.css', array(), $version );
-			wp_enqueue_script( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker.min.js', array( 'jquery', 'jquery-ui-autocomplete', 'google-maps' ), $version, true );
+			wp_enqueue_script( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker.min.js', array( 'jquery', 'jquery-ui-widget', 'jquery-ui-autocomplete', 'google-maps' ), $version, true );
 
 			return array(
 				'dependencies'		=> array( 'wp-map-picker' ),

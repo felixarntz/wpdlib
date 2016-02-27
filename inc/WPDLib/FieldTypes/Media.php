@@ -203,7 +203,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			}
 
 			wp_enqueue_style( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.css', array(), $version );
-			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.js', array( 'jquery', 'media-editor' ), $version, true );
+			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.js', array( 'jquery', 'jquery-ui-widget', 'media-editor' ), $version, true );
 
 			return array(
 				'dependencies'		=> array( 'media-editor', 'wp-media-picker' ),

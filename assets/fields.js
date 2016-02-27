@@ -87,7 +87,6 @@
 			};
 
 			self.datetimepicker_args = {
-				lang: self.args.language,
 				formatDate: 'Y-m-d',
 				formatTime: 'H:i',
 				dayOfWeekStart: self.args.start_of_week
@@ -107,6 +106,10 @@
 			};
 
 			self.mappicker_args = {};
+
+			if ( this.datetimepicker_enabled ) {
+				$.datetimepicker.setLocale( self.args.language );
+			}
 
 			self._initJQueryPluginFields();
 

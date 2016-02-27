@@ -6,11 +6,6 @@
 
 ( function( $, google ) {
 
-	if ( typeof $.fn.wpMapPicker !== 'undefined' ) {
-		// if the jQuery plugin is already defined, abort
-		return;
-	}
-
 	if ( typeof google === 'undefined' || typeof google.maps === 'undefined' ) {
 		// if google.maps is not loaded, scaffold the jQuery plugin function and abort
 		$.fn.wpMapPicker = function() {
@@ -21,202 +16,12 @@
 		return;
 	}
 
-	function WPMapPicker( $elem, settings ) {
-		this.$elem = $elem;
-		this.settings = settings;
-	}
+	var _wrap = '<div class="wp-mappicker-container" />';
+	var _canvas_wrap = '<div class="wp-mappicker-map-canvas-wrap" />';
+	var _canvas = '<div class="wp-mappicker-map-canvas" />';
 
-	WPMapPicker.prototype = {
-		init: function() {
-			this.canvas = this.$elem.next().find( '.wp-mappicker-map-canvas' )[0];
-			this.geocoder = new google.maps.Geocoder();
-
-			var self = this;
-
-			this.initLatLng( function( latlng, is_default ) {
-				self.initMap( latlng, is_default );
-				self.initEvents();
-			});
-		},
-
-		initLatLng: function( callback ) {
-			var latlng;
-			var is_default = false;
-
-			if ( 'coords' === this.settings.store ) {
-				latlng = this.parseLatLng( this.$elem.val() );
-				if ( ! latlng ) {
-					latlng = new google.maps.LatLng( this.settings.default_location.lat, this.settings.default_location.lng );
-					is_default = true;
-				}
-				callback( latlng, is_default );
-			} else {
-				if ( this.$elem.val() ) {
-					this.geocoder.geocode({
-						address: this.$elem.val()
-					}, function( results ) {
-						if ( 'undefined' !== typeof results[0] && 'undefined' !== typeof results[0].geometry && 'undefined' !== typeof results[0].geometry.location ) {
-							callback( results[0].geometry.location, false );
-						} else {
-							latlng = new google.maps.LatLng( this.settings.default_location.lat, this.settings.default_location.lng );
-							is_default = true;
-							callback( latlng, is_default );
-						}
-					});
-				} else {
-					latlng = new google.maps.LatLng( this.settings.default_location.lat, this.settings.default_location.lng );
-					is_default = true;
-					callback( latlng, is_default );
-				}
-			}
-		},
-
-		initMap: function( latlng, is_default ) {
-			this.is_default = is_default;
-			this.latlng = latlng;
-			this.map = new google.maps.Map( this.canvas, {
-				center: this.latlng,
-				zoom: this.is_default ? this.settings.default_location.zoom : this.settings.zoom,
-				draggable: this.settings.draggable,
-				tilt: 0,
-				streetViewControl: 0,
-				mapTypeId: google.maps.MapTypeId[ this.settings.mapType.toUpperCase() ]
-			});
-			this.marker = new google.maps.Marker({
-				position: this.latlng,
-				map: this.map,
-				draggable: true
-			});
-		},
-
-		initEvents: function() {
-			var self = this;
-
-			if ( 'coords' === this.settings.store ) {
-				this.$elem.on( 'change', function() {
-					var latlng = self.parseLatLng( $( this ).val() );
-					if ( latlng ) {
-						self.latlng = latlng;
-
-						self.marker.setPosition( self.latlng );
-						self.map.setCenter( self.latlng );
-						if ( self.is_default ) {
-							self.is_default = false;
-							self.map.setZoom( self.settings.zoom );
-						}
-					}
-				});
-			} else {
-				this.$elem.autocomplete({
-					source: function( request, response ) {
-						self.geocoder.geocode({
-							address: request.term
-						}, function( results ) {
-							response( $.map( results, function( item ) {
-								return {
-									label: item.formatted_address,
-									value: item.formatted_address,
-									latlng: item.geometry.location
-								};
-							}) );
-						});
-					},
-					select: function( e, ui ) {
-						self.latlng = ui.item.latlng;
-
-						self.marker.setPosition( self.latlng );
-						self.map.setCenter( self.latlng );
-						if ( self.is_default ) {
-							self.is_default = false;
-							self.map.setZoom( self.settings.zoom );
-						}
-					}
-				});
-			}
-
-			google.maps.event.addListener( this.map, 'click', function( e ) {
-				self.latlng = e.latLng;
-				self.marker.setPosition( self.latlng );
-				if ( self.is_default ) {
-					self.is_default = false;
-					self.map.setCenter( self.latlng );
-					self.map.setZoom( self.settings.zoom );
-				}
-				self.updateFieldValue();
-			});
-
-			google.maps.event.addListener( this.marker, 'dragend', function( e ) {
-				self.latlng = e.latLng;
-				if ( self.is_default ) {
-					self.is_default = false;
-					self.map.setCenter( self.latlng );
-					self.map.setZoom( self.settings.zoom );
-				}
-				self.updateFieldValue();
-			});
-		},
-
-		updateFieldValue: function() {
-			if ( 'coords' === this.settings.store ) {
-				this.$elem.val( this.formatLatLng( this.latlng ) );
-			} else {
-				var self = this;
-
-				this.geocoder.geocode({
-					location: this.latlng
-				}, function( results ) {
-					if ( 'undefined' !== typeof results[0] && 'undefined' !== typeof results[0].formatted_address ) {
-						self.$elem.val( results[0].formatted_address );
-					}
-				});
-			}
-		},
-
-		parseLatLng: function( val ) {
-			if ( 'object' === typeof val ) {
-				return val;
-			}
-
-			val = val.split( '|' );
-			if ( 2 !== val.length ) {
-				return false;
-			}
-
-			for ( var i = 0; i < 2; i++ ) {
-				val[ i ] = parseFloat( val[ i ].replace( this.settings.decimal_separator, '.' ) );
-			}
-
-			return new google.maps.LatLng( val[0], val[1] );
-		},
-
-		formatLatLng: function( val ) {
-			if ( 'string' === typeof val ) {
-				return val;
-			}
-
-			return ( '' + val.lat() ).replace( '.', this.settings.decimal_separator ) + '|' + ( '' + val.lng() ).replace( '.', this.settings.decimal_separator );
-		}
-	};
-
-	var generateMarkup = function( $elem ) {
-		var input_id = $elem.attr( 'id' );
-
-		$elem.after( '<div class="wp-mappicker-map-canvas-wrap"><div data-input-id="' + input_id + '" class="wp-mappicker-map-canvas"></div></div>' );
-	};
-
-	/**
-	 * Initializes the plugin on one or more fields.
-	 *
-	 * This is the actual jQuery plugin function.
-	 *
-	 * In addition to providing settings in the function call, it is also possible to store field-related settings in a field directly.
-	 * It has to be valid JSON and it must be stored in a 'data-settings' attribute.
-	 *
-	 * @param object settings custom settings for the field (all optional)
-	 * @return jQuery
-	 */
-	$.fn.wpMapPicker = function( settings ) {
-		settings = $.extend({
+	var MapPicker = {
+		options: {
 			store: 'address',
 			zoom: 15,
 			draggable: true,
@@ -226,37 +31,253 @@
 				lng: '0.0',
 				zoom: 2
 			},
-			decimal_separator: '.'
-		}, settings || {});
+			decimal_separator: '.',
+			change: false,
+			clear: false
+		},
 
-		return this.each( function() {
-			if ( $( this ).data( 'wp-map-picker' ) ) {
-				return;
-			}
+		_create: function() {
+			var self = this;
 
-			var $elem = $( this );
-			var elem_settings = $.extend({}, settings );
-			var data_settings = $elem.data( 'settings' );
+			$.extend( self.options, self.element.data() );
 
-			if ( data_settings ) {
-				if ( typeof data_settings === 'string' ) {
-					try {
-						data_settings = JSON.parse( data_settings );
-					} catch ( err ) {
-						console.error( err.message );
+			self.default_latlng = self._parseLatLng( self.options.default_location );
+			self.is_default = true;
+
+			self.element.wrap( _wrap );
+			self.canvas_wrap = $( _canvas_wrap ).insertAfter( self.element );
+			self.canvas = $( _canvas ).appendTo( self.canvas_wrap );
+
+			self.geocoder = new google.maps.Geocoder();
+
+			self.map = new google.maps.Map( self.canvas[0], {
+				center: self.default_latlng,
+				zoom: self.options.default_location.zoom,
+				draggable: self.options.draggable,
+				tilt: 0,
+				streetViewControl: 0,
+				mapTypeId: google.maps.MapTypeId[ self.options.mapType.toUpperCase() ]
+			});
+			this.marker = new google.maps.Marker({
+				position: self.default_latlng,
+				map: self.map,
+				draggable: true
+			});
+
+			self._updateMap();
+
+			self._addListeners();
+		},
+
+		_addListeners: function() {
+			var self = this;
+
+			if ( 'coords' === self.options.store ) {
+				self.element.on( 'change', function() {
+					var latlng = self._parseLatLng( self.element.val() );
+					if ( latlng ) {
+						self._createMap( latlng );
 					}
-				}
-				if ( typeof data_settings === 'object' ) {
-					elem_settings = $.extend( elem_settings, data_settings );
-				}
+				});
+			} else {
+				self.element.autocomplete({
+					source: function( request, response ) {
+						self.geocoder.geocode({
+							address: request.term
+						}, function( results ) {
+							if ( null !== results ) {
+								response( $.map( results, function( item ) {
+									return {
+										label: item.formatted_address,
+										value: item.formatted_address,
+										latlng: item.geometry.location
+									};
+								}) );
+							} else {
+								response( [] );
+							}
+						});
+					},
+					select: function( e, ui ) {
+						self.element.val( ui.item.label );
+						self._createMap( ui.item.latlng );
+						if ( 'function' === typeof self.options.change ) {
+							self.options.change.call( self );
+						}
+					}
+				});
 			}
 
-			generateMarkup( $elem );
+			google.maps.event.addListener( self.map, 'click', function( e ) {
+				self._updateFieldValue( e.latLng );
+				self._createMap( e.latLng );
+			});
 
-			var elem_controller = new WPMapPicker( $elem, elem_settings );
-			elem_controller.init();
+			google.maps.event.addListener( self.marker, 'dragend', function( e ) {
+				self._updateFieldValue( e.latLng );
+				self._createMap( e.latLng );
+			});
+		},
 
-			$elem.data( 'wp-map-picker', elem_controller );
-		});
+		_updateFieldValue: function( latlng, manual_change ) {
+			var self = this;
+
+			if ( 'coords' === self.options.store ) {
+				self.element.val( self._formatLatLng( latlng ) );
+
+				if ( ! manual_change && 'function' === typeof self.options.change ) {
+					self.options.change.call( self );
+				}
+			} else {
+				self.geocoder.geocode({
+					location: latlng
+				}, function( results ) {
+					if ( null !== results && 'undefined' !== typeof results[0] && 'undefined' !== typeof results[0].formatted_address ) {
+						self.element.val( results[0].formatted_address );
+
+						if ( ! manual_change && 'function' === typeof self.options.change ) {
+							self.options.change.call( self );
+						}
+					}
+				});
+			}
+		},
+
+		_createMap: function( latlng ) {
+			var self = this;
+
+			self.latlng = latlng;
+
+			self.marker.setPosition( latlng );
+			self.map.setCenter( latlng );
+			if ( self.is_default ) {
+				self.is_default = false;
+				self.map.setZoom( self.options.zoom );
+			}
+		},
+
+		_resetMap: function() {
+			var self = this;
+
+			self.latlng = null;
+
+			self.marker.setPosition( self.default_latlng );
+			self.map.setCenter( self.default_latlng );
+			self.map.setZoom( self.options.default_location.zoom );
+			self.is_default = true;
+		},
+
+		_updateMap: function() {
+			var self = this;
+			var val = self.element.val();
+
+			if ( val ) {
+				if ( 'coords' === self.options.store ) {
+					var latlng = self._parseLatLng( val );
+					if ( latlng ) {
+						self._createMap( latlng );
+					} else {
+						self.element.val( null );
+						self._resetMap();
+					}
+				} else {
+					self.geocoder.geocode({
+						address: val
+					}, function( results ) {
+						if ( null !== results && 'undefined' !== typeof results[0] && 'undefined' !== typeof results[0].geometry && 'undefined' !== typeof results[0].geometry.location ) {
+							self._createMap( results[0].geometry.location );
+						} else {
+							self.element.val( null );
+							self._resetMap();
+						}
+					});
+				}
+			} else {
+				self.element.val( null );
+				self._resetMap();
+			}
+		},
+
+		_parseLatLng: function( val ) {
+			var self = this;
+
+			if ( 'object' === typeof val && 'function' !== typeof val.lat ) {
+				val = '' + val.lat + '|' + val.lng;
+			} else if ( 'object' === typeof val ) {
+				return val;
+			}
+
+			if ( 'string' !== typeof val ) {
+				return false;
+			}
+
+			val = val.split( '|' );
+			if ( 2 !== val.length ) {
+				return false;
+			}
+
+			for ( var i = 0; i < 2; i++ ) {
+				val[ i ] = parseFloat( val[ i ].replace( self.options.decimal_separator, '.' ) );
+			}
+
+			return new google.maps.LatLng( val[0], val[1] );
+		},
+
+		_formatLatLng: function( val ) {
+			var self = this;
+
+			if ( 'string' === typeof val ) {
+				return val;
+			}
+
+			return ( '' + val.lat() ).replace( '.', self.options.decimal_separator ) + '|' + ( '' + val.lng() ).replace( '.', self.options.decimal_separator );
+		},
+
+		clear: function() {
+			this.element.val( null );
+			if ( ! this.is_default ) {
+				this._resetMap();
+				if ( 'function' === typeof this.options.clear ) {
+					this.options.clear.call( this );
+				}
+			}
+		},
+
+		refresh: function() {
+			google.maps.event.trigger( this.map, 'resize' );
+			if ( this.latlng ) {
+				this.map.setCenter( this.latlng );
+			} else {
+				this.map.setCenter( this.default_latlng );
+			}
+		},
+
+		latlng: function( latlng ) {
+			if ( 'undefined' === typeof latlng ) {
+				return this.latlng;
+			}
+
+			if ( ! latlng ) {
+				this.element.val( null );
+				this._resetMap();
+			} else {
+				this._updateFieldValue( latlng, true );
+				this._createMap( latlng );
+			}
+		},
+
+		value: function( val ) {
+			if ( 'undefined' === typeof val ) {
+				if ( ! this.latlng ) {
+					return '';
+				}
+				return this.element.val();
+			}
+
+			this.element.val( val );
+			this._updateMap();
+		}
 	};
+
+	$.widget( 'wp.wpMapPicker', MapPicker );
 }( jQuery, google ) );
