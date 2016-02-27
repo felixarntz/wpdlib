@@ -118,7 +118,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 		protected function display_item( $value, $label, $single_type, $id, $name, $current = '', $echo = true ) {
 			$option_atts = array(
 				'value'		=> $value,
-				'selected'	=> $this->is_value_checked_or_selected( $value, $current ),
+				'selected'	=> $this->is_value_checked_or_selected( $current, $value ),
 			);
 
 			if ( is_array( $label ) ) {
