@@ -33,12 +33,18 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 		 */
 		public function display( $val, $echo = true ) {
 			$wp_editor_settings = array(
-				'wpautop'		=> true,
-				'media_buttons'	=> false,
 				'textarea_name'	=> $this->args['name'],
-				'textarea_rows'	=> absint( $this->args['rows'] ),
+				'textarea_rows'	=> $this->args['rows'],
 				'editor_class'	=> $this->args['class'],
-				'tinymce'		=> array( 'plugins' => 'wordpress' ),
+				'default_editor'=> user_can_richedit() ? 'tinymce' : 'html',
+				'wpautop'		=> true,
+				'media_buttons'	=> true,
+				'quicktags'		=> array(
+					'buttons' => 'strong,em,u,link,block,del,ins,img,ul,ol,li,code,close',
+				),
+				'tinymce'		=> array(
+					'toolbar1' => 'bold,italic,strikethrough,bullist,numlist,blockquote,hr,alignleft,aligncenter,alignright,link,unlink,spellchecker,wp_adv',
+				),
 			);
 
 			ob_start();

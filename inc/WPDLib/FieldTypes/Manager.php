@@ -374,6 +374,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				'disabled',
 				'options',
 				'label',
+				'rows',
 				'min',
 				'max',
 				'step',
