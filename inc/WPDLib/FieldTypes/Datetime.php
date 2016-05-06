@@ -138,7 +138,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$version = ComponentManager::get_dependency_info( 'datetimepicker', 'version' );
 
 			wp_enqueue_style( 'datetimepicker', $assets_url . '/vendor/datetimepicker/jquery.datetimepicker.css', array(), $version );
-			wp_enqueue_script( 'datetimepicker', $assets_url . '/vendor/datetimepicker/jquery.datetimepicker.js', array( 'jquery' ), $version, true );
+			wp_enqueue_script( 'datetimepicker', $assets_url . '/vendor/datetimepicker/build/jquery.datetimepicker.full.min.js', array( 'jquery' ), $version, true );
 
 			return array(
 				'dependencies'	=> array( 'datetimepicker' ),
