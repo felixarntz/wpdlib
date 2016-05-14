@@ -1,6 +1,6 @@
 {
   "name": "wpdlib",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Common library for Definitely plugins for WordPress",
   "keywords": [
     "wordpress",

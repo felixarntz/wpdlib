@@ -1,7 +1,8 @@
 {
   "name": "felixarntz/wpdlib",
+  "type": "wordpress-muplugin",
   "description": "Common library for Definitely plugins for WordPress",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "license": "GPL-3.0",
   "keywords": [
     "wordpress",
@@ -30,5 +31,8 @@
     "psr-4": {
       "WPDLib\\": "inc/WPDLib/"
     }
+  },
+  "require": {
+    "composer/installers": "~1.0"
   }
 }
