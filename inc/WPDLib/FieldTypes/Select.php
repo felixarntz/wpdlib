@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPDLib\FieldTypes\Select class
+ *
  * @package WPDLib
- * @version 0.6.4
+ * @subpackage FieldTypes
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPDLib\FieldTypes;
@@ -82,8 +85,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_dependency_info( 'select2', 'version' );
 
-			wp_enqueue_style( 'select2', $assets_url . '/vendor/select2/dist/css/select2.min.css', array(), $version );
-			wp_enqueue_script( 'select2', $assets_url . '/vendor/select2/dist/js/select2.min.js', array( 'jquery' ), $version, true );
+			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+			wp_enqueue_style( 'select2', $assets_url . '/vendor/select2/dist/css/select2' . $min . '.css', array(), $version );
+			wp_enqueue_script( 'select2', $assets_url . '/vendor/select2/dist/js/select2' . $min . '.js', array( 'jquery' ), $version, true );
 
 			$dependencies = array( 'select2' );
 

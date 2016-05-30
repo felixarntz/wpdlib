@@ -1,6 +1,6 @@
 {
   "name": "datetimepicker",
-  "version": "2.5.1",
+  "version": "2.5.4",
   "main": [
     "build/jquery.datetimepicker.full.min.js",
     "jquery.datetimepicker.css"
@@ -53,13 +53,13 @@
     "type": "git",
     "url": "git://github.com:xdan/datetimepicker.git"
   },
-  "_release": "2.5.1",
+  "_release": "2.5.4",
   "_resolution": {
     "type": "version",
-    "tag": "2.5.1",
-    "commit": "bd4f97e1285ee490a2c514b6d4b383f8e50461e6"
+    "tag": "2.5.4",
+    "commit": "d35c53dd594e1b15dd976e0774de968c55e8c382"
   },
-  "_source": "git://github.com/xdan/datetimepicker.git",
-  "_target": "2.5.1",
+  "_source": "https://github.com/xdan/datetimepicker.git",
+  "_target": "2.5.4",
   "_originalSource": "datetimepicker"
 }

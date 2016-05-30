@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPDLib\FieldTypes\Datetime class
+ *
  * @package WPDLib
- * @version 0.6.4
+ * @subpackage FieldTypes
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPDLib\FieldTypes;
@@ -137,8 +140,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 			$assets_url = ComponentManager::get_base_url() . '/assets';
 			$version = ComponentManager::get_dependency_info( 'datetimepicker', 'version' );
 
+			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 			wp_enqueue_style( 'datetimepicker', $assets_url . '/vendor/datetimepicker/jquery.datetimepicker.css', array(), $version );
-			wp_enqueue_script( 'datetimepicker', $assets_url . '/vendor/datetimepicker/build/jquery.datetimepicker.full.min.js', array( 'jquery' ), $version, true );
+			wp_enqueue_script( 'datetimepicker', $assets_url . '/vendor/datetimepicker/build/jquery.datetimepicker.full' . $min . '.js', array( 'jquery' ), $version, true );
 
 			return array(
 				'dependencies'	=> array( 'datetimepicker' ),

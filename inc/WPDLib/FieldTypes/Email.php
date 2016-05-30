@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPDLib\FieldTypes\Email class
+ *
  * @package WPDLib
- * @version 0.6.4
+ * @subpackage FieldTypes
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPDLib\FieldTypes;

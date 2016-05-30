@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPDLib\FieldTypes\Manager class
+ *
  * @package WPDLib
- * @version 0.6.4
+ * @subpackage FieldTypes
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPDLib\FieldTypes;
@@ -125,9 +128,11 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 				$dependencies[] = 'jquery';
 			}
 
-			wp_enqueue_style( 'wpdlib-fields', $assets_url . '/fields.min.css', array(), $version );
+			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-			wp_enqueue_script( 'wpdlib-fields', $assets_url . '/fields.min.js', $dependencies, $version, true );
+			wp_enqueue_style( 'wpdlib-fields', $assets_url . '/dist/css/fields' . $min . '.css', array(), $version );
+
+			wp_enqueue_script( 'wpdlib-fields', $assets_url . '/dist/js/fields' . $min . '.js', $dependencies, $version, true );
 
 			wp_localize_script( 'wpdlib-fields', '_wpdlib_data', $script_vars );
 		}

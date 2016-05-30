@@ -1,8 +1,11 @@
 <?php
 /**
+ * WPDLib\FieldTypes\Media class
+ *
  * @package WPDLib
- * @version 0.6.4
+ * @subpackage FieldTypes
  * @author Felix Arntz <felix-arntz@leaves-and-love.net>
+ * @since 0.5.0
  */
 
 namespace WPDLib\FieldTypes;
@@ -202,8 +205,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 				wp_enqueue_media();
 			}
 
-			wp_enqueue_style( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.css', array(), $version );
-			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker.min.js', array( 'jquery', 'jquery-ui-widget', 'media-editor' ), $version, true );
+			$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+			wp_enqueue_style( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker' . $min . '.css', array(), $version );
+			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker' . $min . '.js', array( 'jquery', 'jquery-ui-widget', 'media-editor' ), $version, true );
 
 			return array(
 				'dependencies'		=> array( 'media-editor', 'wp-media-picker' ),
