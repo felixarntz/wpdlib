@@ -1,150 +1,141 @@
-# Copyright (c) 2014-2016 Felix Arntz
+# Copyright (C) 2016 wpdlib
+# This file is distributed under the same license as the wpdlib package.
 msgid ""
 msgstr ""
-"Project-Id-Version: wpdlib 0.6.4\n"
-"Report-Msgid-Bugs-To: https://github.com/felixarntz/wpdlib/\n"
-"POT-Creation-Date: 2016-05-14 16:19:51+00:00\n"
+"Project-Id-Version: wpdlib\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
-"Language-Team: Felix Arntz <felix-arntz@leaves-and-love.net>\n"
-"X-Generator: grunt-wp-i18n 0.5.3\n"
-"X-Poedit-Basepath: .\n"
-"X-Poedit-Language: English\n"
-"X-Poedit-Country: UNITED STATES\n"
-"X-Poedit-SourceCharset: uft-8\n"
-"X-Poedit-KeywordsList: __;_e;_x:1,2c;_ex:1,2c;_n:1,2; "
-"_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_attr__; esc_html__;esc_attr_e; "
-"esc_html_e;esc_attr_x:1,2c; esc_html_x:1,2c;\n"
-"X-Poedit-Bookmars: \n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Textdomain-Support: yes\n"
+"Project-Id-Version: WPDLib 0.6.5\n"
+"report-msgid-bugs-to: https://github.com/felixarntz/wpdlib/\n"
+"x-generator: gulp-wp-pot\n"
+"x-poedit-basepath: .\n"
+"x-poedit-language: English\n"
+"x-poedit-country: UNITED STATES\n"
+"x-poedit-sourcecharset: uft-8\n"
+"x-poedit-keywordslist: __;_e;_x:1,2c;_ex:1,2c;_n:1,2; _nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_attr__; esc_html__;esc_attr_e; esc_html_e;esc_attr_x:1,2c; esc_html_x:1,2c;\n"
+"x-poedit-bookmars: \n"
+"x-poedit-searchpath-0: .\n"
+"x-textdomain-support: yes\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n\n"
 
-#: inc/WPDLib/Components/Base.php:160 inc/WPDLib/Components/Manager.php:173
+#: inc/WPDLib/Components/Base.php:163, inc/WPDLib/Components/Manager.php:176
 msgid "Components must not be added later than the %s hook."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:164 inc/WPDLib/Components/Manager.php:177
+#: inc/WPDLib/Components/Base.php:167, inc/WPDLib/Components/Manager.php:180
 msgid "The object is not a component."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:171
-msgid ""
-"The component %1$s of class %2$s is not a valid child for the component "
-"%3$s."
+#: inc/WPDLib/Components/Base.php:174
+msgid "The component %1$s of class %2$s is not a valid child for the component %3$s."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:180 inc/WPDLib/Components/Manager.php:191
+#: inc/WPDLib/Components/Base.php:183, inc/WPDLib/Components/Manager.php:194
 msgid "A component of class %1$s with slug %2$s already exists."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:296
-msgid ""
-"The component %1$s of class %2$s already has a parent assigned and is not a "
-"multiparent component."
+#: inc/WPDLib/Components/Base.php:299
+msgid "The component %1$s of class %2$s already has a parent assigned and is not a multiparent component."
 msgstr ""
 
-#: inc/WPDLib/Components/Base.php:302
+#: inc/WPDLib/Components/Base.php:305
 msgid "A component with an empty slug is not allowed."
 msgstr ""
 
-#: inc/WPDLib/Components/Manager.php:182
+#: inc/WPDLib/Components/Manager.php:185
 msgid "The component %1$s of class %2$s is not a valid toplevel component."
 msgstr ""
 
-#: inc/WPDLib/Components/Menu.php:144
+#: inc/WPDLib/Components/Menu.php:147
 msgid "Menu label"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Checkbox.php:38
+#: inc/WPDLib/FieldTypes/Checkbox.php:41
 msgid "Enable?"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Color.php:61
+#: inc/WPDLib/FieldTypes/Color.php:64
 msgid "%s is not a valid hexadecimal color."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Datetime.php:170
+#: inc/WPDLib/FieldTypes/Datetime.php:175
 msgid "The date %1$s is invalid. It must not occur earlier than %2$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Datetime.php:192
+#: inc/WPDLib/FieldTypes/Datetime.php:197
 msgid "The date %1$s is invalid. It must not occur later than %2$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Email.php:39
+#: inc/WPDLib/FieldTypes/Email.php:42
 msgid "%s is not a valid email address."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Map.php:45
+#: inc/WPDLib/FieldTypes/Map.php:48
 msgid "Enter coords in the format &quot;latitude|longitude&quot;"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Map.php:106
-msgid ""
-"The string %s is not in valid geo coordinates format. It must be specified "
-"in the format &quot;latitude|longitude&quot;."
+#: inc/WPDLib/FieldTypes/Map.php:109
+msgid "The string %s is not in valid geo coordinates format. It must be specified in the format &quot;latitude|longitude&quot;."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Map.php:114
+#: inc/WPDLib/FieldTypes/Map.php:117
 msgid "The latitude %1$s is invalid. It must be between %2$s and %3$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Map.php:118
+#: inc/WPDLib/FieldTypes/Map.php:121
 msgid "The longitude %1$s is invalid. It must be between %2$s and %3$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:111
+#: inc/WPDLib/FieldTypes/Media.php:114
 msgid "The URL %s does not point to a WordPress media file."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:119
+#: inc/WPDLib/FieldTypes/Media.php:122
 msgid "The post with ID %s is not a valid WordPress media file."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:124
+#: inc/WPDLib/FieldTypes/Media.php:127
 msgid "The media item with ID %1$s is neither of the valid formats (%2$s)."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:211 inc/WPDLib/FieldTypes/Media.php:214
+#: inc/WPDLib/FieldTypes/Media.php:216, inc/WPDLib/FieldTypes/Media.php:219
 msgid "Choose a File"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:212
+#: inc/WPDLib/FieldTypes/Media.php:217
 msgid "Choose another File"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:213 inc/WPDLib/FieldTypes/Repeatable.php:298
+#: inc/WPDLib/FieldTypes/Media.php:218, inc/WPDLib/FieldTypes/Repeatable.php:301
 msgid "Remove"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Media.php:215
+#: inc/WPDLib/FieldTypes/Media.php:220
 msgid "Insert File"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Number.php:82
+#: inc/WPDLib/FieldTypes/Number.php:85
 msgid "The number %1$s is invalid since it is not divisible by %2$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Number.php:86
+#: inc/WPDLib/FieldTypes/Number.php:89
 msgid "The number %1$s is invalid. It must be greater than or equal to %2$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Number.php:90
+#: inc/WPDLib/FieldTypes/Number.php:93
 msgid "The number %1$s is invalid. It must be lower than or equal to %2$s."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Radio.php:242 inc/WPDLib/FieldTypes/Radio.php:277
+#: inc/WPDLib/FieldTypes/Radio.php:245, inc/WPDLib/FieldTypes/Radio.php:280
 msgid "%s is not a valid option."
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Repeatable.php:108
+#: inc/WPDLib/FieldTypes/Repeatable.php:111
 msgid "Add new"
 msgstr ""
 
-#: inc/WPDLib/FieldTypes/Repeatable.php:269
-#: inc/WPDLib/FieldTypes/Repeatable.php:272
+#: inc/WPDLib/FieldTypes/Repeatable.php:272, inc/WPDLib/FieldTypes/Repeatable.php:275
 msgid "%s."
 msgstr ""

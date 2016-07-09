@@ -64,7 +64,7 @@ var paths = {
 /* ---- MAIN TASKS ---- */
 
 // general task (compile Sass and JavaScript and refresh POT file)
-gulp.task( 'default', [ 'sass', 'js' ]);
+gulp.task( 'default', [ 'sass', 'js', 'pot' ]);
 
 // watch Sass and JavaScript files
 gulp.task( 'watch', function() {
