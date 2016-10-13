@@ -48,12 +48,15 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 					$data_placeholder = array_merge_recursive( json_decode( $args['data-placeholder'], true ), $data_placeholder );
 				}
 				$args['data-placeholder'] = json_encode( $data_placeholder );
+				if ( ( ! isset( $args['multiple'] ) || ! $args['multiple'] ) && ! isset( $args['data-allow-clear'] ) ) {
+					$args['data-allow-clear'] = 'true';
+				}
 			}
 			unset( $args['placeholder'] );
 			unset( $args['options'] );
 
 			$output = '<select' . FieldManager::make_html_attributes( $args, false, false ) . '>';
-			if ( ! empty( $this->args['placeholder'] ) ) {
+			if ( ( ! isset( $args['multiple'] ) || ! $args['multiple'] ) && ! empty( $this->args['placeholder'] ) ) {
 				$output .= '<option value=""' . ( empty( $val ) ? ' selected="selected"' : '' ) . '>' . esc_html( $this->args['placeholder'] ) . '</option>';
 			}
 			foreach ( $this->args['options'] as $value => $label ) {
@@ -66,6 +69,21 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			}
 
 			return $output;
+		}
+
+		/**
+		 * Validates a value for the field.
+		 *
+		 * @since 0.5.0
+		 * @param mixed $val the current value of the field
+		 * @return string|array|WP_Error the validated field value or an error object
+		 */
+		public function validate( $val = null ) {
+			if ( ! empty( $this->args['placeholder'] ) && $this->is_empty( $val ) ) {
+				return $this->parse( $val );
+			}
+
+			return parent::validate( $val );
 		}
 
 		/**

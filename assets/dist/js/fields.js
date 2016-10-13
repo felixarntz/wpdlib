@@ -427,11 +427,14 @@
 			}
 
 			var $option = $( selection.element );
+			var option_data = $option.data();
 
-			if ( $option.data().hasOwnProperty( 'image' ) ) {
-				return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
-			} else if ( $option.data().hasOwnProperty( 'color' ) ) {
-				return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
+			if ( option_data ) {
+				if ( option_data.hasOwnProperty( 'image' ) ) {
+					return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-image:url(' + $option.data( 'image' ) + ');"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
+				} else if ( option_data.hasOwnProperty( 'color' ) ) {
+					return $( '<div class="wpdlib-option-box-wrap"><div class="wpdlib-option-box" style="background-color:#' + $option.data( 'color' ) + ';"></div><span class="wpdlib-option-box-text">' + selection.text + '</span></div>' );
+				}
 			}
 
 			return selection.text;
