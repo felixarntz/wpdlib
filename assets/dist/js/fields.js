@@ -94,7 +94,11 @@
 			self.datetimepicker_args = {
 				formatDate: 'Y-m-d',
 				formatTime: 'H:i',
-				dayOfWeekStart: self.args.start_of_week
+				dayOfWeekStart: self.args.start_of_week,
+				scrollMonth: false,
+				scrollTime: false,
+				scrollInput: false,
+				validateOnBlur: false
 			};
 
 			self.colorpicker_args = {

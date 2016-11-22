@@ -238,7 +238,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Datetime' ) ) {
 		protected function untranslate( $val ) {
 			self::maybe_init_locale();
 
-			return preg_replace_callback( '/[A-Za-z]+/', array( $this, 'untranslate_replace' ), $val );
+			return preg_replace_callback( '/[A-Za-zÄäÖöÜüß]+/', array( $this, 'untranslate_replace' ), $val );
 		}
 
 		/**
