@@ -11,8 +11,8 @@ var config = {
 	authorEmail: pkg.author.email,
 	description: pkg.description,
 	version: pkg.version,
-	license: pkg.license.name,
-	licenseURI: pkg.license.url,
+	license: 'GNU General Public License v3',
+	licenseURI: 'http://www.gnu.org/licenses/gpl-3.0.html',
 	translateURI: 'https://github.com/felixarntz/' + pkg.name + '/'
 };
 
