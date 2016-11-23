@@ -144,9 +144,9 @@ if ( ! class_exists( 'WPDLib\Components\Menu' ) ) {
 		 */
 		protected function get_defaults() {
 			$defaults = array(
-				'label'			=> __( 'Menu label', 'wpdlib' ),
-				'icon'			=> '',
-				'position'		=> null,
+				'label'    => __( 'Menu label', 'wpdlib' ),
+				'icon'     => '',
+				'position' => null,
 			);
 
 			/**

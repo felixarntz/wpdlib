@@ -346,9 +346,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Manager' ) ) {
 			}
 
 			$replace_types = array(
-				'radio'		=> 'select',
-				'multibox'	=> 'multiselect',
-				'textarea'	=> 'text',
+				'radio'    => 'select',
+				'multibox' => 'multiselect',
+				'textarea' => 'text',
 			);
 
 			if ( isset( $replace_types[ $field_type ] ) ) {

@@ -52,7 +52,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'repeatable'	=> array(),
+				'repeatable' => array(),
 			) );
 			if ( ! is_array( $args['repeatable'] ) ) {
 				$args['repeatable'] = array();
@@ -94,14 +94,14 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			}
 
 			$args = array(
-				'id'			=> $this->args['id'],
-				'class'			=> $this->args['class'],
-				'data-limit'	=> $this->args['repeatable']['limit'],
+				'id'         => $this->args['id'],
+				'class'      => $this->args['class'],
+				'data-limit' => $this->args['repeatable']['limit'],
 			);
 
 			$button_args = array(
-				'class'			=> 'wpdlib-new-repeatable-button button',
-				'href'			=> '#',
+				'class' => 'wpdlib-new-repeatable-button button',
+				'href'  => '#',
 			);
 			if ( $this->args['repeatable']['limit'] > 0 && count( $val ) == $this->args['repeatable']['limit'] ) {
 				$button_args['style'] = 'display:none;';
@@ -217,10 +217,10 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			if ( $formatted ) {
 				if ( is_array( $formatted ) ) {
 					$formatted = wp_parse_args( $formatted, array(
-						'mode'			=> 'array',
-						'template'		=> '',
-						'before'		=> '',
-						'after'			=> '',
+						'mode'     => 'array',
+						'template' => '',
+						'before'   => '',
+						'after'    => '',
 					) );
 
 					if ( 'template' === $formatted['mode'] ) {
@@ -248,8 +248,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			$script_vars['repeatable_field_templates'][ $this->args['id'] ] = $this->display_item( '{{' . 'KEY' . '}}', array(), false );
 
 			return array(
-				'dependencies'	=> $dependencies,
-				'script_vars'	=> $script_vars,
+				'dependencies' => $dependencies,
+				'script_vars'  => $script_vars,
 			);
 		}
 
@@ -292,9 +292,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Repeatable' ) ) {
 			}
 
 			$button_args = array(
-				'class'			=> 'wpdlib-remove-repeatable-button',
-				'href'			=> '#',
-				'data-number'	=> $key,
+				'class'       => 'wpdlib-remove-repeatable-button',
+				'href'        => '#',
+				'data-number' => $key,
 			);
 
 			$output .= '<td class="wpdlib-repeatable-remove">';

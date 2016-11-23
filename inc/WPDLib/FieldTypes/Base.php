@@ -62,13 +62,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Base' ) ) {
 		public function __construct( $type, $args ) {
 			$this->type = $type;
 			$this->args = wp_parse_args( $args, array(
-				'id'			=> '',
-				'name'			=> '',
-				'class'			=> '',
-				'placeholder'	=> '',
-				'required'		=> false,
-				'readonly'		=> false,
-				'disabled'		=> false,
+				'id'          => '',
+				'name'        => '',
+				'class'       => '',
+				'placeholder' => '',
+				'required'    => false,
+				'readonly'    => false,
+				'disabled'    => false,
 			) );
 			if ( isset( $this->args['label'] ) ) {
 				unset( $this->args['label'] );

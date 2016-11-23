@@ -52,7 +52,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Url' ) ) {
 					$formatted = array();
 				}
 				$formatted = wp_parse_args( $formatted, array(
-					'mode'	=> 'text',
+					'mode' => 'text',
 				) );
 				switch ( $formatted['mode'] ) {
 					case 'link':

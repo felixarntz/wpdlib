@@ -36,17 +36,17 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 		 */
 		public function display( $val, $echo = true ) {
 			$wp_editor_settings = array(
-				'textarea_name'	=> $this->args['name'],
-				'textarea_rows'	=> $this->args['rows'],
-				'editor_class'	=> $this->args['class'],
-				'default_editor'=> user_can_richedit() ? 'tinymce' : 'html',
-				'wpautop'		=> true,
-				'media_buttons'	=> true,
-				'quicktags'		=> array(
-					'buttons' => 'strong,em,u,link,block,del,ins,img,ul,ol,li,code,close',
+				'textarea_name'  => $this->args['name'],
+				'textarea_rows'  => $this->args['rows'],
+				'editor_class'   => $this->args['class'],
+				'default_editor' => user_can_richedit() ? 'tinymce' : 'html',
+				'wpautop'        => true,
+				'media_buttons'  => true,
+				'quicktags'      => array(
+					'buttons'        => 'strong,em,u,link,block,del,ins,img,ul,ol,li,code,close',
 				),
-				'tinymce'		=> array(
-					'toolbar1' => 'bold,italic,strikethrough,bullist,numlist,blockquote,hr,alignleft,aligncenter,alignright,link,unlink,spellchecker,wp_adv',
+				'tinymce'        => array(
+					'toolbar1'       => 'bold,italic,strikethrough,bullist,numlist,blockquote,hr,alignleft,aligncenter,alignright,link,unlink,spellchecker,wp_adv',
 				),
 			);
 
@@ -91,8 +91,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Wysiwyg' ) ) {
 					$formatted = array();
 				}
 				$formatted = wp_parse_args( $formatted, array(
-					'wpautop'		=> true,
-					'shortcode'		=> false,
+					'wpautop'   => true,
+					'shortcode' => false,
 				) );
 
 				if ( $formatted['wpautop'] ) {

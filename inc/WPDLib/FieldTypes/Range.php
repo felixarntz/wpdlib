@@ -39,12 +39,12 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Range' ) ) {
 			$args = array_merge( $args, $this->data_atts );
 
 			$text_args = array(
-				'id'	=> $args['id'] . '-' . $this->type . '-viewer',
-				'class'	=> 'wpdlib-input-' . $this->type . '-viewer',
-				'value'	=> $args['value'],
-				'min'	=> $args['min'],
-				'max'	=> $args['max'],
-				'step'	=> $args['step'],
+				'id'    => $args['id'] . '-' . $this->type . '-viewer',
+				'class' => 'wpdlib-input-' . $this->type . '-viewer',
+				'value' => $args['value'],
+				'min'   => $args['min'],
+				'max'   => $args['max'],
+				'step'  => $args['step'],
 			);
 
 			$output = '<input type="number"' . FieldManager::make_html_attributes( $text_args, false, false ) . ' />';

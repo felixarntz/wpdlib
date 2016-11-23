@@ -39,9 +39,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Number' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'min'	=> '',
-				'max'	=> '',
-				'step'	=> 1,
+				'min'  => '',
+				'max'  => '',
+				'step' => 1,
 			) );
 			parent::__construct( $type, $args );
 		}

@@ -45,8 +45,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'store'			=> 'id',
-				'mime_types'	=> 'all',
+				'store'      => 'id',
+				'mime_types' => 'all',
 			) );
 
 			if ( 'url' !== $args['store'] ) {
@@ -75,7 +75,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			$mime_types = $this->verify_mime_types( $args['mime_types'] );
 			if ( $mime_types ) {
 				$args['data-query'] = json_encode( array(
-					'post_mime_type'	=> $mime_types,
+					'post_mime_type' => $mime_types,
 				) );
 			}
 
@@ -165,9 +165,9 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 					$formatted = array();
 				}
 				$formatted = wp_parse_args( $formatted, array(
-					'mode'		=> 'field',
-					'field'		=> 'url',
-					'template'	=> '',
+					'mode'     => 'field',
+					'field'    => 'url',
+					'template' => '',
 				) );
 				$attachment_id = $val;
 				if ( 'url' === $this->args['store'] ) {
@@ -211,13 +211,13 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Media' ) ) {
 			wp_enqueue_script( 'wp-media-picker', $assets_url . '/vendor/wp-media-picker/wp-media-picker' . $min . '.js', array( 'jquery', 'jquery-ui-widget', 'media-editor' ), $version, true );
 
 			return array(
-				'dependencies'		=> array( 'media-editor', 'wp-media-picker' ),
-				'script_vars'		=> array(
-					'media_i18n_add'		=> __( 'Choose a File', 'wpdlib' ),
-					'media_i18n_replace'	=> __( 'Choose another File', 'wpdlib' ),
-					'media_i18n_remove'		=> __( 'Remove', 'wpdlib' ),
-					'media_i18n_modal'		=> __( 'Choose a File', 'wpdlib' ),
-					'media_i18n_button'		=> __( 'Insert File', 'wpdlib' ),
+				'dependencies'       => array( 'media-editor', 'wp-media-picker' ),
+				'script_vars'        => array(
+					'media_i18n_add'     => __( 'Choose a File', 'wpdlib' ),
+					'media_i18n_replace' => __( 'Choose another File', 'wpdlib' ),
+					'media_i18n_remove'  => __( 'Remove', 'wpdlib' ),
+					'media_i18n_modal'   => __( 'Choose a File', 'wpdlib' ),
+					'media_i18n_button'  => __( 'Insert File', 'wpdlib' ),
 				),
 			);
 		}

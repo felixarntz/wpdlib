@@ -41,8 +41,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 
 			if ( ! empty( $args['placeholder'] ) ) {
 				$data_placeholder = array(
-					'id'	=> '',
-					'text'	=> $args['placeholder'],
+					'id'   => '',
+					'text' => $args['placeholder'],
 				);
 				if ( isset( $args['data-placeholder'] ) ) {
 					$data_placeholder = array_merge_recursive( json_decode( $args['data-placeholder'], true ), $data_placeholder );
@@ -122,7 +122,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 			}
 
 			return array(
-				'dependencies'	=> $dependencies,
+				'dependencies' => $dependencies,
 			);
 		}
 
@@ -140,8 +140,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Select' ) ) {
 		 */
 		protected function display_item( $value, $label, $single_type, $id, $name, $current = '', $echo = true ) {
 			$option_atts = array(
-				'value'		=> $value,
-				'selected'	=> $this->is_value_checked_or_selected( $current, $value ),
+				'value'    => $value,
+				'selected' => $this->is_value_checked_or_selected( $current, $value ),
 			);
 
 			if ( is_array( $label ) ) {

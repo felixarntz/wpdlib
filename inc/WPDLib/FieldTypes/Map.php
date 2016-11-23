@@ -39,7 +39,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'store'			=> 'address',
+				'store' => 'address',
 			) );
 
 			if ( 'coords' !== $args['store'] ) {
@@ -196,7 +196,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 
 			$gmaps_url = 'https://maps.google.com/maps/api/js';
 			$gmaps_args = array(
-				'language'	=> str_replace( '_', '-', get_locale() ),
+				'language' => str_replace( '_', '-', get_locale() ),
 			);
 			if ( ( $api_key = self::get_api_key() ) ) {
 				$gmaps_args['key'] = $api_key;
@@ -211,7 +211,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Map' ) ) {
 			wp_enqueue_script( 'wp-map-picker', $assets_url . '/vendor/wp-map-picker/wp-map-picker' . $min . '.js', array( 'jquery', 'jquery-ui-widget', 'jquery-ui-autocomplete', 'google-maps' ), $version, true );
 
 			return array(
-				'dependencies'		=> array( 'wp-map-picker' ),
+				'dependencies' => array( 'wp-map-picker' ),
 			);
 		}
 

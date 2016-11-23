@@ -39,7 +39,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'options'	=> array(),
+				'options' => array(),
 			) );
 			parent::__construct( $type, $args );
 
@@ -60,8 +60,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 		 */
 		public function display( $val, $echo = true ) {
 			$args = array(
-				'id'	=> $this->args['id'],
-				'class'	=> $this->args['class'],
+				'id'    => $this->args['id'],
+				'class' => $this->args['class'],
 			);
 
 			$name = $this->get_sanitized_name();
@@ -303,7 +303,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					$formatted = array();
 				}
 				$formatted = wp_parse_args( $formatted, array(
-					'mode'		=> 'text',
+					'mode' => 'text',
 				) );
 				return $this->format_item( $val, $formatted );
 			}
@@ -328,8 +328,8 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Radio' ) ) {
 					$formatted = array();
 				}
 				$formatted = wp_parse_args( $formatted, array(
-					'mode'		=> 'text',
-					'list'		=> false,
+					'mode' => 'text',
+					'list' => false,
 				) );
 				$list_separator = ( 'html' == $formatted['mode'] ) ? ' ' : ', ';
 				foreach ( (array) $val as $_val) {

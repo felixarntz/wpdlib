@@ -37,7 +37,7 @@ if ( ! class_exists( 'WPDLib\FieldTypes\Textarea' ) ) {
 		 */
 		public function __construct( $type, $args ) {
 			$args = wp_parse_args( $args, array(
-				'rows'	=> 5,
+				'rows' => 5,
 			) );
 			parent::__construct( $type, $args );
 		}
