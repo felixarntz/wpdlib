@@ -2,7 +2,7 @@
   "name": "felixarntz/wpdlib",
   "type": "wordpress-muplugin",
   "description": "Common library for Definitely plugins for WordPress",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "license": "GPL-3.0",
   "keywords": [
     "wordpress",
